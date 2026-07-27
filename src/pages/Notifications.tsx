@@ -9,14 +9,14 @@ export default function Notifications() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto h-full flex flex-col">
+    <div className="p-6 md:p-10 w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-[#36c0c9]/10 rounded-xl">
+          <div className="p-3 rounded-xl">
             <Bell className="w-6 h-6 text-[#0E7C86]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold font-['Poppins'] text-[#0D212C]">Notifications</h1>
+            <h1 className="text-2xl font-semibold font-['Poppins'] text-[#0D212C]">Notifications</h1>
             <p className="text-gray-500 text-sm mt-1">Stay updated with your latest reports and activities.</p>
           </div>
         </div>
@@ -25,10 +25,10 @@ export default function Notifications() {
         </div>
       </div>
 
-      <div className="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-y-auto flex-1 custom-scrollbar p-6">
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="overflow-y-auto flex-1 custom-scrollbar py-2">
           {notifications.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-400 p-10">
+            <div className="h-64 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col items-center justify-center text-gray-400 p-10">
               <Bell className="w-16 h-16 mb-4 opacity-20" />
               <p className="text-lg font-medium text-gray-500">No notifications yet</p>
               <p className="text-sm mt-2">When your reports are generated, they will appear here.</p>

@@ -368,7 +368,7 @@ export default function Layout() {
           </div>
           
           <div className="flex items-center gap-6">
-            {!location.pathname.startsWith('/new') && location.pathname !== '/' && (
+            {!location.pathname.startsWith('/new') && location.pathname !== '/' && !location.pathname.includes('/notifications') && !location.pathname.includes('/reports') && (
               <div className="relative hidden md:block w-80">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 

@@ -207,21 +207,7 @@ export default function GenerateReport() {
               {/* Timeline line connecting dots */}
               <div className="absolute left-[23px] top-3 bottom-3 w-[2px] bg-gray-100 z-0" />
               
-              {!showAllSteps && stepIndex >= 4 && (
-                <button 
-                  onClick={() => setShowAllSteps(true)}
-                  className="text-[13px] font-medium text-[#36c0c9] hover:text-[#2a9a9f] self-start ml-6 transition-colors relative z-10 bg-white px-1"
-                >
-                  Show previous steps
-                </button>
-              )}
-              
               {currentSteps.map((step, idx) => {
-                if (!showAllSteps && !isComplete) {
-                  const minVisible = Math.max(0, stepIndex - 3);
-                  const maxVisible = minVisible + 4;
-                  if (idx < minVisible || idx > maxVisible) return null;
-                }
                 
                 const isDone = isComplete || idx < stepIndex;
                 const isActive = !isComplete && idx === stepIndex;

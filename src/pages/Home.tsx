@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
-import { Plus, FileText, ChevronRight, Clock, Filter, ArrowUpDown, MoreVertical, Pin, Globe, Calendar, ShieldCheck } from 'lucide-react';
+import { Plus, FileText, ChevronRight, Clock, Filter, ArrowUpDown, MoreVertical, Pin, Globe, Calendar, ShieldCheck, Search } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
 import { motion } from 'framer-motion';
 
@@ -24,7 +24,7 @@ function useOnClickOutside(ref: React.RefObject<any>, handler: (event: MouseEven
 
 export default function Home() {
   const navigate = useNavigate();
-  const { threads, loadThreads, deleteThread, updateThread, searchQuery } = useAppStore();
+  const { threads, loadThreads, deleteThread, updateThread, searchQuery, setSearchQuery } = useAppStore();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(menuRef, () => setActiveMenuId(null));
@@ -167,9 +167,20 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="relative" ref={sortRef}>
-              <button 
-                onClick={() => setIsSortOpen(!isSortOpen)}
+            <div className="flex items-center gap-4">
+              <div className="relative hidden md:block w-64">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search reports..." 
+                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors placeholder-gray-400 text-gray-700 shadow-sm" 
+                />
+              </div>
+              <div className="relative" ref={sortRef}>
+                <button 
+                  onClick={() => setIsSortOpen(!isSortOpen)}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
               >
                 <ArrowUpDown className="w-4 h-4 text-gray-500" />
@@ -197,6 +208,7 @@ export default function Home() {
                   </button>
                 </div>
               )}
+            </div>
             </div>
           </div>
 
@@ -263,10 +275,11 @@ export default function Home() {
                       Generating
                     </div>
                   )}
-                  {thread.isPinnedOnHome && (
-                    <Pin className="w-3 h-3 text-gray-400 fill-gray-400" />
-                  )}
                 </div>
+                <div className="flex items-center gap-2">
+                  {thread.isPinnedOnHome && (
+                    <Pin className="w-4 h-4 text-[#36c0c9] fill-[#36c0c9]" />
+                  )}
                   {thread.status !== 'generating' && (
                     <div className="relative" ref={activeMenuId === thread.id ? menuRef : null}>
                       <button 
@@ -285,6 +298,7 @@ export default function Home() {
                     </div>
                   )}
                 </div>
+              </div>
               
               <div className="relative group/title">
                 <h3 className="font-semibold text-[17px] text-[#0D212C] mb-3 truncate font-['Poppins']">
