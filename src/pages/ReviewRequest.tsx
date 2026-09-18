@@ -61,7 +61,7 @@ export default function ReviewRequest() {
               <FileSearch className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[1.125rem] font-semibold font-['Poppins'] text-[var(--color-ink)]">Health Tech Landscape Report</h2>
+              <h2 className="text-[1.125rem] font-medium font-['Poppins'] text-[var(--color-ink)]">Health Tech Landscape Report</h2>
               <p className="text-[var(--color-ink-muted)] text-[0.8125rem]">Health Tech Landscape Report analysis</p>
             </div>
           </div>

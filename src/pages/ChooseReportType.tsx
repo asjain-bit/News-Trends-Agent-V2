@@ -34,7 +34,7 @@ export default function ChooseReportType() {
             <ReportBarsIcon className="w-5 h-5 text-[#0D212C]" />
           </div>
           <div className="flex flex-col gap-1.5 max-w-3xl">
-            <h2 className="text-[1.125rem] font-bold font-['Poppins'] text-[#0D212C] leading-snug">
+            <h2 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] leading-snug">
               Health Tech Landscape Report
             </h2>
             <p className="text-[0.875rem] text-slate-500 font-normal leading-relaxed">
