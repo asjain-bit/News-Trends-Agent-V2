@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
-import { Home, FileText, LogOut, Search, PanelLeftClose, PanelRightClose, Menu, MessageSquare, Pin, MoreVertical, AlertTriangle, Plus, Trash2, X, CheckCircle, Bell } from 'lucide-react';
+import { Home, FileText, LogOut, Search, PanelLeftClose, PanelRightClose, Menu, MessageSquare, Pin, MoreVertical, AlertTriangle, Plus, Trash2, X, CheckCircle, Bell, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notificationService } from '../services/notificationService';
 
@@ -355,13 +355,24 @@ export default function Layout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F6F7FB]">
         {/* Topbar */}
         <header className="h-16 flex items-center justify-between px-6 md:px-10 shrink-0 z-30 bg-white border-b border-gray-200">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
               className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-md hover:bg-gray-100 transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
+            {location.pathname.includes('/notifications') && (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="p-1.5 -ml-1 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer flex items-center justify-center"
+                title="Go back"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
             <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
               {getPageTitle()}
             </h1>

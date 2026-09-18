@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
-import { Bell, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
+import { Bell, CheckCircle, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Notifications() {
@@ -11,20 +11,9 @@ export default function Notifications() {
   return (
     <div className="p-6 md:p-10 w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-xl hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer flex items-center justify-center"
-            title="Go back"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-[1.375rem] font-semibold font-['Poppins'] text-[#0D212C]">Notifications</h1>
-            <p className="text-gray-500 text-[0.875rem] mt-0.5">Stay updated with your latest reports and activities.</p>
-          </div>
+        <div>
+          <h1 className="text-[1.375rem] font-semibold font-['Poppins'] text-[#0D212C]">Notifications</h1>
+          <p className="text-gray-500 text-[0.875rem] mt-0.5">Stay updated with your latest reports and activities.</p>
         </div>
         <div className="text-[0.8125rem] font-medium bg-[#36c0c9]/10 text-[#0E7C86] px-3.5 py-1.5 rounded-full">
           {notifications.filter(n => !n.read).length} Unread
