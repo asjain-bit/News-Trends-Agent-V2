@@ -74,8 +74,8 @@ export const ReportCallout: React.FC<ReportCalloutProps> = ({ data, isWordDocume
   if (isWordDocument) {
     return (
       <div className={`my-8 rounded-2xl p-6 ${style.wrapper} border`}>
-        <h4 className={`text-lg font-bold mb-2 ${style.title}`}>{data.title}</h4>
-        <p className="leading-relaxed text-gray-800">{data.content}</p>
+        <h4 className={`text-[1rem] font-semibold mb-1.5 ${style.title}`}>{data.title}</h4>
+        <p className="leading-relaxed text-gray-800 text-[0.875rem]">{data.content}</p>
       </div>
     );
   }
@@ -85,19 +85,19 @@ export const ReportCallout: React.FC<ReportCalloutProps> = ({ data, isWordDocume
       initial={{ opacity: 0, scale: 0.98 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className={`my-8 p-6 rounded-2xl border ${style.wrapper} flex flex-col sm:flex-row gap-5 items-start shadow-sm`}
+      className={`my-8 p-6 rounded-2xl border ${style.wrapper} flex flex-col sm:flex-row gap-4 items-start shadow-sm`}
     >
-      <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${style.iconContainer}`}>
+      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${style.iconContainer}`}>
         {style.icon}
       </div>
       <div>
-        <div className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">
+        <div className="text-[0.6875rem] font-bold uppercase tracking-widest text-gray-500 mb-1">
           {data.calloutType}
         </div>
-        <h4 className={`text-lg font-bold mb-2 ${style.title}`}>
+        <h4 className={`text-[1rem] font-semibold mb-1.5 ${style.title}`}>
           {data.title}
         </h4>
-        <p className="text-gray-700 leading-relaxed text-[15px]">
+        <p className="text-gray-700 leading-relaxed text-[0.875rem]">
           {data.content}
         </p>
       </div>

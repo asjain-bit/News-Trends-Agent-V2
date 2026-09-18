@@ -13,7 +13,7 @@ export interface ReportTypeConfig {
 export const REPORT_TYPES: Record<string, ReportTypeConfig> = {
   techLandscape: {
     id: "techLandscape",
-    label: "Tech Landscape",
+    label: "Health Tech Landscape Report",
     description: "Generate comprehensive landscape intelligence reports.",
     status: "active",
     required: ["country", "techDomain", "depth"],

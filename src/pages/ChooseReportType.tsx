@@ -1,138 +1,62 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { REPORT_TYPES } from '../config/reportTypes';
-import { Lock, Paperclip, Send, BarChart3, Activity, User, Sparkles, Mic, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+// Equalizer/Bar icon matching reference image
+const ReportBarsIcon = ({ className = "w-5 h-5 text-[#0D212C]" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <rect x="3.5" y="9" width="2.75" height="9" rx="1.375" />
+    <rect x="9.75" y="4" width="2.75" height="15" rx="1.375" />
+    <rect x="16" y="11" width="2.75" height="7" rx="1.375" />
+  </svg>
+);
 
 export default function ChooseReportType() {
   const navigate = useNavigate();
-  const [prompt, setPrompt] = useState('');
 
-  const handleSelect = (id: string, status: string) => {
-    if (status === 'active') {
-      navigate(`/new/tech`);
-    }
+  const handleStart = () => {
+    navigate('/new/tech');
   };
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0 }
-  };
-
-  const suggestedPrompts = [
-    "AI Landscape in UAE",
-    "Banking Technology in Saudi Arabia",
-    "Healthcare AI Trends",
-    "FinTech Investment Landscape",
-    "Semiconductor Market Analysis"
-  ];
 
   return (
-    <div className="w-full mx-auto px-6 lg:px-10 py-10 h-[calc(100vh-80px)] flex flex-col">
-      
-      <div className="mb-10">
-        <h1 className="text-[24px] font-semibold font-['Poppins'] text-[#0D212C] mb-1 tracking-tight">Create a new intelligence report</h1>
-        <p className="text-gray-500 text-[15px]">Choose a report type and describe what you want to research.</p>
-      </div>
-
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12"
+    <div className="w-full px-6 lg:px-12 py-8 md:py-10 flex flex-col">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={handleStart}
+        className="w-full bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md hover:border-slate-300/80 transition-all duration-300 ease-out cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-6 group"
       >
-        {/* Tech Landscape */}
-        <motion.div
-          variants={item}
-          onClick={() => handleSelect(REPORT_TYPES.techLandscape.id, REPORT_TYPES.techLandscape.status)}
-          className={`relative p-6 rounded-[20px] border transition-all flex flex-col cursor-pointer bg-white border-[#36c0c9]/30 shadow-sm hover:shadow-md hover:bg-cyan-50/40 hover:border-[#36c0c9]/60 min-h-[260px]`}
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center text-[#0D212C]">
-                <BarChart3 className="w-6 h-6" strokeWidth={2} />
-              </div>
-              <h2 className="text-[18px] font-semibold font-['Poppins'] text-[#0D212C]">
-                Tech Landscape
-              </h2>
-            </div>
-            <div className="bg-emerald-50 text-emerald-600 text-[11px] font-medium px-2.5 py-1 rounded-full border border-emerald-200/50 capitalize tracking-wide mt-2 whitespace-nowrap">
-              Available
-            </div>
+        {/* Left Side: Icon, Title & Subtext */}
+        <div className="flex items-start gap-4 flex-1">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+            <ReportBarsIcon className="w-5 h-5 text-[#0D212C]" />
           </div>
-          
-          <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
-            Technology market analysis for a selected country, covering trends, competitors, investments, and regulations.
-          </p>
+          <div className="flex flex-col gap-1.5 max-w-3xl">
+            <h2 className="text-[1.125rem] font-bold font-['Poppins'] text-[#0D212C] leading-snug">
+              Health Tech Landscape Report
+            </h2>
+            <p className="text-[0.875rem] text-slate-500 font-normal leading-relaxed">
+              Healthcare technology market analysis for a selected country, covering trends, competitors, investments, and regulations.
+            </p>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-2 text-[#36c0c9] font-semibold text-sm mt-auto">
-            Start Report <ArrowRight className="w-4 h-4" />
-          </div>
-        </motion.div>
-
-        {/* Healthcare Country */}
-        <motion.div
-          variants={item}
-          className="relative p-6 rounded-[20px] border border-gray-200 flex flex-col bg-gray-50 shadow-sm opacity-90 cursor-not-allowed min-h-[260px]"
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center text-gray-400">
-                <Activity className="w-6 h-6" strokeWidth={2} />
-              </div>
-              <h2 className="text-[18px] font-semibold font-['Poppins'] text-gray-400">
-                Healthcare Country
-              </h2>
-            </div>
-            <div className="bg-gray-100 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200/60 capitalize tracking-wide mt-2 whitespace-nowrap">
-              Coming Soon
-            </div>
-          </div>
-          
-          <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
-            Healthcare ecosystem analysis covering providers, policies, investments, and market trends.
-          </p>
-
-          <div className="flex items-center gap-2 text-gray-400 font-medium text-sm mt-auto">
-            <Lock className="w-3.5 h-3.5" /> Coming soon
-          </div>
-        </motion.div>
-
-        {/* Personality */}
-        <motion.div
-          variants={item}
-          className="relative p-6 rounded-[20px] border border-gray-200 flex flex-col bg-gray-50 shadow-sm opacity-90 cursor-not-allowed min-h-[260px]"
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center text-gray-400">
-                <User className="w-6 h-6" strokeWidth={2} />
-              </div>
-              <h2 className="text-[18px] font-semibold font-['Poppins'] text-gray-400">
-                Personality
-              </h2>
-            </div>
-            <div className="bg-gray-100 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200/60 capitalize tracking-wide mt-2 whitespace-nowrap">
-              Coming Soon
-            </div>
-          </div>
-          
-          <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
-            AI-generated profile of a person with background, influence, and recent developments.
-          </p>
-
-          <div className="flex items-center gap-2 text-gray-400 font-medium text-sm mt-auto">
-            <Lock className="w-3.5 h-3.5" /> Coming soon
-          </div>
-        </motion.div>
+        {/* Right Side: Start Report Button */}
+        <div className="shrink-0 flex items-center self-end sm:self-center">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleStart();
+            }}
+            className="text-[#0E7C86] hover:text-[#08636b] font-medium text-[0.875rem] flex items-center gap-2 group-hover:gap-2.5 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <span>Start Report</span>
+            <ArrowRight className="w-4 h-4 text-[#0E7C86] group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
       </motion.div>
     </div>
   );

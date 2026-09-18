@@ -14,19 +14,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="max-w-xl mx-auto md:mx-0"
         >
-          <div className="flex items-center gap-3 mb-12">
+          <div className="flex items-center gap-3 mb-8">
             <img src="/logo-dark.png" alt="M42 Logo" className="h-8 object-contain" />
-            <span className="font-semibold text-xl font-['Poppins'] text-[var(--text-primary)] tracking-tight">News & Trends Intelligence Agent</span>
+            <span className="font-semibold text-[1.25rem] font-['Poppins'] text-[var(--text-primary)] tracking-tight">News & Trends Intelligence Agent</span>
           </div>
-          
-          <h1 className="text-2xl md:text-3xl font-semibold font-['Poppins'] text-[var(--text-primary)] mb-1 leading-tight">
-            Generate trusted intelligence reports
-          </h1>
-          <p className="text-[var(--text-secondary)] text-base mb-12 max-w-lg">
-            Create AI-powered reports with verified sources and citations.
-          </p>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <Feature icon={<Sparkles className="w-5 h-5 text-[var(--text-accent)]" />} title="AI-Powered Research" />
             <Feature icon={<FileText className="w-5 h-5 text-[var(--text-accent)]" />} title="Trusted Citations" />
             <Feature icon={<CheckCircle2 className="w-5 h-5 text-[var(--text-accent)]" />} title="Quality & Governance" />
@@ -55,6 +48,6 @@ const Feature = ({ icon, title }: { icon: React.ReactNode, title: string }) => (
     <div className="w-10 h-10 rounded-lg bg-white shadow-sm border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
       {icon}
     </div>
-    <h3 className="font-medium text-[var(--text-primary)] font-['Poppins'] text-base">{title}</h3>
+    <h3 className="font-medium text-[var(--text-primary)] font-['Poppins'] text-[0.9375rem]">{title}</h3>
   </div>
 );

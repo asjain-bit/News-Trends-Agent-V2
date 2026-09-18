@@ -75,30 +75,27 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   generateReportInBackground: async (threadId, depth) => {
-    // 15s simulation
-    await new Promise(resolve => setTimeout(resolve, 15000));
+    // Smooth 8.5s simulation
+    await new Promise(resolve => setTimeout(resolve, 8500));
     
     const threads = await storageService.getThreads();
     const thread = threads.find(t => t.id === threadId);
     if (!thread) return;
 
-    // We must import generateDummyReportSections dynamically or put it in a separate service. 
-    // Wait! dummyReportData is in src/utils/dummyReportData.ts.
-    // Let's dynamically import to avoid circular dependencies.
     const { generateDummyReportSections } = await import('../utils/dummyReportData');
 
-    const newVersionNumber = thread.versions.length + 1;
+    const newVersionNumber = (thread.versions?.length || 0) + 1;
     const newVersion = {
       id: `v${newVersionNumber}`,
       versionNumber: newVersionNumber,
       createdAt: Date.now(),
-      content: { sections: generateDummyReportSections(depth, newVersionNumber) }
+      content: { sections: generateDummyReportSections(depth || 'Standard', newVersionNumber) }
     };
     
     await storageService.saveThread({
       ...thread,
       status: 'completed',
-      versions: [...thread.versions, newVersion],
+      versions: [...(thread.versions || []), newVersion],
       updatedAt: Date.now()
     });
     

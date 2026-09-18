@@ -152,21 +152,21 @@ export default function Layout() {
             >
               <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-50 to-white -z-10" />
               <div className="p-8 flex flex-col items-center z-10 w-full">
-                <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-5 border border-red-100 shadow-sm text-red-500">
-                  <AlertTriangle className="w-7 h-7" />
+                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
+                  <AlertTriangle className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Confirm Logout</h3>
-                <p className="text-[14px] text-gray-500 mb-8 leading-relaxed px-4">Are you sure you want to log out of your account? You will need to sign in again to access your reports.</p>
+                <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Confirm Logout</h3>
+                <p className="text-[0.8125rem] text-gray-500 mb-6 leading-relaxed px-4">Are you sure you want to log out of your account? You will need to sign in again to access your reports.</p>
                 <div className="flex gap-3 w-full">
                   <button 
                     onClick={handleLogout}
-                    className="flex-1 px-4 py-2.5 text-[14px] font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm"
+                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm"
                   >
                     Yes, log out
                   </button>
                   <button 
                     onClick={() => setShowLogoutConfirm(false)}
-                    className="flex-1 px-4 py-2.5 text-[14px] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                   >
                     Cancel
                   </button>
@@ -193,8 +193,8 @@ export default function Layout() {
               <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
                 <img src="/logo.png" alt="M42 Logo" className="h-6 object-contain shrink-0" />
                 <div className="flex flex-col">
-                   <span className="font-medium text-[13px] text-white leading-tight font-['Poppins']">News & Trends</span>
-                   <span className="font-medium text-[13px] text-white leading-tight font-['Poppins']">Agent</span>
+                   <span className="font-medium text-[0.8125rem] text-white leading-tight font-['Poppins']">News & Trends</span>
+                   <span className="font-medium text-[0.8125rem] text-white leading-tight font-['Poppins']">Agent</span>
                 </div>
               </div>
               <button onClick={() => setCollapsed(true)} className="text-white/50 hover:text-white transition-colors">
@@ -232,7 +232,7 @@ export default function Layout() {
               {({ isActive }) => (
                 <>
                   <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
-                  {!collapsed && <span className="text-[14px]">{item.label}</span>}
+                  {!collapsed && <span className="text-[0.875rem]">{item.label}</span>}
                 </>
               )}
             </NavLink>
@@ -243,7 +243,7 @@ export default function Layout() {
               {/* Pinned Chats */}
               {pinnedThreads.length > 0 && (
                 <div>
-                  <div className="px-4 text-[11px] font-semibold text-white uppercase tracking-wider mb-2">Pinned</div>
+                  <div className="px-4 text-[0.6875rem] font-semibold text-white uppercase tracking-wider mb-2">Pinned</div>
                   <div className="flex flex-col gap-0.5">
                     {pinnedThreads.map(thread => (
                       <div 
@@ -255,7 +255,7 @@ export default function Layout() {
                       >
                         <div className="flex items-center gap-2.5 overflow-hidden w-full pr-0 group-hover:pr-6 transition-all duration-200">
                           <Pin className="w-3.5 h-3.5 text-white/40 shrink-0 fill-current" />
-                          <span className={`text-[13px] truncate ${location.pathname === `/report/${thread.id}` ? 'text-white' : 'text-white/70'}`}>
+                          <span className={`text-[0.8125rem] truncate ${location.pathname === `/report/${thread.id}` ? 'text-white' : 'text-white/70'}`}>
                             {thread.title || 'Untitled Report'}
                           </span>
                         </div>
@@ -268,10 +268,10 @@ export default function Layout() {
                           </button>
                           {activeMenuId === thread.id && (
                             <div className="absolute left-0 md:left-auto md:right-0 top-full mt-1 w-32 bg-[#153443] border border-white/10 rounded-md shadow-xl py-1 z-50">
-                              <button onClick={(e) => { togglePin(e, thread); notificationService.notify("Chat unpinned", "success"); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Unpin</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Rename</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Download</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[12px] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
+                              <button onClick={(e) => { togglePin(e, thread); notificationService.notify("Chat unpinned", "success"); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Unpin</button>
+                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Rename</button>
+                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Download</button>
+                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
                             </div>
                           )}
                         </div>
@@ -284,7 +284,7 @@ export default function Layout() {
               {/* Recent Chats */}
               {recentThreads.length > 0 && (
                 <div>
-                  <div className="px-4 text-[11px] font-semibold text-white uppercase tracking-wider mb-2">Recent ({recentThreads.length})</div>
+                  <div className="px-4 text-[0.6875rem] font-semibold text-white uppercase tracking-wider mb-2">Recent ({recentThreads.length})</div>
                   <div className="flex flex-col gap-0.5">
                     {recentThreads.map(thread => (
                       <div 
@@ -296,7 +296,7 @@ export default function Layout() {
                       >
                         <div className="flex items-center gap-2.5 overflow-hidden w-full pr-0 group-hover:pr-6 transition-all duration-200">
                           <MessageSquare className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                          <span className={`text-[13px] truncate ${location.pathname === `/report/${thread.id}` ? 'text-white' : 'text-white/70'}`}>
+                          <span className={`text-[0.8125rem] truncate ${location.pathname === `/report/${thread.id}` ? 'text-white' : 'text-white/70'}`}>
                             {thread.title || 'Untitled Report'}
                           </span>
                         </div>
@@ -309,10 +309,10 @@ export default function Layout() {
                           </button>
                           {activeMenuId === thread.id && (
                             <div className="absolute left-0 md:left-auto md:right-0 top-full mt-1 w-32 bg-[#153443] border border-white/10 rounded-md shadow-xl py-1 z-50">
-                              <button onClick={(e) => { togglePin(e, thread); notificationService.notify("Chat pinned", "success"); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Pin</button>
-                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Rename</button>
-                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[12px] text-white hover:bg-white/10 transition-colors">Download</button>
-                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[12px] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
+                              <button onClick={(e) => { togglePin(e, thread); notificationService.notify("Chat pinned", "success"); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Pin</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Rename</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Download</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
                             </div>
                           )}
                         </div>
@@ -328,14 +328,14 @@ export default function Layout() {
         {/* Profile Details at bottom with 20px padding */}
         <div className="pb-[20px] px-4 border-t border-white/10 pt-4 mt-auto">
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} gap-3 p-2 rounded-xl relative`}>
-            <div className="w-9 h-9 rounded-full bg-[#36c0c9] text-[#0D212C] flex items-center justify-center font-semibold text-sm shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#36c0c9] text-[#0D212C] flex items-center justify-center font-semibold text-[0.8125rem] shrink-0">
               {user?.name.split(' ').map(n => n[0]).join('').substring(0, 2) || 'AJ'}
             </div>
             {!collapsed && (
               <div className="flex-1 flex justify-between items-center overflow-hidden">
                 <div className="flex flex-col truncate pr-2">
-                  <span className="text-[14px] font-medium text-white truncate">{user?.name || 'Ashika Jain'}</span>
-                  <span className="text-xs text-[#FFFFFF94] truncate">{user?.role === 'strategy' ? 'Strategy User' : 'General User'}</span>
+                  <span className="text-[0.875rem] font-medium text-white truncate">{user?.name || 'Ashika Jain'}</span>
+                  <span className="text-[0.75rem] text-[#FFFFFF94] truncate">{user?.role === 'strategy' ? 'Strategy User' : 'General User'}</span>
                 </div>
                 <button onClick={() => setShowLogoutConfirm(true)} className="text-[#FFFFFF94] hover:text-white transition-colors" title="Log out">
                   <LogOut className="w-4 h-4" />
@@ -362,7 +362,7 @@ export default function Layout() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-xl font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
+            <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
               {getPageTitle()}
             </h1>
           </div>
@@ -376,7 +376,7 @@ export default function Layout() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search reports, topics, or keywords..." 
-                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#36c0c9] transition-colors placeholder-gray-400 text-gray-700 shadow-sm" 
+                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-[0.8125rem] focus:outline-none focus:border-[#36c0c9] transition-colors placeholder-gray-400 text-gray-700 shadow-sm" 
                 />
               </div>
             )}
@@ -407,12 +407,12 @@ export default function Layout() {
       {threadToRename && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0D212C]/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-gray-100">
-            <h3 className="text-xl font-bold font-['Poppins'] text-[#0D212C] mb-4">Rename Chat</h3>
+            <h3 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] mb-4">Rename Chat</h3>
             <input 
               type="text" 
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
-              className="w-full px-4 py-2 mb-6 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#36c0c9]/20 focus:border-[#36c0c9] text-[15px]"
+              className="w-full px-4 py-2 mb-6 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#36c0c9]/20 focus:border-[#36c0c9] text-[0.875rem]"
               placeholder="Enter new name"
               autoFocus
             />
@@ -422,7 +422,7 @@ export default function Layout() {
                   setThreadToRename(null);
                   setRenameValue('');
                 }}
-                className="flex-1 px-5 py-2.5 rounded-xl font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2 rounded-xl text-[0.875rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -438,7 +438,7 @@ export default function Layout() {
                   setThreadToRename(null);
                 }}
                 disabled={!renameValue.trim()}
-                className="flex-1 px-5 py-2.5 rounded-xl font-medium text-white bg-[#36c0c9] hover:bg-[#2ea3aa] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="flex-1 px-4 py-2 rounded-xl text-[0.875rem] font-medium text-white bg-[#36c0c9] hover:bg-[#2ea3aa] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
                 Save
               </button>
@@ -451,11 +451,11 @@ export default function Layout() {
       {threadToDelete && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0D212C]/40 backdrop-blur-sm">
            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center flex flex-col items-center border border-gray-100">
-            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-5 border border-red-100 shadow-sm text-red-500">
-               <Trash2 className="w-7 h-7" />
+            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
+               <Trash2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Delete Chat</h3>
-            <p className="text-gray-500 mb-8 text-[14px] leading-relaxed px-4">
+            <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Delete Chat</h3>
+            <p className="text-gray-500 mb-6 text-[0.8125rem] leading-relaxed px-4">
               Are you sure you want to delete this chat? This cannot be undone.
             </p>
             <div className="flex gap-3 w-full">
@@ -468,13 +468,13 @@ export default function Layout() {
                     navigate('/');
                   }
                 }}
-                className="flex-1 px-4 py-2.5 text-[14px] font-medium text-white bg-red-500 hover:bg-red-600 transition-colors rounded-xl shadow-sm"
+                className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 transition-colors rounded-xl shadow-sm"
               >
                 Delete
               </button>
               <button 
                 onClick={() => setThreadToDelete(null)}
-                className="flex-1 px-4 py-2.5 text-[14px] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl"
+                className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl"
               >
                 Cancel
               </button>
@@ -492,9 +492,9 @@ export default function Layout() {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white text-gray-800 px-4 py-3 rounded-lg shadow-xl border border-gray-100 flex items-center gap-3 text-sm font-medium min-w-[250px] pointer-events-auto"
+              className="bg-white text-gray-800 px-4 py-3 rounded-lg shadow-xl border border-gray-100 flex items-center gap-3 text-[0.8125rem] font-medium min-w-[250px] pointer-events-auto"
             >
-              {toast.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-400" />}
+              {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
               {toast.message}
             </motion.div>
           ))}

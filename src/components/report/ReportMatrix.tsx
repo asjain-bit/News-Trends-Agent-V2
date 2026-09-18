@@ -23,14 +23,14 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
     ];
     return (
       <div className="my-8">
-        <h3 className="text-xl font-bold text-[#0D212C] mb-6 text-center">SWOT Analysis Matrix</h3>
+        <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-6 text-center">SWOT Analysis Matrix</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {quadrants.map((quad, idx) => (
             <div key={idx} className="border border-gray-300 p-6">
-              <h4 className="text-lg font-bold text-[#0D212C] mb-4">{quad.title}</h4>
+              <h4 className="text-[0.9375rem] font-semibold text-[#0D212C] mb-4">{quad.title}</h4>
               <ul className="space-y-3">
                 {quad.items.map((item, i) => (
-                  <li key={i} className="flex gap-3 text-gray-700 text-[14px]">
+                  <li key={i} className="flex gap-3 text-gray-700 text-[0.8125rem]">
                     <span className="text-[#36c0c9] font-bold mt-0.5">•</span>
                     <span className="leading-relaxed">{item}</span>
                   </li>
@@ -45,7 +45,7 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
 
   return (
     <div className="my-10">
-      <h3 className="text-xl font-bold text-[#0D212C] mb-6 text-center">SWOT Analysis Matrix</h3>
+      <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-6 text-center">SWOT Analysis Matrix</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Strengths */}
         <motion.div 
@@ -56,11 +56,11 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
         >
           <div className="flex items-center gap-2 mb-4 text-green-700">
             <ShieldCheck className="w-5 h-5" />
-            <h4 className="font-bold text-lg">Strengths</h4>
+            <h4 className="font-semibold text-[0.9375rem]">Strengths</h4>
           </div>
           <ul className="space-y-3">
             {data.strengths.map((item, idx) => (
-              <li key={idx} className="flex items-start text-sm text-green-900">
+              <li key={idx} className="flex items-start text-[0.8125rem] text-green-900">
                 <span className="mr-2 mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
                 <span className="leading-relaxed">{item}</span>
               </li>
@@ -77,11 +77,11 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
         >
           <div className="flex items-center gap-2 mb-4 text-orange-700">
             <ShieldAlert className="w-5 h-5" />
-            <h4 className="font-bold text-lg">Weaknesses</h4>
+            <h4 className="font-semibold text-[0.9375rem]">Weaknesses</h4>
           </div>
           <ul className="space-y-3">
             {data.weaknesses.map((item, idx) => (
-              <li key={idx} className="flex items-start text-sm text-orange-900">
+              <li key={idx} className="flex items-start text-[0.8125rem] text-orange-900">
                 <span className="mr-2 mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0" />
                 <span className="leading-relaxed">{item}</span>
               </li>
@@ -98,11 +98,11 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
         >
           <div className="flex items-center gap-2 mb-4 text-blue-700">
             <TrendingUp className="w-5 h-5" />
-            <h4 className="font-bold text-lg">Opportunities</h4>
+            <h4 className="font-semibold text-[0.9375rem]">Opportunities</h4>
           </div>
           <ul className="space-y-3">
             {data.opportunities.map((item, idx) => (
-              <li key={idx} className="flex items-start text-sm text-blue-900">
+              <li key={idx} className="flex items-start text-[0.8125rem] text-blue-900">
                 <span className="mr-2 mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
                 <span className="leading-relaxed">{item}</span>
               </li>
@@ -119,11 +119,11 @@ export const ReportMatrix: React.FC<ReportMatrixProps> = ({ data, isWordDocument
         >
           <div className="flex items-center gap-2 mb-4 text-red-700">
             <Zap className="w-5 h-5" />
-            <h4 className="font-bold text-lg">Threats</h4>
+            <h4 className="font-semibold text-[0.9375rem]">Threats</h4>
           </div>
           <ul className="space-y-3">
             {data.threats.map((item, idx) => (
-              <li key={idx} className="flex items-start text-sm text-red-900">
+              <li key={idx} className="flex items-start text-[0.8125rem] text-red-900">
                 <span className="mr-2 mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                 <span className="leading-relaxed">{item}</span>
               </li>
