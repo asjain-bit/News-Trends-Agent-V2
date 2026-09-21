@@ -1,7 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
-import { Home, FileText, LogOut, Search, PanelLeftClose, PanelRightClose, Menu, MessageSquare, Pin, MoreVertical, AlertTriangle, Plus, Trash2, X, CheckCircle, Bell, ArrowLeft } from 'lucide-react';
+import { 
+  FileText, 
+  LogOut, 
+  Search, 
+  PanelLeftClose, 
+  PanelRightClose, 
+  Menu, 
+  MessageSquare, 
+  Pin, 
+  MoreVertical, 
+  AlertTriangle, 
+  Plus, 
+  Trash2, 
+  X, 
+  CheckCircle, 
+  Bell, 
+  ArrowLeft,
+  LayoutGrid,
+  Star,
+  Layers,
+  BarChart2,
+  SlidersHorizontal,
+  Map,
+  Globe,
+  Lock,
+  Sparkles,
+  FileCode2,
+  ChevronDown
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notificationService } from '../services/notificationService';
 
@@ -60,7 +88,7 @@ export default function Layout() {
 
   const filteredThreads = threads.filter(t => (t.title || 'Untitled Report').toLowerCase().includes(searchQuery.toLowerCase()));
   const pinnedThreads = filteredThreads.filter(t => t.isPinned);
-  const recentThreads = filteredThreads.filter(t => !t.isPinned).slice(0, 10);
+  const recentThreads = filteredThreads.filter(t => !t.isPinned).slice(0, 8);
 
   const togglePin = async (e: React.MouseEvent, thread: any) => {
     e.preventDefault();
@@ -78,7 +106,6 @@ export default function Layout() {
     const latestVersion = thread.versions[thread.versions.length - 1];
     const sections = latestVersion.content?.sections || latestVersion.content || [];
     
-    // Minimal HTML structure containing only the text paragraphs
     const htmlContent = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset='utf-8'><title>${thread.title || 'Report'}</title></head>
@@ -112,8 +139,25 @@ export default function Layout() {
     { id: 'reports', label: 'All Reports', path: '/reports', icon: FileText },
   ];
 
+  const [magicExpanded, setMagicExpanded] = useState(true);
+
+  const magicNavItems = [
+    { id: 'overview', label: 'Overview', path: '/overview', icon: Star },
+    { id: 'catalogue', label: 'Catalogue', path: '/catalogue', icon: Layers },
+    { id: 'ai-scoring', label: 'AI Scoring', path: '/ai-scoring', icon: BarChart2 },
+    { id: 'weightage', label: 'Weightage', path: '/weightage', icon: SlidersHorizontal },
+    { id: 'roadmap', label: 'Build Roadmap', path: '/build-roadmap', icon: Map },
+    { id: 'gtm', label: 'GTM Insights', path: '/gtm-insights', icon: Globe },
+  ];
+
   // Determine title based on route
   const getPageTitle = () => {
+    if (location.pathname.includes('/catalogue')) return 'Catalogue';
+    if (location.pathname.includes('/overview')) return 'Overview';
+    if (location.pathname.includes('/ai-scoring')) return 'AI Scoring';
+    if (location.pathname.includes('/weightage')) return 'Weightage';
+    if (location.pathname.includes('/build-roadmap')) return 'Build Roadmap';
+    if (location.pathname.includes('/gtm-insights')) return 'GTM Insights';
     if (location.pathname === '/new/tech') return 'Generate New Report';
     if (location.pathname.includes('/new')) return 'New Report';
     if (location.pathname.includes('/reports')) return 'All Reports';
@@ -160,13 +204,13 @@ export default function Layout() {
                 <div className="flex gap-3 w-full">
                   <button 
                     onClick={handleLogout}
-                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm"
+                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm cursor-pointer"
                   >
                     Yes, log out
                   </button>
                   <button 
                     onClick={() => setShowLogoutConfirm(false)}
-                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -177,7 +221,7 @@ export default function Layout() {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar - Exact Original Dark Theme */}
       <motion.aside
         initial={false}
         animate={{ 
@@ -239,7 +283,47 @@ export default function Layout() {
           ))}
 
           {!collapsed && (
-            <div className="mt-6 flex flex-col gap-6">
+            <div className="mt-4 flex flex-col gap-6">
+              {/* MAGIC MODE SECTION (Added before Pinned/Recents) */}
+              <div className="pt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setMagicExpanded(!magicExpanded)}
+                  className="w-full px-4 text-[0.6875rem] font-semibold text-[#ED4D19] uppercase tracking-wider mb-2 flex items-center justify-between hover:text-[#ED4D19]/90 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#ED4D19]" />
+                    <span>MAGIC MODE</span>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform duration-200 ${magicExpanded ? '' : '-rotate-90'}`} />
+                </button>
+                {magicExpanded && (
+                  <div className="flex flex-col gap-1">
+                    {magicNavItems.map((item) => (
+                      <NavLink
+                        key={item.id}
+                        to={item.path}
+                        onClick={() => setMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                            isActive
+                              ? 'bg-[#153443] text-white font-normal'
+                              : 'text-[#FFFFFF94] hover:bg-white/5'
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <>
+                            <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
+                            {!collapsed && <span className="text-[0.875rem]">{item.label}</span>}
+                          </>
+                        )}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Pinned Chats */}
               {pinnedThreads.length > 0 && (
                 <div>
@@ -269,9 +353,9 @@ export default function Layout() {
                           {activeMenuId === thread.id && (
                             <div className="absolute left-0 md:left-auto md:right-0 top-full mt-1 w-32 bg-[#153443] border border-white/10 rounded-md shadow-xl py-1 z-50">
                               <button onClick={(e) => { togglePin(e, thread); notificationService.notify("Chat unpinned", "success"); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Unpin</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Rename</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Download</button>
-                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToRename({id: thread.id, title: thread.title}); setRenameValue(thread.title); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Rename</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); handleDownload(thread); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-white hover:bg-white/10 transition-colors">Download</button>
+                              <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveMenuId(null); setThreadToDelete({id: thread.id, title: thread.title}); }} className="w-full text-left px-3 py-1.5 text-[0.75rem] text-red-400 hover:bg-white/10 transition-colors">Delete</button>
                             </div>
                           )}
                         </div>
@@ -373,13 +457,24 @@ export default function Layout() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
-              {getPageTitle()}
-            </h1>
+            {location.pathname.includes('/catalogue') ? (
+              <div className="flex flex-col">
+                <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] leading-tight">
+                  Catalogue
+                </h1>
+                <p className="text-[0.75rem] text-slate-500 font-normal leading-tight hidden md:block mt-0.5">
+                  Maintain the three portfolio lists components, solutions and countries then map which components make up which solutions.
+                </p>
+              </div>
+            ) : (
+              <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
+                {getPageTitle()}
+              </h1>
+            )}
           </div>
           
           <div className="flex items-center gap-6">
-            {!location.pathname.startsWith('/new') && location.pathname !== '/' && !location.pathname.includes('/notifications') && !location.pathname.includes('/reports') && (
+            {!location.pathname.startsWith('/new') && location.pathname !== '/' && !location.pathname.includes('/notifications') && !location.pathname.includes('/reports') && !location.pathname.includes('/catalogue') && !location.pathname.includes('/overview') && !location.pathname.includes('/ai-scoring') && !location.pathname.includes('/weightage') && !location.pathname.includes('/build-roadmap') && !location.pathname.includes('/gtm-insights') && (
               <div className="relative hidden md:block w-80">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 

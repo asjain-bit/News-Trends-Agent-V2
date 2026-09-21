@@ -104,8 +104,7 @@ export default function Home() {
       {/* Top Header Row with Title, Search, Sort By, and New Report Button */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-[1.375rem] font-medium font-['Poppins'] text-[var(--color-ink)] mb-0.5 leading-tight">My Reports</h1>
-          <p className="text-[0.875rem] text-[var(--color-ink-muted)] mt-0">Access your intelligence reports or start a new request.</p>
+          <h1 className="text-[1.375rem] font-medium font-['Poppins'] text-[var(--color-ink)] leading-tight">All Reports</h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">

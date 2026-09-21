@@ -34,8 +34,23 @@ interface AppState {
   setSearchQuery: (query: string) => void;
 }
 
+const getInitialUser = (): User => {
+  try {
+    const saved = localStorage.getItem('m42_user');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {
+    // Ignore error
+  }
+  return {
+    id: "user-strat-1",
+    name: "Ashika Jain",
+    role: "strategy",
+    email: "strategy@example.com",
+  };
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
-  user: null,
+  user: getInitialUser(),
   isAuthenticating: false,
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
@@ -43,6 +58,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isAuthenticating: true });
     try {
       const user = await authService.login(role);
+      try {
+        localStorage.setItem('m42_user', JSON.stringify(user));
+      } catch (e) {}
       set({ user });
     } finally {
       set({ isAuthenticating: false });
@@ -50,6 +68,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   logout: async () => {
     await authService.logout();
+    try {
+      localStorage.removeItem('m42_user');
+    } catch (e) {}
     set({ user: null });
   },
 
