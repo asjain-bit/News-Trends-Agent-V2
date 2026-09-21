@@ -22,7 +22,9 @@ import {
   Building2,
   ShieldCheck,
   BarChart3,
-  CheckCircle2
+  CheckCircle2,
+  Upload,
+  FileText
 } from 'lucide-react';
 
 // Custom hook for clicking outside dropdowns
@@ -42,6 +44,9 @@ function useOnClickOutside(ref: React.RefObject<any>, handler: (event: MouseEven
     };
   }, [ref, handler]);
 }
+
+// Data definitions...
+
 
 // Types
 export interface ComponentItem {
@@ -291,7 +296,7 @@ function CustomSelect({
   onChange,
   disabled = false,
 }: {
-  label: string;
+  label: React.ReactNode;
   value: string;
   options: { label: string; value: string }[];
   onChange?: (val: string) => void;
@@ -388,20 +393,27 @@ export default function Catalogue() {
   const [componentsPage, setComponentsPage] = useState(1);
   const [countriesPage, setCountriesPage] = useState(1);
 
-  // Add Modals
+  // Add Modals Form States
   const [showAddSolutionModal, setShowAddSolutionModal] = useState(false);
   const [showAddComponentModal, setShowAddComponentModal] = useState(false);
-  const [newSolutionName, setNewSolutionName] = useState('');
-  const [newSolutionPositioning, setNewSolutionPositioning] = useState<'Common' | 'Mixed' | 'Distinctive'>('Distinctive');
-  const [newSolutionStatus, setNewSolutionStatus] = useState<'In progress' | 'Completed' | 'New' | 'Prioritised'>('New');
-  const [newSolutionScore, setNewSolutionScore] = useState(70);
-  const [newSolutionRevenue, setNewSolutionRevenue] = useState('$15M');
-  const [newSolutionCompCount, setNewSolutionCompCount] = useState(4);
 
+  // Solution Form Fields
+  const [newSolutionName, setNewSolutionName] = useState('');
+  const [newSolutionPositioning, setNewSolutionPositioning] = useState<'Common' | 'Mixed' | 'Distinctive'>('Common');
+  const [newSolutionStatus, setNewSolutionStatus] = useState<'In progress' | 'Completed' | 'New' | 'Prioritised'>('New');
+  const [newSolutionDescription, setNewSolutionDescription] = useState('');
+  const [newSolutionKeyCapabilities, setNewSolutionKeyCapabilities] = useState('');
+  const [newSolutionConstraints, setNewSolutionConstraints] = useState('');
+  const [newSolutionFile, setNewSolutionFile] = useState<File | null>(null);
+
+  // Component Form Fields
   const [newComponentName, setNewComponentName] = useState('');
-  const [newComponentSubtitle, setNewComponentSubtitle] = useState('');
   const [newComponentCategory, setNewComponentCategory] = useState('AI / GenAI');
   const [newComponentStatus, setNewComponentStatus] = useState<'In progress' | 'Completed' | 'New' | 'Prioritised'>('New');
+  const [newComponentDescription, setNewComponentDescription] = useState('');
+  const [newComponentKeyCapabilities, setNewComponentKeyCapabilities] = useState('');
+  const [newComponentDependencies, setNewComponentDependencies] = useState('');
+  const [newComponentFile, setNewComponentFile] = useState<File | null>(null);
 
   // Edit Modals: Only Status and Positioning editable for Solution
   const [editingSolution, setEditingSolution] = useState<SolutionItem | null>(null);
@@ -506,12 +518,14 @@ export default function Catalogue() {
 
   const mappedSolutionComponents = useMemo(() => {
     if (!viewingSolution) return [];
-    return components.filter((comp) => (reuseMatrix[comp.id] || []).includes(viewingSolution.id));
+    const list = components.filter((comp) => (reuseMatrix[comp.id] || []).includes(viewingSolution.id));
+    return list.length > 0 ? list : components.slice(0, viewingSolution.compCount || 4);
   }, [viewingSolution, components, reuseMatrix]);
 
   const targetCountryItems = useMemo(() => {
     if (!currentSolutionProfile) return [];
-    return countries.filter((c) => currentSolutionProfile.targetCountryIds.includes(c.id));
+    const list = countries.filter((c) => (currentSolutionProfile.targetCountryIds || []).includes(c.id));
+    return list.length > 0 ? list : countries.slice(0, 4);
   }, [currentSolutionProfile, countries]);
 
   // Handlers
@@ -554,37 +568,47 @@ export default function Catalogue() {
 
   const handleAddSolution = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSolutionName.trim()) return;
+    if (!newSolutionName.trim() || !newSolutionDescription.trim()) return;
     const newSol: SolutionItem = {
       id: `s_${Date.now()}`,
       name: newSolutionName.trim(),
       shortCode: newSolutionName.trim().substring(0, 8).toUpperCase(),
       positioning: newSolutionPositioning,
       status: newSolutionStatus,
-      score: newSolutionScore,
-      revenue3Yr: newSolutionRevenue,
-      compCount: Number(newSolutionCompCount) || 1,
+      score: 72,
+      revenue3Yr: '$18M',
+      compCount: 4,
     };
     setSolutions((prev) => [newSol, ...prev]);
     setNewSolutionName('');
-    setNewSolutionCompCount(4);
+    setNewSolutionPositioning('Common');
+    setNewSolutionStatus('New');
+    setNewSolutionDescription('');
+    setNewSolutionKeyCapabilities('');
+    setNewSolutionConstraints('');
+    setNewSolutionFile(null);
     setShowAddSolutionModal(false);
   };
 
   const handleAddComponent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComponentName.trim()) return;
+    if (!newComponentName.trim() || !newComponentDescription.trim()) return;
     const newComp: ComponentItem = {
       id: `c_${Date.now()}`,
       name: newComponentName.trim(),
-      subtitle: newComponentSubtitle.trim() || 'New component module',
+      subtitle: newComponentDescription.trim().slice(0, 48) || 'Enterprise component module',
       category: newComponentCategory,
       status: newComponentStatus,
       reuseCount: 0,
     };
     setComponents((prev) => [newComp, ...prev]);
     setNewComponentName('');
-    setNewComponentSubtitle('');
+    setNewComponentCategory('AI / GenAI');
+    setNewComponentStatus('New');
+    setNewComponentDescription('');
+    setNewComponentKeyCapabilities('');
+    setNewComponentDependencies('');
+    setNewComponentFile(null);
     setShowAddComponentModal(false);
   };
 
@@ -748,60 +772,48 @@ export default function Catalogue() {
               </button>
             </div>
 
-            {/* Main Solution Card matching snapshot */}
+            {/* Main Solution Card matching snapshot without Target Audience */}
             <div className="bg-white rounded-2xl border border-gray-200/90 p-6 md:p-8 shadow-xs relative overflow-hidden">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-3 max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md text-[0.6875rem] font-medium uppercase tracking-wider border border-gray-200/70">
-                      {viewingSolution.shortCode}
-                    </span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
-                      {viewingSolution.positioning}
-                    </span>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-normal ${
-                      viewingSolution.status === 'Completed'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : viewingSolution.status === 'In progress'
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                        : viewingSolution.status === 'Prioritised'
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'bg-purple-50 text-purple-700 border border-purple-200'
-                    }`}>
-                      {viewingSolution.status}
-                    </span>
-                  </div>
-
-                  <h1 className="text-2xl sm:text-3xl font-semibold text-[#0D212C] font-['Poppins'] tracking-tight">
-                    {viewingSolution.name}
-                  </h1>
-
-                  <p className="text-sm text-gray-600 leading-relaxed font-normal">
-                    {currentSolutionProfile?.summary || 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows, lab bridges, and billing systems into unified FHIR-standard health records.'}
-                  </p>
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md text-[0.6875rem] font-medium uppercase tracking-wider border border-gray-200/70">
+                    {viewingSolution.shortCode}
+                  </span>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
+                    {viewingSolution.positioning}
+                  </span>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-normal ${
+                    viewingSolution.status === 'Completed'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : viewingSolution.status === 'In progress'
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                      : viewingSolution.status === 'Prioritised'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-purple-50 text-purple-700 border border-purple-200'
+                  }`}>
+                    {viewingSolution.status}
+                  </span>
                 </div>
 
-                {/* Target Audience Pill */}
-                <div className="bg-gray-50/80 border border-gray-100 rounded-xl p-4 md:min-w-[260px] space-y-1.5 shrink-0">
-                  <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                    PRIMARY TARGET AUDIENCE
-                  </div>
-                  <div className="text-xs text-gray-800 font-medium leading-normal">
-                    {currentSolutionProfile?.targetAudience || 'National Health Authorities, Tertiary Hospital Networks, Multi-specialty Clinics'}
-                  </div>
-                </div>
+                <h1 className="text-2xl sm:text-3xl font-semibold text-[#0D212C] font-['Poppins'] tracking-tight">
+                  {viewingSolution.name}
+                </h1>
+
+                <p className="text-sm text-gray-600 leading-relaxed font-normal max-w-4xl">
+                  {currentSolutionProfile?.summary || 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows, lab bridges, and billing systems into unified FHIR-standard health records.'}
+                </p>
               </div>
 
-              {/* 4 Metric Highlights Cards */}
+              {/* 4 Metric Highlights Cards using exact table column names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100">
                 <div className="bg-orange-50/30 border border-orange-200/80 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500">3-Year Revenue Potential</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">REVENUE (3-YR)</div>
                   <div className="text-2xl font-bold text-[#ED4D19]">{viewingSolution.revenue3Yr}</div>
                   <div className="text-[11px] text-gray-400">Cumulative addressable ARR</div>
                 </div>
 
                 <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500">AI Readiness & Fit</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">SCORE</div>
                   <div className="text-2xl font-bold text-[#0D212C] flex items-center gap-1.5">
                     <span>{viewingSolution.score}</span>
                     <span className="text-xs font-normal text-gray-400">/ 100</span>
@@ -815,7 +827,7 @@ export default function Catalogue() {
                 </div>
 
                 <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500">Integrated Components</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">COMP.</div>
                   <div className="text-2xl font-bold text-[#0D212C]">{viewingSolution.compCount} Modules</div>
                   <div className="text-[11px] text-gray-400">
                     80% portfolio synergy
@@ -823,10 +835,119 @@ export default function Catalogue() {
                 </div>
 
                 <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500">Target Geographies</div>
-                  <div className="text-2xl font-bold text-[#0D212C]">4 Markets</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">COUNTRIES</div>
+                  <div className="text-2xl font-bold text-[#0D212C]">{targetCountryItems.length} Markets</div>
                   <div className="text-[11px] text-gray-400">High-conviction expansion slice</div>
                 </div>
+              </div>
+            </div>
+
+            {/* Simple & Clean: Integrated Modules Section */}
+            <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                  Integrated Modules ({mappedSolutionComponents.length})
+                </h3>
+                <span className="text-xs text-gray-400">Component reuse across portfolio</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                      <th className="py-3 px-6 font-normal">COMPONENT</th>
+                      <th className="py-3 px-6 font-normal">CATEGORY</th>
+                      <th className="py-3 px-6 font-normal">STATUS</th>
+                      <th className="py-3 px-6 font-normal">REUSE</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                    {mappedSolutionComponents.map((component) => (
+                      <tr key={component.id} className="hover:bg-gray-50/70 transition-colors">
+                        <td className="py-3.5 px-6">
+                          <div className="flex flex-col">
+                            <span className="font-normal text-[#0D212C] text-[0.8125rem]">
+                              {component.name}
+                            </span>
+                            <span className="text-[0.75rem] text-gray-400 font-normal mt-0.5">
+                              {component.subtitle}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-gray-700">
+                          {component.category}
+                        </td>
+                        <td className="py-3.5 px-6">
+                          <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
+                            component.status === 'Completed'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : component.status === 'In progress'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : component.status === 'Prioritised'
+                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                              : 'bg-purple-50 text-purple-700 border border-purple-200'
+                          }`}>
+                            {component.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-[#0D212C]">
+                          {component.reuseCount} solutions
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Simple & Clean: Target Countries Section */}
+            <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                  Target Countries ({targetCountryItems.length})
+                </h3>
+                <span className="text-xs text-gray-400">High-conviction expansion markets</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                      <th className="py-3 px-6 font-normal">COUNTRY</th>
+                      <th className="py-3 px-6 font-normal">TOTAL HEALTH SPEND</th>
+                      <th className="py-3 px-6 font-normal">DIGITAL SHARE</th>
+                      <th className="py-3 px-6 font-normal">DEAL ANCHOR (PER-COUNTRY)</th>
+                      <th className="py-3 px-6 font-normal">CONFIDENCE</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                    {targetCountryItems.map((country) => (
+                      <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
+                        <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
+                          {country.name}
+                        </td>
+                        <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
+                          {country.totalSpend}
+                        </td>
+                        <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
+                          {country.digitalShare}
+                        </td>
+                        <td className="py-3.5 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
+                          {country.dealAnchor}
+                        </td>
+                        <td className="py-3.5 px-6">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
+                            country.confidence === 'High'
+                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                              : country.confidence === 'Medium'
+                              ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                              : 'bg-red-50 text-red-600 border border-red-200'
+                          }`}>
+                            {country.confidence}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -994,49 +1115,49 @@ export default function Catalogue() {
                   </tbody>
                 </table>
               </div>
+            </div>
 
-              {/* Pagination UI - subtle light grey clicked state */}
-              <div className="p-3.5 px-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 bg-white">
-                <div>
-                  Showing {filteredSolutions.length === 0 ? 0 : (solutionsPage - 1) * ITEMS_PER_PAGE + 1}–
-                  {Math.min(solutionsPage * ITEMS_PER_PAGE, filteredSolutions.length)} of {filteredSolutions.length}
+            {/* Pagination UI - Outside the table */}
+            <div className="flex items-center justify-between text-xs text-gray-500 pt-1 px-1">
+              <div>
+                Showing {filteredSolutions.length === 0 ? 0 : (solutionsPage - 1) * ITEMS_PER_PAGE + 1}–
+                {Math.min(solutionsPage * ITEMS_PER_PAGE, filteredSolutions.length)} of {filteredSolutions.length}
+              </div>
+              
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setSolutionsPage((p) => Math.max(1, p - 1))}
+                  disabled={solutionsPage === 1}
+                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalSolutionsPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setSolutionsPage(pageNum)}
+                      className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
+                        solutionsPage === pageNum
+                          ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                          : 'text-gray-500 font-normal hover:text-gray-900'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
                 </div>
-                
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setSolutionsPage((p) => Math.max(1, p - 1))}
-                    disabled={solutionsPage === 1}
-                    className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                    title="Previous page"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
 
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: totalSolutionsPages }, (_, i) => i + 1).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        onClick={() => setSolutionsPage(pageNum)}
-                        className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
-                          solutionsPage === pageNum
-                            ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
-                            : 'text-gray-500 font-normal hover:text-gray-900'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setSolutionsPage((p) => Math.min(totalSolutionsPages, p + 1))}
-                    disabled={solutionsPage === totalSolutionsPages}
-                    className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                    title="Next page"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setSolutionsPage((p) => Math.min(totalSolutionsPages, p + 1))}
+                  disabled={solutionsPage === totalSolutionsPages}
+                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                  title="Next page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -1184,49 +1305,49 @@ export default function Catalogue() {
                 </tbody>
               </table>
             </div>
+          </div>
 
-            {/* Pagination UI */}
-            <div className="p-3.5 px-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 bg-white">
-              <div>
-                Showing {filteredComponents.length === 0 ? 0 : (componentsPage - 1) * ITEMS_PER_PAGE + 1}–
-                {Math.min(componentsPage * ITEMS_PER_PAGE, filteredComponents.length)} of {filteredComponents.length}
+          {/* Pagination UI - Outside the table */}
+          <div className="flex items-center justify-between text-xs text-gray-500 pt-1 px-1">
+            <div>
+              Showing {filteredComponents.length === 0 ? 0 : (componentsPage - 1) * ITEMS_PER_PAGE + 1}–
+              {Math.min(componentsPage * ITEMS_PER_PAGE, filteredComponents.length)} of {filteredComponents.length}
+            </div>
+            
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setComponentsPage((p) => Math.max(1, p - 1))}
+                disabled={componentsPage === 1}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Previous page"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalComponentsPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setComponentsPage(pageNum)}
+                    className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
+                      componentsPage === pageNum
+                        ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                        : 'text-gray-500 font-normal hover:text-gray-900'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
               </div>
-              
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setComponentsPage((p) => Math.max(1, p - 1))}
-                  disabled={componentsPage === 1}
-                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                  title="Previous page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
 
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalComponentsPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => setComponentsPage(pageNum)}
-                      className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
-                        componentsPage === pageNum
-                          ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
-                          : 'text-gray-500 font-normal hover:text-gray-900'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setComponentsPage((p) => Math.min(totalComponentsPages, p + 1))}
-                  disabled={componentsPage === totalComponentsPages}
-                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                  title="Next page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => setComponentsPage((p) => Math.min(totalComponentsPages, p + 1))}
+                disabled={componentsPage === totalComponentsPages}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Next page"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -1334,49 +1455,49 @@ export default function Catalogue() {
                 </tbody>
               </table>
             </div>
+          </div>
 
-            {/* Pagination UI */}
-            <div className="p-3.5 px-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 bg-white">
-              <div>
-                Showing {(countriesPage - 1) * ITEMS_PER_PAGE + 1}–
-                {Math.min(countriesPage * ITEMS_PER_PAGE, filteredCountries.length)} of {filteredCountries.length}
+          {/* Pagination UI - Outside the table */}
+          <div className="flex items-center justify-between text-xs text-gray-500 pt-1 px-1">
+            <div>
+              Showing {(countriesPage - 1) * ITEMS_PER_PAGE + 1}–
+              {Math.min(countriesPage * ITEMS_PER_PAGE, filteredCountries.length)} of {filteredCountries.length}
+            </div>
+            
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCountriesPage((p) => Math.max(1, p - 1))}
+                disabled={countriesPage === 1}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Previous page"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalCountriesPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCountriesPage(pageNum)}
+                    className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
+                      countriesPage === pageNum
+                        ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                        : 'text-gray-500 font-normal hover:text-gray-900'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
               </div>
-              
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setCountriesPage((p) => Math.max(1, p - 1))}
-                  disabled={countriesPage === 1}
-                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                  title="Previous page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
 
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalCountriesPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCountriesPage(pageNum)}
-                      className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
-                        countriesPage === pageNum
-                          ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
-                          : 'text-gray-500 font-normal hover:text-gray-900'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setCountriesPage((p) => Math.min(totalCountriesPages, p + 1))}
-                  disabled={countriesPage === totalCountriesPages}
-                  className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
-                  title="Next page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => setCountriesPage((p) => Math.min(totalCountriesPages, p + 1))}
+                disabled={countriesPage === totalCountriesPages}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Next page"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
@@ -1488,26 +1609,26 @@ export default function Catalogue() {
             </div>
           </div>
 
-          {/* Reuse Grid Table Card with Vertical + Horizontal Scroll + Sticky Columns */}
+          {/* Reuse Grid Table Card with Horizontal Scroll + Sticky Columns (Vertical scroll removed) */}
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto overflow-y-auto max-h-[520px]">
+            <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="bg-gray-50">
                   <tr className="border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                    <th className="py-3.5 px-5 min-w-[210px] w-[210px] font-normal border-r border-gray-200 bg-gray-50 sticky left-0 top-0 z-30 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.03)]">
+                    <th className="py-3.5 px-5 min-w-[210px] w-[210px] font-normal border-r border-gray-200 bg-gray-50 sticky left-0 z-20 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.03)]">
                       COMPONENT ↓ / SOLUTION →
                     </th>
                     {solutions.map((sol) => (
                       <th
                         key={sol.id}
-                        className="py-3.5 px-3 text-center min-w-[125px] w-[125px] font-normal border-r border-gray-200 bg-gray-50 sticky top-0 z-20"
+                        className="py-3.5 px-3 text-center min-w-[125px] w-[125px] font-normal border-r border-gray-200 bg-gray-50"
                         title={sol.name}
                       >
                         <span className="font-normal text-gray-600 uppercase tracking-wider text-[0.6875rem]">{sol.shortCode || sol.name}</span>
                       </th>
                     ))}
                     {/* Fixed REUSE Column Header */}
-                    <th className="py-3.5 px-4 text-center min-w-[85px] w-[85px] font-normal text-gray-700 sticky right-0 top-0 bg-gray-50 border-l border-gray-200 z-30 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.04)]">
+                    <th className="py-3.5 px-4 text-center min-w-[85px] w-[85px] font-normal text-gray-700 sticky right-0 bg-gray-50 border-l border-gray-200 z-20 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.04)]">
                       REUSE
                     </th>
                   </tr>
@@ -1522,7 +1643,7 @@ export default function Catalogue() {
                           {comp.name}
                         </td>
 
-                        {/* Solutions Columns with previous orange chip UI */}
+                        {/* Solutions Columns with orange chip UI when mapped, completely empty when unmapped */}
                         {solutions.map((sol) => {
                           const isMapped = mappedSolutions.includes(sol.id);
                           return (
@@ -1539,11 +1660,7 @@ export default function Catalogue() {
                                 <div className="w-6 h-6 mx-auto rounded-md bg-orange-50 text-[#ED4D19] border border-orange-200 flex items-center justify-center text-xs font-semibold shadow-2xs">
                                   ✓
                                 </div>
-                              ) : (
-                                <div className="w-6 h-6 mx-auto flex items-center justify-center text-gray-300 font-bold text-base">
-                                  ·
-                                </div>
-                              )}
+                              ) : null}
                             </td>
                           );
                         })}
@@ -1815,7 +1932,7 @@ export default function Catalogue() {
         </div>
       )}
 
-      {/* ADD SOLUTION MODAL (Increased width max-w-2xl; custom light theme dropdowns) */}
+      {/* ADD SOLUTION MODAL */}
       {showAddSolutionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
@@ -1824,6 +1941,7 @@ export default function Catalogue() {
                 Add New Solution
               </h3>
               <button
+                type="button"
                 onClick={() => setShowAddSolutionModal(false)}
                 className="text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent p-1.5 transition-colors cursor-pointer border-0"
               >
@@ -1832,23 +1950,29 @@ export default function Catalogue() {
             </div>
 
             <form onSubmit={handleAddSolution} className="space-y-4 text-xs">
-              {/* Row 1: Solution Name */}
+              {/* Field 1: Solution Name (Required) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Solution Name</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Solution Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Clinical Trials Matching"
+                  placeholder="Name of the solution"
                   value={newSolutionName}
                   onChange={(e) => setNewSolutionName(e.target.value)}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
                 />
               </div>
 
-              {/* Row 2: Positioning */}
+              {/* Field 2: Positioning (Required) */}
               <div>
                 <CustomSelect
-                  label="Positioning"
+                  label={
+                    <span>
+                      Positioning <span className="text-red-500">*</span>
+                    </span>
+                  }
                   value={newSolutionPositioning}
                   options={[
                     { label: 'Common', value: 'Common' },
@@ -1859,57 +1983,96 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Row 3: Status */}
+              {/* Field 3: Status (Required) */}
               <div>
                 <CustomSelect
-                  label="Status"
+                  label={
+                    <span>
+                      Status <span className="text-red-500">*</span>
+                    </span>
+                  }
                   value={newSolutionStatus}
                   options={[
                     { label: 'New', value: 'New' },
-                    { label: 'In progress', value: 'In progress' },
                     { label: 'Prioritised', value: 'Prioritised' },
+                    { label: 'In progress', value: 'In progress' },
                     { label: 'Completed', value: 'Completed' },
                   ]}
                   onChange={(val) => setNewSolutionStatus(val as any)}
                 />
               </div>
 
-              {/* Row 4: AI Score */}
+              {/* Field 4: Description (Required) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">AI Score (0-100)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={newSolutionScore}
-                  onChange={(e) => setNewSolutionScore(Number(e.target.value))}
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Briefly describe the solution and the problem it solves"
+                  value={newSolutionDescription}
+                  onChange={(e) => setNewSolutionDescription(e.target.value)}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
                 />
               </div>
 
-              {/* Row 5: Revenue (3-Yr) */}
+              {/* Field 5: Key Capabilities (Optional) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Revenue (3-Yr)</label>
-                <input
-                  type="text"
-                  placeholder="$20M"
-                  value={newSolutionRevenue}
-                  onChange={(e) => setNewSolutionRevenue(e.target.value)}
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Key Capabilities
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Main capabilities of the solution"
+                  value={newSolutionKeyCapabilities}
+                  onChange={(e) => setNewSolutionKeyCapabilities(e.target.value)}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
                 />
               </div>
 
-              {/* Row 6: Components Count (Comp) */}
+              {/* Field 6: Constraints (Optional) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Components Count (Comp)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={newSolutionCompCount}
-                  onChange={(e) => setNewSolutionCompCount(Number(e.target.value))}
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Constraints
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Key regulatory, integration or language constraints"
+                  value={newSolutionConstraints}
+                  onChange={(e) => setNewSolutionConstraints(e.target.value)}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
                 />
+              </div>
+
+              {/* Field 7: Attachment (Optional) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Attachment
+                </label>
+                <label className="flex items-center gap-3 px-3.5 py-2.5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors">
+                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div className="flex-1 text-xs text-gray-500 truncate">
+                    {newSolutionFile ? newSolutionFile.name : 'Supporting file for AI to review'}
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => setNewSolutionFile(e.target.files?.[0] || null)}
+                  />
+                  {newSolutionFile && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNewSolutionFile(null);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 p-0.5"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </label>
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
@@ -1932,7 +2095,7 @@ export default function Catalogue() {
         </div>
       )}
 
-      {/* ADD COMPONENT MODAL (Increased width max-w-2xl) */}
+      {/* ADD COMPONENT MODAL */}
       {showAddComponentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
@@ -1941,6 +2104,7 @@ export default function Catalogue() {
                 Add New Component
               </h3>
               <button
+                type="button"
                 onClick={() => setShowAddComponentModal(false)}
                 className="text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent p-1.5 transition-colors cursor-pointer border-0"
               >
@@ -1949,52 +2113,134 @@ export default function Catalogue() {
             </div>
 
             <form onSubmit={handleAddComponent} className="space-y-4 text-xs">
+              {/* Field 1: Component Name (Required) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Component Name</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Component Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Diagnostic Image Segmenter"
+                  placeholder="Name of the component"
                   value={newComponentName}
                   onChange={(e) => setNewComponentName(e.target.value)}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Subtitle / Description</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Computer vision segmentation"
-                  value={newComponentSubtitle}
-                  onChange={(e) => setNewComponentSubtitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Category</label>
-                <input
-                  type="text"
-                  placeholder="AI / GenAI"
-                  value={newComponentCategory}
-                  onChange={(e) => setNewComponentCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
-                />
-              </div>
-
+              {/* Field 2: Category (Required Dropdown) */}
               <div>
                 <CustomSelect
-                  label="Status"
+                  label={
+                    <span>
+                      Category <span className="text-red-500">*</span>
+                    </span>
+                  }
+                  value={newComponentCategory}
+                  options={[
+                    { label: 'AI / GenAI', value: 'AI / GenAI' },
+                    { label: 'Payments', value: 'Payments' },
+                    { label: 'Core data', value: 'Core data' },
+                    { label: 'Data / BI', value: 'Data / BI' },
+                    { label: 'InsurTech / AI', value: 'InsurTech / AI' },
+                    { label: 'Workflow', value: 'Workflow' },
+                    { label: 'Telehealth', value: 'Telehealth' },
+                    { label: 'Genomics', value: 'Genomics' },
+                  ]}
+                  onChange={(val) => setNewComponentCategory(val)}
+                />
+              </div>
+
+              {/* Field 3: Status (Required Dropdown) */}
+              <div>
+                <CustomSelect
+                  label={
+                    <span>
+                      Status <span className="text-red-500">*</span>
+                    </span>
+                  }
                   value={newComponentStatus}
                   options={[
                     { label: 'New', value: 'New' },
-                    { label: 'In progress', value: 'In progress' },
                     { label: 'Prioritised', value: 'Prioritised' },
+                    { label: 'In progress', value: 'In progress' },
                     { label: 'Completed', value: 'Completed' },
                   ]}
                   onChange={(val) => setNewComponentStatus(val as any)}
                 />
+              </div>
+
+              {/* Field 4: Description (Required Free Text) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Briefly describe what the component does"
+                  value={newComponentDescription}
+                  onChange={(e) => setNewComponentDescription(e.target.value)}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
+                />
+              </div>
+
+              {/* Field 5: Key Capabilities (Optional Free Text) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Key Capabilities
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Main capabilities of the component"
+                  value={newComponentKeyCapabilities}
+                  onChange={(e) => setNewComponentKeyCapabilities(e.target.value)}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
+                />
+              </div>
+
+              {/* Field 6: Dependencies (Optional Free Text) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Dependencies
+                </label>
+                <input
+                  type="text"
+                  placeholder="Other components this component depends on"
+                  value={newComponentDependencies}
+                  onChange={(e) => setNewComponentDependencies(e.target.value)}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
+                />
+              </div>
+
+              {/* Field 7: Attachment (Optional File) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Attachment
+                </label>
+                <label className="flex items-center gap-3 px-3.5 py-2.5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors">
+                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div className="flex-1 text-xs text-gray-500 truncate">
+                    {newComponentFile ? newComponentFile.name : 'Supporting file for AI to review'}
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => setNewComponentFile(e.target.files?.[0] || null)}
+                  />
+                  {newComponentFile && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNewComponentFile(null);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 p-0.5"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </label>
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
