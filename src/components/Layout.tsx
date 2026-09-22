@@ -275,7 +275,7 @@ export default function Layout() {
             >
               {({ isActive }) => (
                 <>
-                  <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
+                  <item.icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
                   {!collapsed && <span className="text-[0.875rem]">{item.label}</span>}
                 </>
               )}
@@ -314,7 +314,7 @@ export default function Layout() {
                       >
                         {({ isActive }) => (
                           <>
-                            <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
+                            <item.icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-white' : 'text-[#FFFFFF94]'}`} />
                             {!collapsed && <span className="text-[0.875rem]">{item.label}</span>}
                           </>
                         )}

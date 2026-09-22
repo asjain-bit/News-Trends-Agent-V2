@@ -108,7 +108,9 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Search bar */}
+          {threads.length > 0 && (
+            <>
+              {/* Search bar */}
           <div className="relative w-full sm:w-60 md:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input 
@@ -152,6 +154,8 @@ export default function Home() {
               </div>
             )}
           </div>
+            </>
+          )}
 
           {/* New Report Button */}
           <button
@@ -168,7 +172,7 @@ export default function Home() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-[var(--color-surface)] border border-[var(--color-border)] border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm"
+          className="bg-white border border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm"
         >
           <div className="w-14 h-14 bg-[var(--color-canvas)] rounded-full flex items-center justify-center mb-4">
             <FileText className="w-7 h-7 text-[var(--color-ink-muted)] opacity-50" />
@@ -179,9 +183,9 @@ export default function Home() {
           </p>
           <button
             onClick={() => navigate('/new')}
-            className="bg-[var(--color-surface-muted)] text-[var(--color-ink)] hover:bg-[#e2e8f0] transition-colors duration-200 rounded-lg px-5 py-2 text-[0.875rem] font-medium"
+            className="text-[#36c0c9] hover:text-[#2ea3aa] bg-transparent border-0 transition-colors duration-200 px-5 py-2 text-[0.875rem] font-medium cursor-pointer"
           >
-            Start Report
+            Create new report
           </button>
         </motion.div>
       ) : (
