@@ -59,22 +59,32 @@ body {
 .custom-slider-orange::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 3.5px solid #ED4D19;
-  box-shadow: 0 2px 5px rgba(237, 77, 25, 0.25);
+  background: #ED4D19;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  border: 2px solid white;
 }
 
 .custom-slider-orange::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 3.5px solid #ED4D19;
-  box-shadow: 0 2px 5px rgba(237, 77, 25, 0.25);
+  background: #ED4D19;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  border: 2px solid white;
 }
 
+/* Remove focus outlines and caret/black line artifacts on table headers and buttons */
+th, th *, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
+}
+
+th:focus, th:focus-visible, button:focus, button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

@@ -29,7 +29,7 @@ import {
   MoreVertical,
   AlertTriangle,
   Trash2,
-  PowerOff
+  Ban
 } from 'lucide-react';
 
 // Custom hook for clicking outside dropdowns
@@ -1066,18 +1066,11 @@ export default function Catalogue() {
             {/* Main Solution Card matching snapshot without Target Audience */}
             <div className="bg-white rounded-2xl border border-gray-200/90 p-5 md:p-6 shadow-xs relative overflow-hidden">
               <div className="space-y-2">
-                <h1 className="text-lg sm:text-xl font-medium text-[#0D212C] font-['Poppins'] tracking-tight">
-                  {viewingSolution.name}
-                </h1>
-
-                {/* Positioning and Status below title with labels and separator */}
-                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-normal">
-                  <span className="text-gray-400 font-normal">Positioning</span>
-                  <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
-                    {viewingSolution.positioning}
-                  </span>
-                  <span className="text-gray-300 mx-1 select-none">·</span>
-                  <span className="text-gray-400 font-normal">Status</span>
+                {/* Title with Status Chip */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-lg sm:text-xl font-medium text-[#0D212C] font-['Poppins'] tracking-tight">
+                    {viewingSolution.name}
+                  </h1>
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-normal ${
                     viewingSolution.status === 'Completed'
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -1091,7 +1084,15 @@ export default function Catalogue() {
                   </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal max-w-4xl pt-1">
+                {/* Positioning chip below title (without positioning text) */}
+                <div>
+                  <span className="inline-block px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
+                    {viewingSolution.positioning}
+                  </span>
+                </div>
+
+                {/* Summary text with font weight reduced by 1 unit and font size reduced by 2 units */}
+                <p className="text-[0.6875rem] sm:text-xs text-gray-500 leading-relaxed font-light max-w-4xl pt-0.5">
                   {currentSolutionProfile?.summary || 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows, lab bridges, and billing systems into unified FHIR-standard health records.'}
                 </p>
               </div>
@@ -1469,7 +1470,7 @@ export default function Catalogue() {
                                   onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: solution, type: 'solution', action: 'deactivate' }); setActiveMenuId(null); }}
                                   className="w-full text-left px-4 py-2.5 text-xs text-orange-600 hover:bg-orange-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
                                 >
-                                  <PowerOff className="w-3.5 h-3.5" /> Deactivate Solution
+                                  <Ban className="w-3.5 h-3.5" /> Deactivate Solution
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: solution, type: 'solution', action: 'delete' }); setActiveMenuId(null); }}
@@ -1700,7 +1701,7 @@ export default function Catalogue() {
                                 onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: component, type: 'component', action: 'deactivate' }); setActiveMenuId(null); }}
                                 className="w-full text-left px-4 py-2.5 text-xs text-orange-600 hover:bg-orange-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
                               >
-                                <PowerOff className="w-3.5 h-3.5" /> Deactivate Component
+                                <Ban className="w-3.5 h-3.5" /> Deactivate Component
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: component, type: 'component', action: 'delete' }); setActiveMenuId(null); }}

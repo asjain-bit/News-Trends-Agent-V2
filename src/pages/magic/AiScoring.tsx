@@ -607,31 +607,51 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
             </div>
 
             {/* Table Card */}
+            {/* Table Card with Fixed Columns and Horizontal Scroll for Factors */}
             <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto relative">
+                <table className="w-full text-left border-collapse min-w-[1000px]">
                   <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                      <th className="py-3 px-6 font-normal min-w-[180px]">SOLUTION</th>
-                      <th className="py-3 px-4 font-normal text-center min-w-[100px]">STATUS</th>
+                    <tr className="bg-gray-50/80 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
+                      {/* Fixed Solution Column */}
+                      <th className="py-3 px-6 font-normal min-w-[180px] sm:min-w-[210px] sticky left-0 bg-gray-50 z-20 shadow-[1px_0_0_0_#e5e7eb]">
+                        SOLUTION
+                      </th>
+                      
+                      {/* Status Column */}
+                      <th className="py-3 px-4 font-normal text-center min-w-[110px]">
+                        STATUS
+                      </th>
+                      
+                      {/* F1 - F6 Factor Columns with Ample Width */}
                       {FACTORS.map((f) => (
                         <th 
                           key={f.id} 
                           onClick={() => handleToggleFactorSort(f.id)}
-                          className="py-3 px-2.5 font-normal text-center cursor-pointer select-none group"
+                          className="py-3 px-3 font-normal text-center cursor-pointer select-none group min-w-[130px] outline-none focus:outline-none"
                         >
-                          <div className="inline-flex flex-col items-center justify-center hover:text-gray-800 transition-colors">
+                          <div className="inline-flex flex-col items-center justify-center hover:text-gray-800 transition-colors select-none">
                             <div className="flex items-center gap-1">
                               <span className="font-semibold text-[#0D212C] text-[0.6875rem]">{f.code}</span>
                               <ArrowUpDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
                             </div>
-                            <span className="text-[0.625rem] text-gray-400 font-normal normal-case leading-tight mt-0.5 text-center whitespace-normal max-w-[85px]">
+                            <span className="text-[0.625rem] text-gray-400 font-normal normal-case leading-tight mt-0.5 text-center whitespace-normal max-w-[110px]">
                               {f.name}
                             </span>
                           </div>
                         </th>
                       ))}
-                      <th className="py-3 px-6 font-normal text-right min-w-[90px]">
+
+                      {/* Fixed Revenue (3-Yr) Column (Snapshot 1) */}
+                      <th className="py-3 px-4 font-normal text-left min-w-[125px] sticky right-[90px] bg-gray-50 z-20 shadow-[-1px_0_0_0_#e5e7eb]">
+                        <div className="flex flex-col leading-tight">
+                          <span>REVENUE</span>
+                          <span className="text-[0.5625rem] text-gray-400 font-normal">(3-YR)</span>
+                        </div>
+                      </th>
+
+                      {/* Fixed Score Column */}
+                      <th className="py-3 px-6 font-normal text-right min-w-[90px] sticky right-0 bg-gray-50 z-20 shadow-[-1px_0_0_0_#e5e7eb]">
                         SCORE / 100
                       </th>
                     </tr>
@@ -639,20 +659,20 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                   <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                     {paginatedSolutions.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-12 text-center text-gray-400 text-sm">
+                        <td colSpan={10} className="py-12 text-center text-gray-400 text-sm">
                           No solutions found matching the search or filters.
                         </td>
                       </tr>
                     ) : (
                       paginatedSolutions.map((solution) => (
-                        <tr key={solution.id} className="hover:bg-gray-50/70 transition-colors">
-                          {/* Solution Name */}
-                          <td className="py-4 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
+                        <tr key={solution.id} className="hover:bg-gray-50/70 transition-colors group">
+                          {/* Fixed Solution Name */}
+                          <td className="py-4 px-6 font-normal text-[0.8125rem] text-[#0D212C] sticky left-0 bg-white group-hover:bg-[#f9fafb] z-10 shadow-[1px_0_0_0_#f3f4f6]">
                             {solution.name}
                           </td>
 
-                          {/* Separate Status Column */}
-                          <td className="py-4 px-6">
+                          {/* Status Column */}
+                          <td className="py-4 px-4 text-center">
                             <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
                               solution.status === 'Completed'
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -670,14 +690,26 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                           {FACTORS.map((factor) => {
                             const score = solution.fScores[factor.id] || 3;
                             return (
-                              <td key={factor.id} className="py-4 px-4 text-center">
+                              <td key={factor.id} className="py-4 px-3 text-center">
                                 {renderRoundProgress(score, factor, solution.id)}
                               </td>
                             );
                           })}
 
-                          {/* Computed Score / 100 with font weight reduced by 1 unit */}
-                          <td className="py-4 px-6 text-right font-normal text-[0.875rem] text-gray-700">
+                          {/* Fixed Revenue Cell (Snapshot 1) */}
+                          <td className="py-4 px-4 text-left sticky right-[90px] bg-white group-hover:bg-[#f9fafb] z-10 shadow-[-1px_0_0_0_#f3f4f6]">
+                            <div className="flex flex-col leading-tight">
+                              <span className="font-semibold text-[0.8125rem] text-[#0D212C] font-mono">
+                                {solution.revenue3Yr}
+                              </span>
+                              <span className="text-[0.625rem] text-gray-400 font-normal italic font-mono mt-0.5 whitespace-nowrap">
+                                3-yr · ~${(solution.revenueNum / 3).toFixed(1)}M/yr
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Fixed Score / 100 */}
+                          <td className="py-4 px-6 text-right font-semibold text-[0.875rem] text-[#ED4D19] sticky right-0 bg-white group-hover:bg-[#f9fafb] z-10 shadow-[-1px_0_0_0_#f3f4f6]">
                             {solution.score}
                           </td>
                         </tr>
