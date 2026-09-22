@@ -4,12 +4,19 @@ import {
   Info, 
   ChevronDown, 
   ChevronRight, 
-  ChevronLeft,
+  ChevronLeft, 
   Lock, 
   Unlock, 
-  Search,
-  Filter,
-  ArrowUpDown
+  Search, 
+  Filter, 
+  ArrowUpDown, 
+  Settings2,
+  Eye,
+  BookOpen,
+  X,
+  RotateCcw,
+  Check,
+  Save
 } from 'lucide-react';
 
 // Factor Metadata
@@ -38,7 +45,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Criticality',
     fullName: 'F1: CRITICALITY & NEED',
     description: "How essential the solution is to a country's real, unmet needs.",
-    defaultWeight: 2.0,
+    defaultWeight: 1,
     rubric: {
       1: 'Addresses no real need',
       2: 'Marginal / nice-to-have',
@@ -54,7 +61,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Willingness',
     fullName: 'F2: WILLINGNESS TO PAY',
     description: 'Ability & propensity of the target markets to pay for it.',
-    defaultWeight: 2.5,
+    defaultWeight: 1,
     rubric: {
       1: 'No budget / no buyer',
       2: 'Weak, long budget cycles',
@@ -70,7 +77,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Competitiveness',
     fullName: 'F3: COMPETITIVENESS',
     description: 'How distinctive and defensible it is versus alternatives.',
-    defaultWeight: 1.5,
+    defaultWeight: 1,
     rubric: {
       1: 'Commodity, many substitutes',
       2: 'Weakly differentiated',
@@ -86,7 +93,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Reusability',
     fullName: 'F4: REUSABILITY & SCALE',
     description: 'Build-once, scale-many — the reuse its components give.',
-    defaultWeight: 1.5,
+    defaultWeight: 1,
     rubric: {
       1: 'Single-use, no reuse',
       2: 'Limited reuse',
@@ -102,7 +109,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Market reach',
     fullName: 'F5: MARKET REACH (TAM)',
     description: 'How many of the target countries it is sellable in.',
-    defaultWeight: 2.0,
+    defaultWeight: 1,
     rubric: {
       1: 'Fits ~1 target market',
       2: 'Fits a couple of markets',
@@ -118,7 +125,7 @@ export const FACTORS: FactorInfo[] = [
     shortName: 'Revenue depth',
     fullName: 'F6: REVENUE DEPTH',
     description: 'Deal size / monetisation depth per market.',
-    defaultWeight: 2.0,
+    defaultWeight: 1,
     rubric: {
       1: 'Negligible deal value',
       2: 'Thin deals',
@@ -232,18 +239,29 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     tabParam === 'weightage' ? 'weightage' : initialTab
   );
 
-  // Weights state: F1 to F6 multipliers
+  // Weights state: F1 to F6 multipliers (0, 1, 2, 3 only)
+  const [isEditingWeightage, setIsEditingWeightage] = useState(false);
   const [weights, setWeights] = useState<Record<string, number>>({
-    F1: 2.0,
-    F2: 2.5,
-    F3: 1.5,
-    F4: 1.5,
-    F5: 2.0,
-    F6: 2.0,
+    F1: 1,
+    F2: 1,
+    F3: 1,
+    F4: 1,
+    F5: 1,
+    F6: 1,
+  });
+  const [tempWeights, setTempWeights] = useState<Record<string, number>>({
+    F1: 1,
+    F2: 1,
+    F3: 1,
+    F4: 1,
+    F5: 1,
+    F6: 1,
   });
 
   const [isLocked, setIsLocked] = useState(false);
   const [isRubricOpen, setIsRubricOpen] = useState(false);
+  const [isFactorsDrawerOpen, setIsFactorsDrawerOpen] = useState(false);
+  const [isEyeTooltipHovered, setIsEyeTooltipHovered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [scoringPage, setScoringPage] = useState(1);
@@ -261,16 +279,18 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     setSearchParams({ tab });
   };
 
-  // Reset Weights
+  // Reset Weights - Sets all factor weights to 1
   const handleResetWeights = () => {
-    setWeights({
-      F1: 2.0,
-      F2: 2.5,
-      F3: 1.5,
-      F4: 1.5,
-      F5: 2.0,
-      F6: 2.0,
-    });
+    const defaultW = {
+      F1: 1,
+      F2: 1,
+      F3: 1,
+      F4: 1,
+      F5: 1,
+      F6: 1,
+    };
+    setWeights(defaultW);
+    setTempWeights(defaultW);
   };
 
   // Toggle factor sort
@@ -303,6 +323,11 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     return Math.round((totalWeightedScore / maxWeightedScore) * 100);
   };
 
+  // Effective weights for live ranking updates during edit mode
+  const currentEffectiveWeights = useMemo(() => {
+    return isEditingWeightage ? tempWeights : weights;
+  }, [isEditingWeightage, tempWeights, weights]);
+
   // Solutions with live dynamically calculated scores
   const solutionsWithScores = useMemo(() => {
     return INITIAL_SOLUTION_SCORES.map((sol) => {
@@ -316,11 +341,17 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
 
   // Ranked Solutions for Live Ranking in Weightage tab
   const rankedSolutions = useMemo(() => {
-    return [...solutionsWithScores].sort((a, b) => {
+    return INITIAL_SOLUTION_SCORES.map((sol) => {
+      const calculatedScore = calculateScore(sol.fScores, currentEffectiveWeights);
+      return {
+        ...sol,
+        score: calculatedScore
+      };
+    }).sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       return b.revenueNum - a.revenueNum;
     });
-  }, [solutionsWithScores]);
+  }, [currentEffectiveWeights]);
 
   // Filtered & Sorted solutions for the table
   const filteredSolutions = useMemo(() => {
@@ -438,38 +469,50 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
       {activeTab === 'scoring' && (
         <div className="space-y-6">
           {/* Header Title with exact Catalogue Solutions font styling */}
-          <div className="space-y-1.5">
-            <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
-              AI solution scoring
-            </h2>
-            <p className="text-sm text-gray-600 leading-relaxed font-normal max-w-4xl">
-              Every catalogue solution is scored 1–5 on six revenue-oriented factors — an automatic AI assessment — giving a 0–100 attractiveness score and a fair, conservative revenue estimate. The only human lever is the weightage.
-            </p>
-          </div>
-
-          {/* THE SIX REVENUE FACTORS CARD (Snapshot 1) */}
-          <div className="bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs space-y-5">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              <Info className="w-4 h-4 text-gray-400 shrink-0" />
-              <span>THE SIX REVENUE FACTORS — WHAT F1 TO F6 MEAN</span>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="space-y-1.5 max-w-3xl">
+              <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
+                AI solution scoring
+              </h2>
+              <p className="text-sm text-gray-600 leading-relaxed font-normal">
+                Every catalogue solution is scored 1–5 on six revenue-oriented factors — an automatic AI assessment — giving a 0–100 attractiveness score and a fair, conservative revenue estimate. The only human lever is the weightage.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-1">
-              {FACTORS.map((f) => (
-                <div key={f.id} className="flex items-start gap-3.5">
-                  <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] font-bold text-xs flex items-center justify-center border border-orange-200/80 shrink-0 shadow-2xs">
-                    {f.code}
+            {/* Action Buttons: Eye Icon + View Scoring Factors Button */}
+            <div className="flex items-center gap-2.5 shrink-0 pt-0.5">
+              {/* Eye Button with Tooltip */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsFactorsDrawerOpen(true)}
+                  onMouseEnter={() => setIsEyeTooltipHovered(true)}
+                  onMouseLeave={() => setIsEyeTooltipHovered(false)}
+                  className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
+                  aria-label="See what AI solution scoring means"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+
+                {/* Tooltip */}
+                {isEyeTooltipHovered && (
+                  <div className="absolute bottom-full mb-2 right-0 px-3.5 py-2 bg-[#1e293b] text-white text-xs font-normal rounded-xl shadow-xl z-50 whitespace-nowrap">
+                    See what AI solution scoring means
+                    <div className="absolute top-full right-4 -translate-x-1/2 border-4 border-transparent border-t-[#1e293b]" />
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-semibold text-[#0D212C]">
-                      {f.name}
-                    </h4>
-                    <p className="text-[0.75rem] text-gray-500 leading-relaxed font-normal">
-                      {f.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                )}
+              </div>
+
+              {/* View Scoring Factors Button */}
+              <button
+                type="button"
+                onClick={() => setIsFactorsDrawerOpen(true)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-xs font-medium transition-colors shadow-2xs cursor-pointer group"
+              >
+                <BookOpen className="w-4 h-4 text-[#ED4D19]" />
+                <span>View scoring factors</span>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
 
@@ -582,21 +625,26 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                      <th className="py-3 px-6 font-normal min-w-[200px]">SOLUTION</th>
-                      <th className="py-3 px-6 font-normal min-w-[120px]">STATUS</th>
+                      <th className="py-3 px-6 font-normal min-w-[180px]">SOLUTION</th>
+                      <th className="py-3 px-4 font-normal text-center min-w-[100px]">STATUS</th>
                       {FACTORS.map((f) => (
                         <th 
                           key={f.id} 
                           onClick={() => handleToggleFactorSort(f.id)}
-                          className="py-3 px-4 font-normal text-center cursor-pointer select-none group whitespace-nowrap"
+                          className="py-3 px-2.5 font-normal text-center cursor-pointer select-none group"
                         >
-                          <div className="inline-flex items-center gap-1.5 hover:text-gray-800 transition-colors">
-                            <span>{f.fullName}</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
+                          <div className="inline-flex flex-col items-center justify-center hover:text-gray-800 transition-colors">
+                            <div className="flex items-center gap-1">
+                              <span className="font-semibold text-[#0D212C] text-[0.6875rem]">{f.code}</span>
+                              <ArrowUpDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
+                            </div>
+                            <span className="text-[0.625rem] text-gray-400 font-normal normal-case leading-tight mt-0.5 text-center whitespace-normal max-w-[85px]">
+                              {f.name}
+                            </span>
                           </div>
                         </th>
                       ))}
-                      <th className="py-3 px-6 font-normal text-right min-w-[100px]">
+                      <th className="py-3 px-6 font-normal text-right min-w-[90px]">
                         SCORE / 100
                       </th>
                     </tr>
@@ -677,7 +725,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                       onClick={() => setScoringPage(pageNum)}
                       className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                         scoringPage === pageNum
-                          ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                          ? 'bg-[#ED4D19] text-white font-medium shadow-2xs'
                           : 'text-gray-500 font-normal hover:text-gray-900'
                       }`}
                     >
@@ -714,30 +762,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
               </p>
             </div>
 
-            {/* Lock Action Button */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsLocked(!isLocked)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all shadow-xs cursor-pointer ${
-                  isLocked
-                    ? 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'
-                    : 'bg-gradient-to-r from-[#0D212C] to-[#1a3848] hover:opacity-95 text-white'
-                }`}
-              >
-                {isLocked ? (
-                  <>
-                    <Unlock className="w-3.5 h-3.5 text-gray-600" />
-                    <span>Unlock weightage</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-3.5 h-3.5 text-white/80" />
-                    <span>Lock weightage</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {/* Header text without Edit buttons */}
           </div>
 
           {/* 2-Column Grid: Sliders on Left, Live Ranking on Right */}
@@ -748,53 +773,94 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
                   Factor weights
                 </h3>
-                <button
-                  type="button"
-                  onClick={handleResetWeights}
-                  disabled={isLocked}
-                  className="text-xs font-medium text-[#ED4D19] hover:underline disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-opacity"
-                >
-                  Reset to v1
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleResetWeights}
+                    disabled={!isEditingWeightage}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-colors"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Reset to default</span>
+                  </button>
+                  
+                  {/* Edit Controls moved here */}
+                  {!isEditingWeightage ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempWeights({ ...weights });
+                        setIsEditingWeightage(true);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#ED4D19] hover:text-[#C93B0E] active:opacity-90 bg-transparent border-0 px-2 py-1 cursor-pointer transition-colors"
+                    >
+                      <Settings2 className="w-3.5 h-3.5 text-[#ED4D19]" />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingWeightage(false)}
+                        className="px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeights({ ...tempWeights });
+                          setIsEditingWeightage(false);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-opacity cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <span>Save</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-5">
                 {FACTORS.map((factor) => {
-                  const currentWeight = weights[factor.id] ?? factor.defaultWeight;
+                  const currentWeight = isEditingWeightage 
+                    ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
+                    : (weights[factor.id] ?? factor.defaultWeight);
                   return (
                     <div key={factor.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs font-semibold text-[#0D212C]">
-                            {factor.code}
-                          </div>
-                          <div className="text-[11px] text-gray-400">
-                            {factor.name}
+                          <div className="text-xs font-normal text-gray-400">
+                            {factor.code} {factor.name}
                           </div>
                         </div>
 
                         {/* Multiplier Value */}
-                        <div className="text-sm font-bold text-[#0D212C] font-mono">
-                          {currentWeight.toFixed(1)}x
+                        <div className="text-sm font-semibold text-[#0D212C] font-mono">
+                          {currentWeight}x
                         </div>
                       </div>
 
-                      {/* Slider Input with Part B Brand Orange Track */}
-                      <div className="flex items-center gap-3">
+                      {/* Slider Input with Part B Orange Track and White/Orange Thumb */}
+                      <div className="flex items-center gap-3 py-1">
                         <input
                           type="range"
-                          min="0.5"
-                          max="3.0"
-                          step="0.1"
-                          disabled={isLocked}
+                          min="0"
+                          max="3"
+                          step="1"
+                          disabled={!isEditingWeightage}
                           value={currentWeight}
                           onChange={(e) => {
-                            const val = parseFloat(e.target.value);
-                            setWeights((prev) => ({ ...prev, [factor.id]: val }));
+                            const val = parseInt(e.target.value, 10);
+                            setTempWeights((prev) => ({ ...prev, [factor.id]: val }));
                           }}
-                          className={`w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ED4D19] transition-opacity ${
-                            isLocked ? 'opacity-40 cursor-not-allowed' : ''
+                          className={`w-full h-1.5 rounded-full custom-slider-orange ${
+                            isEditingWeightage ? 'cursor-pointer opacity-100' : 'pointer-events-none opacity-100'
                           }`}
+                          style={{
+                            background: `linear-gradient(to right, #ED4D19 ${(currentWeight / 3) * 100}%, #e5e7eb ${(currentWeight / 3) * 100}%)`
+                          }}
                         />
                       </div>
                     </div>
@@ -853,6 +919,84 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SIDE DRAWER: THE SIX REVENUE FACTORS */}
+      {isFactorsDrawerOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Backdrop Blur */}
+          <div 
+            className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={() => setIsFactorsDrawerOpen(false)}
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-md md:max-w-lg bg-white shadow-2xl border-l border-gray-100 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
+              
+              {/* Drawer Header */}
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-wider text-[#ED4D19]">
+                    <Info className="w-3.5 h-3.5 text-[#ED4D19]" />
+                    <span>Scoring Framework</span>
+                  </div>
+                  <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
+                    The Six Revenue Factors
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsFactorsDrawerOpen(false)}
+                  className="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors border-0 cursor-pointer"
+                  aria-label="Close drawer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Drawer Body with Factor Cards */}
+              <div className="p-6 overflow-y-auto space-y-4 flex-1">
+                <p className="text-xs text-gray-500 leading-relaxed font-normal">
+                  Every catalogue solution is scored 1–5 on these six revenue-oriented factors to automatically assess attractiveness and revenue potential:
+                </p>
+
+                <div className="space-y-3 pt-1">
+                  {FACTORS.map((f) => (
+                    <div 
+                      key={f.id} 
+                      className="p-4 rounded-xl border border-gray-200/90 bg-white hover:border-gray-300 hover:shadow-2xs transition-all space-y-2"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-orange-50 text-[#ED4D19] font-bold text-xs flex items-center justify-center border border-orange-200/80 shrink-0">
+                          {f.code}
+                        </div>
+                        <h4 className="text-xs font-semibold text-[#0D212C]">
+                          {f.name}
+                        </h4>
+                      </div>
+                      <p className="text-[0.75rem] text-gray-500 leading-relaxed font-normal pl-10">
+                        {f.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsFactorsDrawerOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium shadow-xs transition-colors cursor-pointer border-0"
+                >
+                  Close
+                </button>
+              </div>
+
             </div>
           </div>
         </div>

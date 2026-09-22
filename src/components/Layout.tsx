@@ -144,8 +144,7 @@ export default function Layout() {
   const magicNavItems = [
     { id: 'overview', label: 'Overview', path: '/overview', icon: Star },
     { id: 'catalogue', label: 'Catalogue', path: '/catalogue', icon: Layers },
-    { id: 'ai-scoring', label: 'AI Scoring', path: '/ai-scoring', icon: BarChart2 },
-    { id: 'weightage', label: 'Weightage', path: '/weightage', icon: SlidersHorizontal },
+    { id: 'ai-scoring', label: 'AI Scoring & Weightage', path: '/ai-scoring', icon: BarChart2 },
     { id: 'roadmap', label: 'Build Roadmap', path: '/build-roadmap', icon: Map },
     { id: 'gtm', label: 'GTM Insights', path: '/gtm-insights', icon: Globe },
   ];
@@ -154,8 +153,7 @@ export default function Layout() {
   const getPageTitle = () => {
     if (location.pathname.includes('/catalogue')) return 'Catalogue';
     if (location.pathname.includes('/overview')) return 'Overview';
-    if (location.pathname.includes('/ai-scoring')) return 'AI Scoring';
-    if (location.pathname.includes('/weightage')) return 'Weightage';
+    if (location.pathname.includes('/ai-scoring')) return 'AI Scoring & Weightage';
     if (location.pathname.includes('/build-roadmap')) return 'Build Roadmap';
     if (location.pathname.includes('/gtm-insights')) return 'GTM Insights';
     if (location.pathname === '/new/tech') return 'Generate New Report';

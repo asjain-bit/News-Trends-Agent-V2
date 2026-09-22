@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useMagicStore } from '../../store/magicStore';
 import { 
   ChevronDown, 
   ChevronLeft, 
@@ -24,7 +25,11 @@ import {
   BarChart3,
   CheckCircle2,
   Upload,
-  FileText
+  FileText,
+  MoreVertical,
+  AlertTriangle,
+  Trash2,
+  PowerOff
 } from 'lucide-react';
 
 // Custom hook for clicking outside dropdowns
@@ -351,6 +356,56 @@ function CustomSelect({
   );
 }
 
+export const COUNTRY_FLAG_MAP: Record<string, string> = {
+  'United Arab Emirates': 'ae',
+  'UAE': 'ae',
+  'UAE (United Arab Emirates)': 'ae',
+  'Saudi Arabia': 'sa',
+  'KSA': 'sa',
+  'KSA (Saudi Arabia)': 'sa',
+  'Qatar': 'qa',
+  'Bahrain': 'bh',
+  'Oman': 'om',
+  'Kuwait': 'kw',
+  'Egypt': 'eg',
+  'Jordan': 'jo',
+  'Estonia': 'ee',
+  'South Korea': 'kr',
+  'United States': 'us',
+  'USA': 'us',
+  'USA (United States)': 'us',
+  'Azerbaijan': 'az',
+  'United Kingdom': 'gb',
+  'UK': 'gb',
+  'Australia': 'au',
+  'Canada': 'ca',
+  'Germany': 'de',
+  'France': 'fr',
+  'India': 'in',
+  'Japan': 'jp',
+  'Singapore': 'sg',
+  'Brazil': 'br',
+  'China': 'cn',
+  'Indonesia': 'id',
+  'Malaysia': 'my',
+  'Netherlands': 'nl',
+  'Switzerland': 'ch',
+  'Vietnam': 'vn',
+};
+
+export function CountryFlag({ country, className = "w-4 h-3" }: { country: string; className?: string }) {
+  const code = COUNTRY_FLAG_MAP[country] || 'un';
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${code}.png`}
+      srcSet={`https://flagcdn.com/w80/${code}.png 2x`}
+      alt={country}
+      className={`inline-block object-cover rounded-2xs shrink-0 shadow-2xs border border-black/10 ${className}`}
+      loading="lazy"
+    />
+  );
+}
+
 // Custom ComboBox (Input + Select) Component
 function CustomComboBox({
   label,
@@ -358,12 +413,14 @@ function CustomComboBox({
   options,
   onChange,
   disabled = false,
+  placeholder,
 }: {
   label: React.ReactNode;
   value: string;
   options: { label: string; value: string }[];
   onChange?: (val: string) => void;
   disabled?: boolean;
+  placeholder?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -376,11 +433,17 @@ function CustomComboBox({
   }, [value]);
 
   const filteredOptions = options.filter(o => o.label.toLowerCase().includes(inputValue.toLowerCase()));
+  const hasCountryFlag = COUNTRY_FLAG_MAP[inputValue] !== undefined;
 
   return (
     <div className="relative" ref={ref}>
       <label className="block text-xs font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="relative">
+      <div className="relative flex items-center">
+        {hasCountryFlag && (
+          <div className="absolute left-3 pointer-events-none flex items-center z-10">
+            <CountryFlag country={inputValue} className="w-4 h-3" />
+          </div>
+        )}
         <input
           type="text"
           disabled={disabled}
@@ -391,11 +454,12 @@ function CustomComboBox({
             onChange?.(e.target.value);
             setIsOpen(true);
           }}
-          className={`w-full px-3.5 py-2.5 text-xs border rounded-lg transition-colors pr-10 ${
+          className={`w-full ${hasCountryFlag ? 'pl-9' : 'px-3.5'} py-2.5 text-xs border rounded-lg transition-colors pr-10 ${
             disabled
               ? 'bg-gray-50/80 border-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-white border-gray-200 hover:border-gray-300 text-gray-800 focus:outline-none focus:border-[#36c0c9]'
+              : 'bg-white border-gray-200 hover:border-gray-300 text-gray-800 focus:outline-none focus:border-gray-300'
           }`}
+          placeholder={placeholder || "Search or select..."}
         />
         <button
           type="button"
@@ -410,25 +474,31 @@ function CustomComboBox({
       {isOpen && !disabled && (
         <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 max-h-48 overflow-y-auto">
           {filteredOptions.length > 0 ? (
-            filteredOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  setInputValue(option.value);
-                  onChange?.(option.value);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-3.5 py-2 text-xs transition-colors flex items-center justify-between ${
-                  option.value === value
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <span>{option.label}</span>
-                {option.value === value && <Check className="w-3.5 h-3.5 text-gray-700" />}
-              </button>
-            ))
+            filteredOptions.map((option) => {
+              const optHasFlag = COUNTRY_FLAG_MAP[option.value] !== undefined;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setInputValue(option.value);
+                    onChange?.(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-2 text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                    option.value === value
+                      ? 'bg-gray-100 text-gray-900 font-medium'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {optHasFlag && <CountryFlag country={option.value} className="w-4 h-3" />}
+                    <span>{option.label}</span>
+                  </div>
+                  {option.value === value && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                </button>
+              );
+            })
           ) : (
             <div className="px-3.5 py-2 text-xs text-gray-500">Press enter or click away to use custom value</div>
           )}
@@ -442,15 +512,39 @@ export default function Catalogue() {
   // Tabs: Solutions (1st), Components (2nd), Countries (3rd), Reuse grid (4th)
   const [activeTab, setActiveTab] = useState<'solutions' | 'components' | 'countries' | 'reuse'>('solutions');
 
-  // State
-  const [solutions, setSolutions] = useState<SolutionItem[]>(INITIAL_SOLUTIONS);
-  const [components, setComponents] = useState<ComponentItem[]>(INITIAL_COMPONENTS);
-  const [countries, setCountries] = useState<CountryItem[]>(INITIAL_COUNTRIES);
+  // Shared State from useMagicStore
+  const {
+    solutions,
+    setSolutions,
+    components,
+    setComponents,
+    countries,
+    setCountries,
+    reuseMatrix,
+    setReuseMatrix,
+  } = useMagicStore();
+
   const [viewingSolution, setViewingSolution] = useState<SolutionItem | null>(null);
   
+  // Add Country State
+  const [showAddCountryModal, setShowAddCountryModal] = useState(false);
+  const [newCountryName, setNewCountryName] = useState('');
+  const [newCountryNote, setNewCountryNote] = useState('');
+  
+  // Action Menus and Popups
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const [confirmActionPopup, setConfirmActionPopup] = useState<{
+    item: SolutionItem | ComponentItem;
+    type: 'solution' | 'component';
+    action: 'deactivate' | 'delete';
+  } | null>(null);
+  
+  // Close menus on outside click
+  const menuRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(menuRef, () => setActiveMenuId(null));
+  
   // Reuse Grid & Versioning State
-  const [reuseMatrix, setReuseMatrix] = useState<Record<string, string[]>>(INITIAL_REUSE_MATRIX);
-  const [tempReuseMatrix, setTempReuseMatrix] = useState<Record<string, string[]>>(INITIAL_REUSE_MATRIX);
+  const [tempReuseMatrix, setTempReuseMatrix] = useState<Record<string, string[]>>(reuseMatrix);
   const [isEditingReuse, setIsEditingReuse] = useState(false);
   const [versionHistory, setVersionHistory] = useState<ReuseVersion[]>(INITIAL_VERSION_HISTORY);
   const [currentVersionLabel, setCurrentVersionLabel] = useState('v2.1 (Current)');
@@ -719,6 +813,48 @@ export default function Catalogue() {
       )
     );
     setEditingComponent(null);
+  };
+
+  const handleConfirmAction = () => {
+    if (!confirmActionPopup) return;
+    const { item, type, action } = confirmActionPopup;
+    
+    if (type === 'solution') {
+      if (action === 'delete') {
+        setSolutions((prev) => prev.filter((s) => s.id !== item.id));
+      } else {
+        setSolutions((prev) => prev.map((s) => s.id === item.id ? { ...s, status: 'Deactivated' as any } : s));
+      }
+    } else {
+      if (action === 'delete') {
+        setComponents((prev) => prev.filter((c) => c.id !== item.id));
+      } else {
+        setComponents((prev) => prev.map((c) => c.id === item.id ? { ...c, status: 'Deactivated' as any } : c));
+      }
+    }
+    setConfirmActionPopup(null);
+  };
+
+  const handleAddCountry = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCountryName.trim()) return;
+
+    const newCountry: CountryItem = {
+      id: `c${Date.now()}`,
+      name: newCountryName,
+      spendCapita: '$120M', // default dummy data
+      population: '15M',
+      totalSpend: '$1.8B',
+      digitalShare: '12%',
+      obtainableSlice: '$216M',
+      dealAnchor: '$4.5M',
+      confidence: 'Medium',
+    };
+
+    setCountries([...countries, newCountry]);
+    setShowAddCountryModal(false);
+    setNewCountryName('');
+    setNewCountryNote('');
   };
 
   const handleAddSolution = (e: React.FormEvent) => {
@@ -1077,7 +1213,10 @@ export default function Catalogue() {
                     {targetCountryItems.map((country) => (
                       <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
                         <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
-                          {country.name}
+                          <div className="flex items-center gap-2.5">
+                            <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
+                            <span>{country.name}</span>
+                          </div>
                         </td>
                         <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
                           {country.totalSpend}
@@ -1302,15 +1441,39 @@ export default function Catalogue() {
                             {solution.compCount}
                           </td>
 
-                          {/* Action Column - Icon only without stroke/fill on hover */}
-                          <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                          {/* Action Column - 3-dot menu */}
+                          <td className="py-4 px-6 text-right relative" onClick={(e) => e.stopPropagation()}>
                             <button
-                              onClick={() => handleOpenEditSolution(solution)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenuId(activeMenuId === solution.id ? null : solution.id);
+                              }}
                               className="p-1 text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent transition-colors cursor-pointer border-0"
-                              title="Edit solution"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <MoreVertical className="w-4 h-4" />
                             </button>
+                            {activeMenuId === solution.id && (
+                              <div ref={menuRef} className="absolute right-6 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleOpenEditSolution(solution); setActiveMenuId(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" /> Edit Solution
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: solution, type: 'solution', action: 'deactivate' }); setActiveMenuId(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-xs text-orange-600 hover:bg-orange-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                                >
+                                  <PowerOff className="w-3.5 h-3.5" /> Deactivate Solution
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: solution, type: 'solution', action: 'delete' }); setActiveMenuId(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Delete Solution
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))
@@ -1344,7 +1507,7 @@ export default function Catalogue() {
                       onClick={() => setSolutionsPage(pageNum)}
                       className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                         solutionsPage === pageNum
-                          ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
+                          ? 'bg-[#ED4D19] text-white font-medium shadow-2xs'
                           : 'text-gray-500 font-normal hover:text-gray-900'
                       }`}
                     >
@@ -1509,14 +1672,39 @@ export default function Catalogue() {
                           {component.reuseCount} solutions
                         </td>
 
-                        <td className="py-4 px-6 text-right">
+                        {/* Action Column - 3-dot menu */}
+                        <td className="py-4 px-6 text-right relative" onClick={(e) => e.stopPropagation()}>
                           <button
-                            onClick={() => handleOpenEditComponent(component)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuId(activeMenuId === component.id ? null : component.id);
+                            }}
                             className="p-1 text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent transition-colors cursor-pointer border-0"
-                            title="Edit component"
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4" />
                           </button>
+                          {activeMenuId === component.id && (
+                            <div ref={menuRef} className="absolute right-6 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleOpenEditComponent(component); setActiveMenuId(null); }}
+                                className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" /> Edit Component
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: component, type: 'component', action: 'deactivate' }); setActiveMenuId(null); }}
+                                className="w-full text-left px-4 py-2.5 text-xs text-orange-600 hover:bg-orange-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                              >
+                                <PowerOff className="w-3.5 h-3.5" /> Deactivate Component
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setConfirmActionPopup({ item: component, type: 'component', action: 'delete' }); setActiveMenuId(null); }}
+                                className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete Component
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))
@@ -1550,7 +1738,7 @@ export default function Catalogue() {
                     onClick={() => setComponentsPage(pageNum)}
                     className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                       componentsPage === pageNum
-                        ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
+                        ? 'bg-[#ED4D19] text-white font-medium shadow-2xs'
                         : 'text-gray-500 font-normal hover:text-gray-900'
                     }`}
                   >
@@ -1615,6 +1803,15 @@ export default function Catalogue() {
                 <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAddCountryModal(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 active:opacity-90 text-white text-[0.8125rem] font-medium rounded-lg transition-all shadow-xs cursor-pointer border-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add country</span>
+              </button>
             </div>
           </div>
 
@@ -1661,7 +1858,10 @@ export default function Catalogue() {
                   {paginatedCountries.map((country) => (
                     <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
                       <td className="py-4 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
-                        {country.name}
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
+                          <span>{country.name}</span>
+                        </div>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
                         {country.spendCapita}
@@ -1724,7 +1924,7 @@ export default function Catalogue() {
                     onClick={() => setCountriesPage(pageNum)}
                     className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                       countriesPage === pageNum
-                        ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
+                        ? 'bg-[#ED4D19] text-white font-medium shadow-2xs'
                         : 'text-gray-500 font-normal hover:text-gray-900'
                     }`}
                   >
@@ -1956,6 +2156,52 @@ export default function Catalogue() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ACTION CONFIRMATION POPUP MODAL */}
+      {confirmActionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+            <button
+              onClick={() => setConfirmActionPopup(null)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs bg-red-50 text-red-600 border-red-100 mb-4"
+            >
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-[#0d212c] mb-2 capitalize">
+                {confirmActionPopup.action} {confirmActionPopup.type}
+              </h3>
+              <p className="text-[0.875rem] text-[#64748b] leading-relaxed max-w-sm mx-auto">
+                {confirmActionPopup.action === 'delete'
+                  ? `Are you sure you want to permanently delete ${confirmActionPopup.item.name}? This action cannot be undone.`
+                  : `Are you sure you want to deactivate ${confirmActionPopup.item.name}?`}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-4 w-full">
+              <button
+                type="button"
+                onClick={() => setConfirmActionPopup(null)}
+                className="px-6 py-3.5 rounded-xl border border-gray-200 text-[0.875rem] font-medium text-[#0d212c] hover:bg-gray-50 cursor-pointer flex-1 bg-transparent transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAction}
+                className="px-6 py-3.5 rounded-xl text-white text-[0.875rem] font-medium cursor-pointer flex-1 border-0 transition shadow-2xs capitalize bg-[#E50000] hover:bg-red-700"
+              >
+                {confirmActionPopup.action}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -2205,6 +2451,71 @@ export default function Catalogue() {
                   className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium shadow-xs transition-opacity cursor-pointer"
                 >
                   Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD COUNTRY MODAL */}
+      {showAddCountryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl border border-gray-100 relative">
+            <div className="flex items-center justify-between pb-4 mb-5 border-b border-gray-100">
+              <div>
+                <h3 className="text-xl font-semibold text-[#0D212C] font-['Poppins']">
+                  Add Country
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddCountryModal(false)}
+                className="text-gray-400 hover:text-gray-700 bg-transparent p-2 rounded-full hover:bg-gray-50 transition-colors cursor-pointer border-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCountry} className="space-y-5">
+              <CustomComboBox
+                label={<>Country <span className="text-red-500">*</span></>}
+                value={newCountryName}
+                onChange={setNewCountryName}
+                options={[
+                  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Bahrain', 
+                  'Oman', 'Kuwait', 'Egypt', 'Jordan', 'Estonia', 'South Korea',
+                  'United Kingdom', 'United States', 'Azerbaijan', 'Singapore',
+                  'Germany', 'France', 'Australia', 'Canada', 'India', 'Japan'
+                ].map(c => ({ label: c, value: c }))}
+                placeholder="Search or select country"
+              />
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Note</label>
+                <textarea
+                  rows={3}
+                  value={newCountryNote}
+                  onChange={(e) => setNewCountryNote(e.target.value)}
+                  placeholder="Optional details about this market..."
+                  className="w-full px-3.5 py-2.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 transition-colors"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddCountryModal(false)}
+                  className="flex-1 py-2.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-medium transition-colors cursor-pointer bg-transparent"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newCountryName.trim()}
+                  className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium shadow-xs transition-opacity cursor-pointer border-0"
+                >
+                  Add Country
                 </button>
               </div>
             </form>

@@ -50,3 +50,31 @@ body {
   background: var(--bg-default);
   min-height: 100vh;
 }
+
+.custom-slider-orange {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.custom-slider-orange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3.5px solid #ED4D19;
+  box-shadow: 0 2px 5px rgba(237, 77, 25, 0.25);
+  cursor: pointer;
+}
+
+.custom-slider-orange::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3.5px solid #ED4D19;
+  box-shadow: 0 2px 5px rgba(237, 77, 25, 0.25);
+  cursor: pointer;
+}
+
