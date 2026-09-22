@@ -471,70 +471,72 @@ export default function BuildRoadmap() {
         </div>
       </div>
 
-      {/* 3 KPI Cards Displayed Across Both Tabs with Icons & Reduced Font Weight */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Card 1: Solutions Unlocked */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              SOLUTIONS UNLOCKED
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
+      {/* 3 KPI Cards Displayed Across Both Tabs with Icons & Reduced Font Weight (Hidden when viewing component details) */}
+      {!viewingComponent && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Card 1: Solutions Unlocked */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                SOLUTIONS UNLOCKED
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>{unlockedSolutions.length}</span>
+                <span className="text-xs font-normal text-gray-400 font-sans">/ {solutionImpactStatuses.length} total</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                Fully assembled & commercialized
+              </p>
             </div>
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>{unlockedSolutions.length}</span>
-              <span className="text-xs font-normal text-gray-400 font-sans">/ {solutionImpactStatuses.length} total</span>
-            </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              Fully assembled & commercialized
-            </p>
-          </div>
-        </div>
 
-        {/* Card 2: 3-Yr Revenue Unlocked */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              3-YR REVENUE UNLOCKED
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
+          {/* Card 2: 3-Yr Revenue Unlocked */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                3-YR REVENUE UNLOCKED
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins']">
+                ${totalUnlockedRevenue}M
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                Cumulative addressable ARR from unlocked solutions
+              </p>
             </div>
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins']">
-              ${totalUnlockedRevenue}M
-            </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              Cumulative addressable ARR from unlocked solutions
-            </p>
-          </div>
-        </div>
 
-        {/* Card 3: Solutions In Progress */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              IN PROGRESS
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+          {/* Card 3: Solutions In Progress */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                IN PROGRESS
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Clock className="w-4 h-4" />
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>{inProgressSolutions.length}</span>
-              <span className="text-xs font-normal text-gray-400 font-sans">solutions</span>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>{inProgressSolutions.length}</span>
+                <span className="text-xs font-normal text-gray-400 font-sans">solutions</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                Building shared component foundations
+              </p>
             </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              Building shared component foundations
-            </p>
           </div>
         </div>
-      </div>
+      )}
 
       {/* TAB 1: COMPONENT BUILD */}
       {activeTab === 'components' && (
@@ -556,10 +558,9 @@ export default function BuildRoadmap() {
 
               {/* Main Details Card */}
               {(() => {
-                const compRank = sortedComponents.findIndex((c) => c.id === viewingComponent.id) + 1 || 1;
                 const actualReuse = (reuseMatrix[viewingComponent.id] || []).length || viewingComponent.reuseCount || 0;
                 const details = COMPONENT_DETAILS_DATA[viewingComponent.id] || {
-                  rank: compRank,
+                  rank: 1,
                   features: [
                     {
                       title: 'Core Module Architecture',
@@ -601,29 +602,17 @@ export default function BuildRoadmap() {
                   ? viewingComponent.effort.replace('pd', 'person-days') 
                   : '~50 person-days';
 
-                const compScore = viewingComponent.id === 'c1' ? 87 : viewingComponent.id === 'c2' ? 80 : viewingComponent.id === 'c3' ? 78 : viewingComponent.id === 'c4' ? 75 : 70;
-
                 return (
                   <div className="bg-white rounded-2xl border border-gray-200/90 p-6 md:p-8 shadow-xs space-y-7">
-                    {/* Component Header / Top Bar (Snapshot 1) */}
+                    {/* Component Header / Top Bar without number and now chip */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-gray-100">
-                      <div className="flex items-start gap-4 sm:gap-6">
-                        <div className="text-xl sm:text-2xl font-normal text-gray-400 font-mono select-none pt-0.5">
-                          {compRank}
-                        </div>
-                        <div className="space-y-1.5">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h3 className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins']">
-                              {viewingComponent.name}
-                            </h3>
-                            <span className="px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium uppercase tracking-wider bg-[#E6F7F8] text-[#0A6B74] border border-[#C5EEF0]">
-                              {viewingComponent.status === 'In progress' ? 'NOW' : viewingComponent.status.toUpperCase()}
-                            </span>
-                          </div>
-                          <p className="text-xs sm:text-[0.8125rem] text-gray-400 font-normal">
-                            {viewingComponent.subtitle}
-                          </p>
-                        </div>
+                      <div className="space-y-1.5">
+                        <h3 className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins']">
+                          {viewingComponent.name}
+                        </h3>
+                        <p className="text-xs sm:text-[0.8125rem] text-gray-400 font-normal">
+                          {viewingComponent.subtitle}
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-4 self-start sm:self-auto">
@@ -635,11 +624,6 @@ export default function BuildRoadmap() {
                           <span className="text-xs sm:text-sm font-semibold text-[#0D212C] mt-0.5 font-['Poppins']">
                             {compEffortFormatted}
                           </span>
-                        </div>
-
-                        {/* Reuse / Score Indicator */}
-                        <div className="text-xl sm:text-2xl font-bold text-[#0D212C] font-['Poppins']">
-                          {compScore}
                         </div>
                       </div>
                     </div>
@@ -669,7 +653,7 @@ export default function BuildRoadmap() {
                       </div>
                     </div>
 
-                    {/* Reused Across X Solutions (Snapshot 2) */}
+                    {/* Reused Across X Solutions (Orange Chips) */}
                     <div className="space-y-3 pt-3 border-t border-gray-100">
                       <h4 className="text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">
                         REUSED ACROSS {displaySolNames.length} SOLUTIONS
@@ -678,7 +662,7 @@ export default function BuildRoadmap() {
                         {displaySolNames.map((solName, idx) => (
                           <span
                             key={idx}
-                            className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#E6F7F8] text-[#0A6B74] border border-[#C5EEF0] transition-colors"
+                            className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-orange-50 text-[#ED4D19] border border-orange-100 transition-colors"
                           >
                             {solName}
                           </span>
