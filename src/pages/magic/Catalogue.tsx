@@ -29,7 +29,8 @@ import {
   MoreVertical,
   AlertTriangle,
   Trash2,
-  Ban
+  Ban,
+  RotateCw
 } from 'lucide-react';
 
 // Custom hook for clicking outside dropdowns
@@ -1019,7 +1020,7 @@ export default function Catalogue() {
     <div className="w-full px-4 sm:px-8 lg:px-12 py-6 md:py-8 space-y-6">
       {/* Underline Tabs - Hidden when viewing solution details page */}
       {viewingSolution === null && (
-        <div className="inline-block border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 gap-2">
           <nav className="flex space-x-1 sm:space-x-2 -mb-[1px]">
             <button
               onClick={() => {
@@ -1077,6 +1078,13 @@ export default function Catalogue() {
               Reuse grid
             </button>
           </nav>
+
+          {activeTab === 'countries' && (
+            <div className="inline-flex items-center gap-1.5 pb-2 text-gray-500 text-xs font-normal">
+              <RotateCw className="w-3.5 h-3.5 text-gray-400" />
+              <span>Last synced 1 month ago</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -1813,11 +1821,6 @@ export default function Catalogue() {
               <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
                 Countries
               </h2>
-              {showSyncNotice && (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-gray-100/80 border border-gray-200/60 text-gray-500 text-[0.6875rem] font-normal animate-in fade-in duration-300">
-                  <span>Last synced 1 month ago</span>
-                </div>
-              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-3">

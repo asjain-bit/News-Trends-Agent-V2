@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft, Search } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft, Search, Filter } from 'lucide-react';
 import { useMagicStore, ComponentItem } from '../../store/magicStore';
 
 const COMPONENT_DETAILS_DATA: Record<string, {
@@ -922,57 +922,41 @@ export default function BuildRoadmap() {
         <div className="space-y-4">
           {/* Solutions Progress Section */}
           <div className="space-y-3.5">
-            {/* Top Row: Title on Left, Search Bar on Right */}
+            {/* Top Row: Title on Left, Search Bar & Status Filter on Right */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h3 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins']">
                 Solution progress
               </h3>
 
-              {/* Search Bar on Right */}
-              <div className="relative w-full sm:w-64">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                <input
-                  type="text"
-                  value={impactSearch}
-                  onChange={(e) => setImpactSearch(e.target.value)}
-                  placeholder="Search solutions..."
-                  className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
-                />
-              </div>
-            </div>
+              {/* Right side: Search Bar + Filter by Status dropdown */}
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Search Bar */}
+                <div className="relative w-56 sm:w-64">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={impactSearch}
+                    onChange={(e) => setImpactSearch(e.target.value)}
+                    placeholder="Search solutions..."
+                    className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
+                  />
+                </div>
 
-            {/* Next Line: 3 Tabs (All, In progress, Unlocked) in reference pill styling */}
-            <div className="flex flex-wrap items-center gap-2 pt-0.5">
-              {[
-                { id: 'all', label: 'All', count: solutionImpactStatuses.length },
-                { id: 'in_progress', label: 'In progress', count: inProgressSolutions.length },
-                { id: 'unlocked', label: 'Unlocked', count: unlockedSolutions.length },
-              ].map((tab) => {
-                const isActive = impactSort === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setImpactSort(tab.id as 'all' | 'in_progress' | 'unlocked')}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-[0.8125rem] font-medium transition-all cursor-pointer border ${
-                      isActive
-                        ? 'bg-[#ED4D19] text-white border-[#ED4D19] shadow-xs'
-                        : 'bg-white text-gray-700 border-gray-200/90 hover:border-gray-300 hover:bg-gray-50/60'
-                    }`}
+                {/* Filter by Status Button / Dropdown on Right Side of Search Bar */}
+                <div className="relative w-[130px]">
+                  <select
+                    value={impactSort}
+                    onChange={(e) => setImpactSort(e.target.value as 'all' | 'in_progress' | 'unlocked')}
+                    className="w-full appearance-none bg-white border border-gray-200 rounded-xl pl-8 pr-7 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                   >
-                    <span>{tab.label}</span>
-                    <span
-                      className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[0.6875rem] font-semibold min-w-[20px] ${
-                        isActive
-                          ? 'bg-white/25 text-white'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  </button>
-                );
-              })}
+                    <option value="all">All Status</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="unlocked">Unlocked</option>
+                  </select>
+                  <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
             </div>
 
             {/* Grid of Solution Cards (3 columns on desktop) with Subtle Light Orange Progress Bars */}
