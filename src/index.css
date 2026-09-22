@@ -78,13 +78,37 @@ body {
   border: 2px solid white;
 }
 
-/* Remove focus outlines and caret/black line artifacts on table headers and buttons */
-th, th *, button, [role="button"] {
-  -webkit-tap-highlight-color: transparent;
-  outline: none !important;
+/* Remove focus outlines, caret artifacts, and black line flashes during table sorting */
+table {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-th:focus, th:focus-visible, button:focus, button:focus-visible {
+thead th {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr td {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+th, th *, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  user-select: none;
+}
+
+th:focus, th:focus-visible, button:focus, button:focus-visible, tr:focus, tr:focus-visible, td:focus, td:focus-visible {
   outline: none !important;
   box-shadow: none !important;
+}
+
+th button, th div, th span {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
 }

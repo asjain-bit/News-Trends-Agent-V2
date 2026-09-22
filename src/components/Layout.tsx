@@ -464,6 +464,15 @@ export default function Layout() {
                   Maintain the three portfolio lists components, solutions and countries then map which components make up which solutions.
                 </p>
               </div>
+            ) : location.pathname.includes('/gtm-insights') ? (
+              <div className="flex flex-col">
+                <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] leading-tight">
+                  GTM Insights
+                </h1>
+                <p className="text-[0.75rem] text-slate-500 font-normal leading-tight hidden md:block mt-0.5">
+                  Search by country or solution to generate an M42-branded go-to-market deck with an on-screen preview and editable PPT. All revenue estimates are data-backed and realistic.
+                </p>
+              </div>
             ) : (
               <h1 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] hidden md:block">
                 {getPageTitle()}

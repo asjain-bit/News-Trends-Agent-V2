@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft, Search } from 'lucide-react';
 import { useMagicStore, ComponentItem } from '../../store/magicStore';
 
 const COMPONENT_DETAILS_DATA: Record<string, {
@@ -390,6 +390,21 @@ export default function BuildRoadmap() {
   const totalUnlockedRevenue = useMemo(() => {
     return unlockedSolutions.reduce((acc, curr) => acc + curr.revNum, 0);
   }, [unlockedSolutions]);
+
+  // Build Impact Search & Sort state
+  const [impactSearch, setImpactSearch] = useState('');
+  const [impactSort, setImpactSort] = useState<'all' | 'in_progress' | 'unlocked'>('all');
+
+  const filteredSolutionImpactStatuses = useMemo(() => {
+    return solutionImpactStatuses.filter((sol) => {
+      const matchesSearch = sol.name.toLowerCase().includes(impactSearch.toLowerCase());
+      const matchesFilter =
+        impactSort === 'all' ||
+        (impactSort === 'unlocked' && sol.isUnlocked) ||
+        (impactSort === 'in_progress' && !sol.isUnlocked);
+      return matchesSearch && matchesFilter;
+    });
+  }, [solutionImpactStatuses, impactSearch, impactSort]);
 
   return (
     <div className="w-full px-4 sm:px-8 lg:px-12 py-6 md:py-8 space-y-6">
@@ -907,61 +922,110 @@ export default function BuildRoadmap() {
         <div className="space-y-4">
           {/* Solutions Progress Section */}
           <div className="space-y-3.5">
-            <h3 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins']">
-              Solutions Progress
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins']">
+                Solution progress
+              </h3>
+
+              {/* Right side: 2 sorting/filter chips (In progress & Unlocked) + Search Bar */}
+              <div className="flex flex-wrap items-center gap-3">
+                {/* 2 Sorting / Filter Chips */}
+                <div className="inline-flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setImpactSort(impactSort === 'in_progress' ? 'all' : 'in_progress')}
+                    className={`px-3 py-1 rounded-full text-xs transition-colors cursor-pointer border ${
+                      impactSort === 'in_progress'
+                        ? 'bg-amber-50 text-amber-700 border-amber-300 font-medium'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 font-normal'
+                    }`}
+                  >
+                    In progress
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImpactSort(impactSort === 'unlocked' ? 'all' : 'unlocked')}
+                    className={`px-3 py-1 rounded-full text-xs transition-colors cursor-pointer border ${
+                      impactSort === 'unlocked'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300 font-medium'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 font-normal'
+                    }`}
+                  >
+                    Unlocked
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative w-52 sm:w-60">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={impactSearch}
+                    onChange={(e) => setImpactSearch(e.target.value)}
+                    placeholder="Search solutions..."
+                    className="w-full bg-white border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Grid of Solution Cards (3 columns on desktop) with Subtle Light Orange Progress Bars */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {solutionImpactStatuses.map((sol) => (
-                <div
-                  key={sol.id}
-                  className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3.5 hover:border-gray-300 transition-all"
-                >
-                  {/* Top Row: Solution Name + Title Case Tag */}
-                  <div className="flex items-start justify-between gap-3">
-                    <h4 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins'] leading-snug">
-                      {sol.name}
-                    </h4>
+              {filteredSolutionImpactStatuses.length === 0 ? (
+                <div className="col-span-full py-10 text-center text-xs text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
+                  No solutions found matching "{impactSearch}".
+                </div>
+              ) : (
+                filteredSolutionImpactStatuses.map((sol) => (
+                  <div
+                    key={sol.id}
+                    className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3.5 hover:border-gray-300 transition-all"
+                  >
+                    {/* Top Row: Solution Name + Title Case Tag */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins'] leading-snug">
+                        {sol.name}
+                      </h4>
 
-                    {sol.isUnlocked ? (
-                      <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        Unlocked
-                      </span>
-                    ) : (
-                      <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                        In progress
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Middle: Crisp Vibrant Orange Progress Bar + Percentage on the Right */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden flex-1">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#FF6B38] to-[#ED4D19] transition-all duration-300"
-                          style={{ width: `${sol.progressPercent}%` }}
-                        />
-                      </div>
-                      <span className="text-[0.75rem] font-medium text-gray-600 min-w-[32px] text-right font-mono">
-                        {sol.progressPercent}%
-                      </span>
+                      {sol.isUnlocked ? (
+                        <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Unlocked
+                        </span>
+                      ) : (
+                        <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                          In progress
+                        </span>
+                      )}
                     </div>
 
-                    {/* Bottom: Clean Description without Status Duplication */}
-                    {sol.isUnlocked ? (
-                      <div className="text-xs text-gray-600 font-normal">
-                        <span className="font-semibold text-[#ED4D19]">{sol.revenue3Yr}</span> unlocked · ~${sol.annualRevCalculated}M/yr
+                    {/* Middle: Crisp Vibrant Orange Progress Bar + Percentage on the Right */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden flex-1">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[#FF6B38] to-[#ED4D19] transition-all duration-300"
+                            style={{ width: `${sol.progressPercent}%` }}
+                          />
+                        </div>
+                        <span className="text-[0.75rem] font-medium text-gray-600 min-w-[32px] text-right font-mono">
+                          {sol.progressPercent}%
+                        </span>
                       </div>
-                    ) : (
-                      <div className="text-xs text-gray-500 font-normal">
-                        {sol.builtReq} of {sol.totalReq} components built
-                      </div>
-                    )}
+
+                      {/* Bottom: Clean Description without Status Duplication */}
+                      {sol.isUnlocked ? (
+                        <div className="text-xs text-gray-600 font-normal">
+                          <span className="font-semibold text-[#ED4D19]">{sol.revenue3Yr}</span> unlocked · ~${sol.annualRevCalculated}M/yr
+                        </div>
+                      ) : (
+                        <div className="text-xs text-gray-500 font-normal">
+                          {sol.builtReq} of {sol.totalReq} components built
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

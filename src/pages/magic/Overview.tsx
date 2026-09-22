@@ -247,14 +247,10 @@ export default function Overview() {
                     <button
                       type="button"
                       onClick={() => handleSort('effort')}
-                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0"
+                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0 outline-none focus:outline-none group"
                     >
                       <span>BUILD EFFORT</span>
-                      {sortField === 'effort' ? (
-                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
-                      ) : (
-                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
-                      )}
+                      <ArrowUpDown className={`w-3.5 h-3.5 ${sortField === 'effort' ? 'text-gray-700' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
                     </button>
                   </th>
 
@@ -263,14 +259,10 @@ export default function Overview() {
                     <button
                       type="button"
                       onClick={() => handleSort('revenue')}
-                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0"
+                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0 outline-none focus:outline-none group"
                     >
                       <span>3-YR REVENUE</span>
-                      {sortField === 'revenue' ? (
-                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
-                      ) : (
-                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
-                      )}
+                      <ArrowUpDown className={`w-3.5 h-3.5 ${sortField === 'revenue' ? 'text-gray-700' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
                     </button>
                   </th>
 
@@ -279,14 +271,10 @@ export default function Overview() {
                     <button
                       type="button"
                       onClick={() => handleSort('score')}
-                      className="inline-flex items-center justify-end gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0 ml-auto"
+                      className="inline-flex items-center justify-end gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0 ml-auto outline-none focus:outline-none group"
                     >
                       <span>AI SCORE</span>
-                      {sortField === 'score' ? (
-                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
-                      ) : (
-                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
-                      )}
+                      <ArrowUpDown className={`w-3.5 h-3.5 ${sortField === 'score' ? 'text-gray-700' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
                     </button>
                   </th>
                 </tr>

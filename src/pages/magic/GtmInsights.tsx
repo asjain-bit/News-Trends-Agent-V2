@@ -262,15 +262,6 @@ export default function GtmInsights() {
         </nav>
       </div>
 
-      {/* Page Header */}
-      <div className="space-y-1.5 max-w-4xl">
-        <h1 className="text-xl font-medium text-[#0D212C] font-['Poppins']">
-          GTM Insights
-        </h1>
-        <p className="text-xs text-gray-500 leading-relaxed font-light">
-          Search by country or solution to generate an M42-branded go-to-market deck with an on-screen preview and editable PPT. All revenue estimates are data-backed and realistic.
-        </p>
-      </div>
 
       {/* Input Selection Bar & Generate CTA */}
       <div className="space-y-2">
@@ -408,7 +399,7 @@ export default function GtmInsights() {
             <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#ED4D19] flex items-center justify-center border border-orange-100 shadow-2xs">
               <FileText className="w-6 h-6" />
             </div>
-            <p className="text-sm text-gray-500 max-w-md font-normal leading-relaxed">
+            <p className="text-xs text-gray-500 max-w-md font-normal leading-relaxed">
               Search any {activeTab === 'country' ? 'country' : 'solution'} above, then <span className="font-medium text-gray-700">Generate deck</span> to preview the templatized slides and download the full PPT.
             </p>
           </div>
@@ -431,20 +422,6 @@ export default function GtmInsights() {
                   <p className="text-xs text-gray-500 font-normal">
                     {generatedDeck.subtitle}
                   </p>
-                </div>
-
-                {/* Download PPT CTA */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      alert(`Downloading "${generatedDeck.title}.pptx" formatted for M42 executive presentations.`);
-                    }}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-xl shadow-xs transition-all cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download PPT (.pptx)</span>
-                  </button>
                 </div>
               </div>
 
@@ -485,9 +462,16 @@ export default function GtmInsights() {
                 <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
                   Templatized Slide Outlines ({generatedDeck.slides.length} Slides)
                 </h3>
-                <span className="text-xs text-gray-400 font-normal">
-                  M42 Executive Theme · 16:9 Aspect Ratio · 1 Slide Per Row
-                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert(`Downloading "${generatedDeck.title}.pptx" formatted for M42 executive presentations.`);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download PPT</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 gap-6">

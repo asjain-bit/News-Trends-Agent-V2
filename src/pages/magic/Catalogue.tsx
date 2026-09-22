@@ -530,6 +530,19 @@ export default function Catalogue() {
   const [showAddCountryModal, setShowAddCountryModal] = useState(false);
   const [newCountryName, setNewCountryName] = useState('');
   const [newCountryNote, setNewCountryNote] = useState('');
+  const [isAnalyzingCountry, setIsAnalyzingCountry] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState('');
+  const [showSyncNotice, setShowSyncNotice] = useState(true);
+
+  useEffect(() => {
+    if (activeTab === 'countries') {
+      setShowSyncNotice(true);
+      const timer = setTimeout(() => {
+        setShowSyncNotice(false);
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab]);
   
   // Action Menus and Popups
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -840,22 +853,42 @@ export default function Catalogue() {
     e.preventDefault();
     if (!newCountryName.trim()) return;
 
-    const newCountry: CountryItem = {
-      id: `c${Date.now()}`,
-      name: newCountryName,
-      spendCapita: '$120M', // default dummy data
-      population: '15M',
-      totalSpend: '$1.8B',
-      digitalShare: '12%',
-      obtainableSlice: '$216M',
-      dealAnchor: '$4.5M',
-      confidence: 'Medium',
-    };
+    setIsAnalyzingCountry(true);
+    setAnalysisStep('Querying WHO & World Bank healthcare expenditure database...');
 
-    setCountries([...countries, newCountry]);
-    setShowAddCountryModal(false);
-    setNewCountryName('');
-    setNewCountryNote('');
+    setTimeout(() => {
+      setAnalysisStep('Profiling digital health share & population TAM...');
+      setTimeout(() => {
+        setAnalysisStep('Computing obtainable market slice & deal anchor...');
+        setTimeout(() => {
+          const mockSpend = Math.floor(Math.random() * 1800 + 400);
+          const mockPop = (Math.random() * 45 + 5).toFixed(1);
+          const mockTotal = Math.round((mockSpend * parseFloat(mockPop)) / 1000);
+          const mockDigital = Math.floor(Math.random() * 8 + 3);
+          const mockSlice = Math.floor(Math.random() * 2 + 1);
+          const mockAnchor = Math.round((mockTotal * 1000 * (mockDigital / 100) * (mockSlice / 100)) / 10);
+
+          const newCountry: CountryItem = {
+            id: `c${Date.now()}`,
+            name: newCountryName,
+            spendCapita: `$${mockSpend.toLocaleString()}`,
+            population: `${mockPop}M`,
+            totalSpend: `$${mockTotal}B`,
+            digitalShare: `${mockDigital}%`,
+            obtainableSlice: `${mockSlice}%`,
+            dealAnchor: `$${Math.max(2, mockAnchor)}M`,
+            confidence: mockSpend > 1000 ? 'High' : 'Medium',
+          };
+
+          setCountries([...countries, newCountry]);
+          setIsAnalyzingCountry(false);
+          setAnalysisStep('');
+          setShowAddCountryModal(false);
+          setNewCountryName('');
+          setNewCountryNote('');
+        }, 500);
+      }, 600);
+    }, 600);
   };
 
   const handleAddSolution = (e: React.FormEvent) => {
@@ -1438,9 +1471,14 @@ export default function Catalogue() {
                             {solution.score}
                           </td>
 
-                          {/* Revenue 3-Yr - PRIMARY COLOR (#ED4D19) instead of purple */}
-                          <td className="py-4 px-6 text-[0.875rem] font-normal text-[#ED4D19]">
-                            {solution.revenue3Yr}
+                          {/* Revenue */}
+                          <td className="py-4 px-6">
+                            <div className="flex flex-col leading-tight">
+                              <span className="text-[0.875rem] font-normal text-[#0D212C]">{solution.revenue3Yr}</span>
+                              <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
+                                ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M per year
+                              </span>
+                            </div>
                           </td>
 
                           {/* Comp Count - reduced font weight */}
@@ -1771,10 +1809,15 @@ export default function Catalogue() {
       {activeTab === 'countries' && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
                 Countries
               </h2>
+              {showSyncNotice && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-gray-100/80 border border-gray-200/60 text-gray-500 text-[0.6875rem] font-normal animate-in fade-in duration-300">
+                  <span>Last synced 1 month ago</span>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -2493,48 +2536,67 @@ export default function Catalogue() {
               </button>
             </div>
 
-            <form onSubmit={handleAddCountry} className="space-y-5">
-              <CustomComboBox
-                label={<>Country <span className="text-red-500">*</span></>}
-                value={newCountryName}
-                onChange={setNewCountryName}
-                options={[
-                  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Bahrain', 
-                  'Oman', 'Kuwait', 'Egypt', 'Jordan', 'Estonia', 'South Korea',
-                  'United Kingdom', 'United States', 'Azerbaijan', 'Singapore',
-                  'Germany', 'France', 'Australia', 'Canada', 'India', 'Japan'
-                ].map(c => ({ label: c, value: c }))}
-                placeholder="Search or select country"
-              />
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Note</label>
-                <textarea
-                  rows={3}
-                  value={newCountryNote}
-                  onChange={(e) => setNewCountryNote(e.target.value)}
-                  placeholder="Optional details about this market..."
-                  className="w-full px-3.5 py-2.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 transition-colors"
+            {isAnalyzingCountry ? (
+              <div className="py-8 px-4 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-[#ED4D19] shadow-xs">
+                  <Sparkles className="w-7 h-7 animate-spin" />
+                </div>
+                <div className="space-y-1.5 max-w-xs">
+                  <h4 className="text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                    AI Market Analysis in progress
+                  </h4>
+                  <p className="text-xs text-gray-500 font-normal leading-relaxed">
+                    {analysisStep}
+                  </p>
+                </div>
+                <div className="w-56 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] h-full rounded-full animate-pulse w-4/5" />
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleAddCountry} className="space-y-5">
+                <CustomComboBox
+                  label={<>Country <span className="text-red-500">*</span></>}
+                  value={newCountryName}
+                  onChange={setNewCountryName}
+                  options={[
+                    'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Bahrain', 
+                    'Oman', 'Kuwait', 'Egypt', 'Jordan', 'Estonia', 'South Korea',
+                    'United Kingdom', 'United States', 'Azerbaijan', 'Singapore',
+                    'Germany', 'France', 'Australia', 'Canada', 'India', 'Japan'
+                  ].map(c => ({ label: c, value: c }))}
+                  placeholder="Search or select country"
                 />
-              </div>
 
-              <div className="flex gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddCountryModal(false)}
-                  className="flex-1 py-2.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-medium transition-colors cursor-pointer bg-transparent"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!newCountryName.trim()}
-                  className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium shadow-xs transition-opacity cursor-pointer border-0"
-                >
-                  Add Country
-                </button>
-              </div>
-            </form>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Note</label>
+                  <textarea
+                    rows={3}
+                    value={newCountryNote}
+                    onChange={(e) => setNewCountryNote(e.target.value)}
+                    placeholder="Optional details about this market..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 transition-colors"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCountryModal(false)}
+                    className="flex-1 py-2.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-medium transition-colors cursor-pointer bg-transparent"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!newCountryName.trim()}
+                    className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium shadow-xs transition-opacity cursor-pointer border-0"
+                  >
+                    Add Country
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
