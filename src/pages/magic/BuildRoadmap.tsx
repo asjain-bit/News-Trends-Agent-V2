@@ -1005,7 +1005,7 @@ export default function BuildRoadmap() {
                       {/* Bottom: Clean Description without Status Duplication */}
                       {sol.isUnlocked ? (
                         <div className="text-xs text-gray-600 font-normal">
-                          <span className="font-semibold text-[#ED4D19]">{sol.revenue3Yr}</span> unlocked · ~${sol.annualRevCalculated}M/yr
+                          <span className="font-semibold text-[#ED4D19]">{sol.revenue3Yr}</span> <span className="text-gray-400 text-[0.6875rem] font-normal">(3 - YR)</span> · ~${sol.annualRevCalculated}M/yr
                         </div>
                       ) : (
                         <div className="text-xs text-gray-500 font-normal">
