@@ -509,6 +509,164 @@ function CustomComboBox({
   );
 }
 
+// Category Selection Dropdown with Search & Custom Input on Enter matching snapshot
+function CategorySelectDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  disabled = false,
+}: {
+  label: React.ReactNode;
+  value: string;
+  options: string[];
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const mainInputRef = useRef<HTMLInputElement>(null);
+  const innerInputRef = useRef<HTMLInputElement>(null);
+
+  useOnClickOutside(ref, () => {
+    setIsOpen(false);
+    setSearchQuery('');
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        innerInputRef.current?.focus();
+      }, 50);
+    }
+  }, [isOpen]);
+
+  const activeQuery = searchQuery;
+  const filteredOptions = options.filter(opt => 
+    opt.toLowerCase().includes(activeQuery.toLowerCase())
+  );
+
+  const handleInnerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        onChange(searchQuery.trim());
+        setIsOpen(false);
+        setSearchQuery('');
+      } else if (filteredOptions.length > 0) {
+        onChange(filteredOptions[0]);
+        setIsOpen(false);
+        setSearchQuery('');
+      }
+    }
+  };
+
+  const handleMainKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (value.trim()) {
+        onChange(value.trim());
+        setIsOpen(false);
+      }
+    }
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      <label className="block text-xs font-medium text-gray-700 mb-1.5">{label}</label>
+      
+      {/* Main Input Field */}
+      <div className="relative flex items-center">
+        <input
+          ref={mainInputRef}
+          type="text"
+          disabled={disabled}
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setSearchQuery(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => {
+            if (!disabled) setIsOpen(true);
+          }}
+          onKeyDown={handleMainKeyDown}
+          placeholder="select or add custom category and hit enter"
+          className={`w-full bg-white border border-gray-200 rounded-xl pl-4 pr-10 py-2.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors ${
+            disabled ? 'bg-gray-50 opacity-60 cursor-not-allowed' : ''
+          }`}
+        />
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) {
+              setIsOpen(!isOpen);
+              if (!isOpen) {
+                mainInputRef.current?.focus();
+              }
+            }
+          }}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 bg-transparent border-0 cursor-pointer"
+        >
+          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {/* Dropdown Menu */}
+      {isOpen && !disabled && (
+        <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+          {/* Inner Search / Type Custom Category Input */}
+          <div className="relative mb-3">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <input
+              ref={innerInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleInnerKeyDown}
+              placeholder="Search or type custom category and press Enter..."
+              className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors"
+            />
+          </div>
+
+          {/* Categories List */}
+          <div className="max-h-52 overflow-y-auto space-y-1 pr-1">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt) => {
+                const isSelected = value === opt;
+                return (
+                  <div
+                    key={opt}
+                    onClick={() => {
+                      onChange(opt);
+                      setIsOpen(false);
+                      setSearchQuery('');
+                    }}
+                    className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors ${
+                      isSelected ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-xs select-none">
+                      {opt}
+                    </span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-3 px-2 text-center text-xs text-gray-500">
+                Press <span className="font-semibold text-gray-700">Enter</span> to add "{searchQuery || value}" as custom category
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Catalogue() {
   // Tabs: Solutions (1st), Components (2nd), Countries (3rd), Reuse grid (4th)
   const [activeTab, setActiveTab] = useState<'solutions' | 'components' | 'countries' | 'reuse'>('solutions');
@@ -617,7 +775,7 @@ export default function Catalogue() {
 
   // Component Form Fields
   const [newComponentName, setNewComponentName] = useState('');
-  const [newComponentCategory, setNewComponentCategory] = useState('AI / GenAI');
+  const [newComponentCategory, setNewComponentCategory] = useState('');
   const [newComponentStatus, setNewComponentStatus] = useState<'In progress' | 'Completed' | 'New' | 'Prioritised'>('New');
   const [newComponentDescription, setNewComponentDescription] = useState('');
   const [newComponentKeyCapabilities, setNewComponentKeyCapabilities] = useState('');
@@ -923,13 +1081,13 @@ export default function Catalogue() {
       id: `c_${Date.now()}`,
       name: newComponentName.trim(),
       subtitle: newComponentDescription.trim().slice(0, 48) || 'Enterprise component module',
-      category: newComponentCategory,
+      category: newComponentCategory.trim() || 'General',
       status: newComponentStatus,
       reuseCount: 0,
     };
     setComponents((prev) => [newComp, ...prev]);
     setNewComponentName('');
-    setNewComponentCategory('AI / GenAI');
+    setNewComponentCategory('');
     setNewComponentStatus('New');
     setNewComponentDescription('');
     setNewComponentKeyCapabilities('');
@@ -1645,7 +1803,16 @@ export default function Catalogue() {
 
               {/* Primary Add Component Button */}
               <button
-                onClick={() => setShowAddComponentModal(true)}
+                onClick={() => {
+                  setNewComponentName('');
+                  setNewComponentCategory('');
+                  setNewComponentStatus('New');
+                  setNewComponentDescription('');
+                  setNewComponentKeyCapabilities('');
+                  setNewComponentDependencies('');
+                  setNewComponentFile(null);
+                  setShowAddComponentModal(true);
+                }}
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 active:opacity-90 text-white text-[0.8125rem] font-medium rounded-lg transition-all shadow-xs cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
@@ -2809,9 +2976,9 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Field 2: Category (Required ComboBox) */}
+              {/* Field 2: Category (Custom Dropdown matching snapshot) */}
               <div>
-                <CustomComboBox
+                <CategorySelectDropdown
                   label={
                     <span>
                       Category <span className="text-red-500">*</span>
@@ -2819,14 +2986,22 @@ export default function Catalogue() {
                   }
                   value={newComponentCategory}
                   options={[
-                    { label: 'AI / GenAI', value: 'AI / GenAI' },
-                    { label: 'Payments', value: 'Payments' },
-                    { label: 'Core data', value: 'Core data' },
-                    { label: 'Data / BI', value: 'Data / BI' },
-                    { label: 'InsurTech / AI', value: 'InsurTech / AI' },
-                    { label: 'Workflow', value: 'Workflow' },
-                    { label: 'Telehealth', value: 'Telehealth' },
-                    { label: 'Genomics', value: 'Genomics' },
+                    'Artificial Intelligence',
+                    'Generative AI',
+                    'Machine Learning',
+                    'Cloud Computing',
+                    'Cybersecurity',
+                    'Data Analytics',
+                    'AI / GenAI',
+                    'Payments',
+                    'Core data',
+                    'Data / BI',
+                    'InsurTech / AI',
+                    'Workflow',
+                    'Telehealth',
+                    'Genomics',
+                    'Diagnostics',
+                    'InsurTech',
                   ]}
                   onChange={(val) => setNewComponentCategory(val)}
                 />
