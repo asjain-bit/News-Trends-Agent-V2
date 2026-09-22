@@ -180,27 +180,40 @@ export default function Layout() {
         
         {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0D212C]/40 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center flex flex-col items-center border border-gray-100">
-              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
-                <LogOut className="w-6 h-6" />
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs bg-red-50 text-red-600 border-red-100 mb-4">
+                <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Confirm Logout</h3>
-              <p className="text-gray-500 mb-6 text-[0.8125rem] leading-relaxed px-4">
-                Are you sure you want to log out of your account? You will need to sign in again to access your reports.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button 
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-[#0d212c] mb-2 font-['Poppins']">
+                  Log Out
+                </h3>
+                <p className="text-[0.875rem] text-[#64748b] leading-relaxed max-w-sm mx-auto">
+                  Are you sure you want to log out of your account? You will need to sign in again to access your reports.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-4 w-full">
+                <button
+                  type="button"
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl cursor-pointer"
+                  className="px-6 py-3.5 rounded-xl border border-gray-200 text-[0.875rem] font-medium text-[#0d212c] hover:bg-gray-50 cursor-pointer flex-1 bg-transparent transition"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
+                  type="button"
                   onClick={handleLogout}
-                  className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 transition-colors rounded-xl shadow-sm cursor-pointer"
+                  className="px-6 py-3.5 rounded-xl text-white text-[0.875rem] font-medium cursor-pointer flex-1 border-0 transition shadow-2xs bg-[#E50000] hover:bg-red-700"
                 >
-                  Log out
+                  Log Out
                 </button>
               </div>
             </div>
@@ -551,17 +564,36 @@ export default function Layout() {
 
       {/* Delete Confirmation Modal */}
       {threadToDelete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0D212C]/40 backdrop-blur-sm">
-           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center flex flex-col items-center border border-gray-100">
-            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
-               <Trash2 className="w-6 h-6" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+            <button
+              onClick={() => setThreadToDelete(null)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs bg-red-50 text-red-600 border-red-100 mb-4">
+              <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Delete Chat</h3>
-            <p className="text-gray-500 mb-6 text-[0.8125rem] leading-relaxed px-4">
-              Are you sure you want to delete this chat? This cannot be undone.
-            </p>
-            <div className="flex gap-3 w-full">
-              <button 
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-[#0d212c] mb-2 font-['Poppins']">
+                Delete Chat
+              </h3>
+              <p className="text-[0.875rem] text-[#64748b] leading-relaxed max-w-sm mx-auto">
+                Are you sure you want to delete this chat? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-4 w-full">
+              <button
+                type="button"
+                onClick={() => setThreadToDelete(null)}
+                className="px-6 py-3.5 rounded-xl border border-gray-200 text-[0.875rem] font-medium text-[#0d212c] hover:bg-gray-50 cursor-pointer flex-1 bg-transparent transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   deleteThread(threadToDelete.id);
                   setThreadToDelete(null);
@@ -570,15 +602,9 @@ export default function Layout() {
                     navigate('/');
                   }
                 }}
-                className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 transition-colors rounded-xl shadow-sm"
+                className="px-6 py-3.5 rounded-xl text-white text-[0.875rem] font-medium cursor-pointer flex-1 border-0 transition shadow-2xs bg-[#E50000] hover:bg-red-700"
               >
                 Delete
-              </button>
-              <button 
-                onClick={() => setThreadToDelete(null)}
-                className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl"
-              >
-                Cancel
               </button>
             </div>
           </div>
