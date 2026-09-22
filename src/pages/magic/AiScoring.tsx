@@ -474,8 +474,8 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
               <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
                 AI solution scoring
               </h2>
-              <p className="text-sm text-gray-600 leading-relaxed font-normal">
-                Every catalogue solution is scored 1–5 on six revenue-oriented factors — an automatic AI assessment — giving a 0–100 attractiveness score and a fair, conservative revenue estimate. The only human lever is the weightage.
+              <p className="text-xs text-gray-500 leading-relaxed font-light">
+                Every catalog solution is scored across six revenue factors (1–5), generating a 0–100 attractiveness score and conservative revenue estimate. Weightage is the only adjustable input.
               </p>
             </div>
 
@@ -505,58 +505,47 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
 
           {/* AI SCORING LOGIC */}
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setIsRubricOpen(!isRubricOpen)}
-              className="w-full px-6 py-3.5 bg-gray-50/60 hover:bg-gray-50 flex items-center justify-between text-left transition-colors cursor-pointer border-0"
-            >
-              <div className="flex items-center gap-2">
-                <ChevronRight className={`w-4 h-4 text-gray-500 transition-transform ${isRubricOpen ? 'rotate-90' : ''}`} />
-                <span className="text-xs font-semibold text-[#0D212C] font-['Poppins']">
-                  AI Scoring Logic
-                </span>
-              </div>
-              <span className="text-[11px] text-gray-400 font-medium">
-                {isRubricOpen ? 'Collapse rubric' : 'Expand rubric'}
+            <div className="px-6 py-3.5 bg-gray-50/60 border-b border-gray-100 flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#0D212C] font-['Poppins']">
+                AI Scoring Logic
               </span>
-            </button>
+            </div>
 
-            {isRubricOpen && (
-              <div className="p-6 border-t border-gray-100 space-y-4">
-                <p className="text-[0.75rem] text-gray-500 italic">
-                  Every factor uses the same 1–5 scale, split into five objective bands. A solution's score reflects its placement, and that band's wording is the one-line reason shown when you hover the score — so scoring is objective, consistent, and repeatable.
-                </p>
+            <div className="p-6 space-y-4">
+              <p className="text-[0.75rem] text-gray-500 italic">
+                Every factor uses the same 1–5 scale, split into five objective bands. A solution's score reflects its placement, and that band's wording is the one-line reason shown when you hover the score — so scoring is objective, consistent, and repeatable.
+              </p>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-gray-50/80 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                        <th className="py-3 px-4 font-normal min-w-[170px]">FACTOR</th>
-                        <th className="py-3 px-4 font-normal min-w-[130px]">1 (LOW)</th>
-                        <th className="py-3 px-4 font-normal min-w-[130px]">2 (FAIR)</th>
-                        <th className="py-3 px-4 font-normal min-w-[140px]">3 (MODERATE)</th>
-                        <th className="py-3 px-4 font-normal min-w-[140px]">4 (STRONG)</th>
-                        <th className="py-3 px-4 font-normal min-w-[150px]">5 (EXCELLENT)</th>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                      <th className="py-3 px-4 font-normal min-w-[220px]">FACTOR</th>
+                      <th className="py-3 px-4 font-normal min-w-[130px]">1 (LOW)</th>
+                      <th className="py-3 px-4 font-normal min-w-[130px]">2 (FAIR)</th>
+                      <th className="py-3 px-4 font-normal min-w-[140px]">3 (MODERATE)</th>
+                      <th className="py-3 px-4 font-normal min-w-[140px]">4 (STRONG)</th>
+                      <th className="py-3 px-4 font-normal min-w-[150px]">5 (EXCELLENT)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-[0.75rem]">
+                    {FACTORS.map((f) => (
+                      <tr key={f.id} className="hover:bg-gray-50/40 transition-colors">
+                        <td className="py-3.5 px-4 font-semibold text-[#0D212C] min-w-[220px]">
+                          <div>{f.code} · {f.name}</div>
+                          <div className="text-[0.6875rem] font-normal text-gray-400 mt-0.5 leading-snug">{f.description}</div>
+                        </td>
+                        <td className="py-3.5 px-4 text-gray-600">{f.rubric[1]}</td>
+                        <td className="py-3.5 px-4 text-gray-600">{f.rubric[2]}</td>
+                        <td className="py-3.5 px-4 text-gray-600">{f.rubric[3]}</td>
+                        <td className="py-3.5 px-4 text-gray-600">{f.rubric[4]}</td>
+                        <td className="py-3.5 px-4 text-[#0D212C] font-medium">{f.rubric[5]}</td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 text-[0.75rem]">
-                      {FACTORS.map((f) => (
-                        <tr key={f.id} className="hover:bg-gray-50/40 transition-colors">
-                          <td className="py-3 px-4 font-semibold text-[#0D212C] whitespace-nowrap">
-                            {f.code} · {f.name}
-                          </td>
-                          <td className="py-3 px-4 text-gray-600">{f.rubric[1]}</td>
-                          <td className="py-3 px-4 text-gray-600">{f.rubric[2]}</td>
-                          <td className="py-3 px-4 text-gray-600">{f.rubric[3]}</td>
-                          <td className="py-3 px-4 text-gray-600">{f.rubric[4]}</td>
-                          <td className="py-3 px-4 text-[#0D212C] font-medium">{f.rubric[5]}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </div>
 
           {/* AI SOLUTION SCORING TABLE WITH FULL FACTOR NAMES & SORTING */}
@@ -623,20 +612,20 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                         STATUS
                       </th>
                       
-                      {/* F1 - F6 Factor Columns with Ample Width */}
+                      {/* F1 - F6 Factor Columns with Ample Width and Subtext */}
                       {FACTORS.map((f) => (
                         <th 
                           key={f.id} 
                           onClick={() => handleToggleFactorSort(f.id)}
-                          className="py-3 px-3 font-normal text-center cursor-pointer select-none group min-w-[130px] outline-none focus:outline-none"
+                          className="py-3 px-4 font-normal text-center cursor-pointer select-none group min-w-[170px] outline-none focus:outline-none"
                         >
                           <div className="inline-flex flex-col items-center justify-center hover:text-gray-800 transition-colors select-none">
                             <div className="flex items-center gap-1">
-                              <span className="font-semibold text-[#0D212C] text-[0.6875rem]">{f.code}</span>
+                              <span className="font-semibold text-[#0D212C] text-[0.6875rem]">{f.code} · {f.name}</span>
                               <ArrowUpDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
                             </div>
-                            <span className="text-[0.625rem] text-gray-400 font-normal normal-case leading-tight mt-0.5 text-center whitespace-normal max-w-[110px]">
-                              {f.name}
+                            <span className="text-[0.625rem] text-gray-400 font-normal normal-case leading-snug mt-1 text-center whitespace-normal max-w-[150px]">
+                              {f.description}
                             </span>
                           </div>
                         </th>
@@ -776,8 +765,8 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
               <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
                 Weightage configuration
               </h2>
-              <p className="text-sm text-gray-600 leading-relaxed font-normal">
-                Set how much each factor counts. Drag a slider and the ranking recomputes live. Set blind, then lock a version.
+              <p className="text-xs text-gray-500 leading-relaxed font-light">
+                Adjust factor weightages to influence solution rankings in real time.
               </p>
             </div>
 

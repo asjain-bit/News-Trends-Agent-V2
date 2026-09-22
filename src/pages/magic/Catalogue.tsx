@@ -553,6 +553,7 @@ export default function Catalogue() {
   
   // Version History Dropdown open state
   const [versionDropdownOpen, setVersionDropdownOpen] = useState(false);
+  const [isReuseGridTooltipHovered, setIsReuseGridTooltipHovered] = useState(false);
   const versionDropdownRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(versionDropdownRef, () => setVersionDropdownOpen(false));
 
@@ -1960,16 +1961,25 @@ export default function Catalogue() {
       {/* TAB 4: REUSE GRID TAB */}
       {activeTab === 'reuse' && (
         <div className="space-y-4">
-          {/* Top Bar with Title, info text with i icon, Version History Dropdown & Orange Edit button */}
+          {/* Top Bar with Title, inline (i) icon with hover tooltip, Version History Dropdown & Orange Edit button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
-                Component ↔ Solution reuse grid
+            <div 
+              className="relative inline-flex items-center gap-2 cursor-pointer select-none"
+              onMouseEnter={() => setIsReuseGridTooltipHovered(true)}
+              onMouseLeave={() => setIsReuseGridTooltipHovered(false)}
+            >
+              <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins'] flex items-center gap-1.5">
+                <span>Component ↔ Solution reuse grid</span>
+                <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors shrink-0" />
               </h2>
-              <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 font-normal">
-                <Info className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                <span>Tick indicates that component is part of a solution</span>
-              </div>
+
+              {/* Hover Tooltip */}
+              {isReuseGridTooltipHovered && (
+                <div className="absolute left-0 top-full mt-2 px-3 py-1.5 bg-[#0D212C] text-white text-xs font-normal rounded-lg shadow-xl z-50 whitespace-nowrap animate-in fade-in duration-150">
+                  Tick indicates that component is part of a solution
+                  <div className="absolute bottom-full left-6 -translate-x-1/2 border-4 border-transparent border-b-[#0D212C]" />
+                </div>
+              )}
             </div>
 
             {/* Actions: Version History Dropdown & Edit Action */}

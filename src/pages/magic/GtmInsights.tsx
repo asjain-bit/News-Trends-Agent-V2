@@ -262,13 +262,10 @@ export default function GtmInsights() {
         </nav>
       </div>
 
-      {/* Page Header */}
-      <div className="space-y-1.5 max-w-4xl">
-        <h1 className="text-xl font-medium text-[#0D212C] font-['Poppins']">
-          GTM Insights
-        </h1>
-        <p className="text-sm text-gray-600 leading-relaxed font-normal">
-          Search by a country or a catalogue solution to generate a templatized, M42-branded go-to-market deck — a summary preview on screen and a full PPT to download and edit offline. Every dollar figure is a fair, data-backed estimate, never a boast.
+      {/* Page Header Subtext */}
+      <div className="max-w-4xl">
+        <p className="text-xs text-gray-500 leading-relaxed font-light">
+          Search by country or solution to generate an M42-branded go-to-market deck with an on-screen preview and editable PPT. All revenue estimates are data-backed and realistic.
         </p>
       </div>
 
