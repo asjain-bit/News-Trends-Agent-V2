@@ -294,8 +294,7 @@ export default function BuildRequest() {
   };
 
   const getCountryFlag = (name: string) => {
-    const found = ALL_COUNTRIES.find(c => c.name === name);
-    return found ? found.flag : '🌎';
+    return <MapPin className="w-3.5 h-3.5 text-gray-500" />;
   };
 
   return (

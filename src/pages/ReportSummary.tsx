@@ -1318,14 +1318,13 @@ export default function ReportSummary() {
                         )}
                       </div>
 
-                      {/* Running Footer with Page 1 & Comments */}
+                      {/* Running Footer with Page 1 */}
                       <div className="pt-2.5 mt-2 border-t border-gray-100 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2 text-[0.625rem] text-gray-400">
                           <span>Confidential • Internal Distribution Only</span>
                           <span>•</span>
                           <span>Page 1 of {totalExecPages}</span>
                         </div>
-                        {renderCommentButtonAndPopover('exec-summary-p1')}
                       </div>
                     </div>
 
@@ -1490,14 +1489,13 @@ export default function ReportSummary() {
                         )}
                       </div>
 
-                      {/* Running Footer with Page 2 & Comments */}
+                      {/* Running Footer with Page 2 */}
                       <div className="pt-2.5 mt-2 border-t border-gray-100 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2 text-[0.625rem] text-gray-400">
                           <span>Confidential • Internal Distribution Only</span>
                           <span>•</span>
                           <span>Page 2 of {totalExecPages}</span>
                         </div>
-                        {renderCommentButtonAndPopover('exec-summary-p2')}
                       </div>
                     </div>
                   </>
@@ -1630,7 +1628,7 @@ export default function ReportSummary() {
                           <span>•</span>
                           <span>Page {currentPageNumber} of {totalReportPages}</span>
                         </div>
-                        {renderCommentButtonAndPopover(page.id)}
+                        {activeTab !== 'executive-summary' && renderCommentButtonAndPopover(page.id)}
                       </div>
                     </div>
                   );
@@ -1683,7 +1681,7 @@ export default function ReportSummary() {
                   </button>
                 )}
                 
-                {!thread?.feedbackSubmitted && (
+                {!thread?.feedbackSubmitted && activeTab !== 'executive-summary' && (
                   <div className="flex items-center gap-2.5 bg-white border border-gray-200 shadow-sm rounded-full px-3 py-1">
                     <span className="text-[0.75rem] font-medium text-gray-500">Was this report helpful?</span>
                     <button 

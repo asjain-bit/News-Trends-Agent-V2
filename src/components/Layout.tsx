@@ -289,10 +289,10 @@ export default function Layout() {
                 <button
                   type="button"
                   onClick={() => setMagicExpanded(!magicExpanded)}
-                  className="w-full px-4 text-[0.6875rem] font-semibold text-[#ED4D19] uppercase tracking-wider mb-2 flex items-center justify-between hover:text-[#ED4D19]/90 transition-colors cursor-pointer"
+                  className="w-full px-4 text-[0.6875rem] font-semibold text-[#36c0c9] uppercase tracking-wider mb-2 flex items-center justify-between hover:text-[#36c0c9]/90 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#ED4D19]" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#36c0c9]" />
                     <span>MAGIC MODE</span>
                   </div>
                   <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform duration-200 ${magicExpanded ? '' : '-rotate-90'}`} />
@@ -368,7 +368,7 @@ export default function Layout() {
               {/* Recent Chats */}
               {recentThreads.length > 0 && (
                 <div>
-                  <div className="px-4 text-[0.6875rem] font-semibold text-white uppercase tracking-wider mb-2">Recent ({recentThreads.length})</div>
+                  <div className="px-4 text-[0.6875rem] font-semibold text-[#36c0c9] uppercase tracking-wider mb-2">Recent ({recentThreads.length})</div>
                   <div className="flex flex-col gap-0.5">
                     {recentThreads.map(thread => (
                       <div 
@@ -412,8 +412,8 @@ export default function Layout() {
         {/* Profile Details at bottom with 20px padding */}
         <div className="pb-[20px] px-4 border-t border-white/10 pt-4 mt-auto">
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} gap-3 p-2 rounded-xl relative`}>
-            <div className="w-8 h-8 rounded-full bg-[#36c0c9] text-[#0D212C] flex items-center justify-center font-semibold text-[0.8125rem] shrink-0">
-              {user?.name.split(' ').map(n => n[0]).join('').substring(0, 2) || 'AJ'}
+            <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden border border-[#36c0c9]/50 bg-[#0D212C]">
+              <img src="https://i.pravatar.cc/150?img=32" alt="User Profile" className="w-full h-full object-cover" />
             </div>
             {!collapsed && (
               <div className="flex-1 flex justify-between items-center overflow-hidden">
