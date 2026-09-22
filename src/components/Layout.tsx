@@ -180,42 +180,31 @@ export default function Layout() {
         
         {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-center flex flex-col items-center border border-gray-100 relative"
-            >
-              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-50 to-white -z-10" />
-              <div className="p-8 flex flex-col items-center z-10 w-full">
-                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
-                  <AlertTriangle className="w-6 h-6" />
-                </div>
-                <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Confirm Logout</h3>
-                <p className="text-[0.8125rem] text-gray-500 mb-6 leading-relaxed px-4">Are you sure you want to log out of your account? You will need to sign in again to access your reports.</p>
-                <div className="flex gap-3 w-full">
-                  <button 
-                    onClick={handleLogout}
-                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm cursor-pointer"
-                  >
-                    Yes, log out
-                  </button>
-                  <button 
-                    onClick={() => setShowLogoutConfirm(false)}
-                    className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                </div>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0D212C]/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center flex flex-col items-center border border-gray-100">
+              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm text-red-500">
+                <LogOut className="w-6 h-6" />
               </div>
-            </motion.div>
-          </motion.div>
+              <h3 className="text-[1.125rem] font-semibold text-[#0D212C] mb-2 font-['Poppins'] tracking-tight">Confirm Logout</h3>
+              <p className="text-gray-500 mb-6 text-[0.8125rem] leading-relaxed px-4">
+                Are you sure you want to log out of your account? You will need to sign in again to access your reports.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="flex-1 px-4 py-2 text-[0.8125rem] font-medium text-white bg-red-500 hover:bg-red-600 transition-colors rounded-xl shadow-sm cursor-pointer"
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
 
