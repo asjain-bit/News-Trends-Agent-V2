@@ -351,6 +351,93 @@ function CustomSelect({
   );
 }
 
+// Custom ComboBox (Input + Select) Component
+function CustomComboBox({
+  label,
+  value,
+  options,
+  onChange,
+  disabled = false,
+}: {
+  label: React.ReactNode;
+  value: string;
+  options: { label: string; value: string }[];
+  onChange?: (val: string) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+  const ref = useRef<HTMLDivElement>(null);
+  useOnClickOutside(ref, () => setIsOpen(false));
+
+  // Sync value when parent changes it
+  React.useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  const filteredOptions = options.filter(o => o.label.toLowerCase().includes(inputValue.toLowerCase()));
+
+  return (
+    <div className="relative" ref={ref}>
+      <label className="block text-xs font-medium text-gray-700 mb-1.5">{label}</label>
+      <div className="relative">
+        <input
+          type="text"
+          disabled={disabled}
+          value={inputValue}
+          onFocus={() => !disabled && setIsOpen(true)}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            onChange?.(e.target.value);
+            setIsOpen(true);
+          }}
+          className={`w-full px-3.5 py-2.5 text-xs border rounded-lg transition-colors pr-10 ${
+            disabled
+              ? 'bg-gray-50/80 border-gray-200 text-gray-500 cursor-not-allowed'
+              : 'bg-white border-gray-200 hover:border-gray-300 text-gray-800 focus:outline-none focus:border-[#36c0c9]'
+          }`}
+        />
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+        >
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 max-h-48 overflow-y-auto">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  setInputValue(option.value);
+                  onChange?.(option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-3.5 py-2 text-xs transition-colors flex items-center justify-between ${
+                  option.value === value
+                    ? 'bg-gray-100 text-gray-900 font-medium'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span>{option.label}</span>
+                {option.value === value && <Check className="w-3.5 h-3.5 text-gray-700" />}
+              </button>
+            ))
+          ) : (
+            <div className="px-3.5 py-2 text-xs text-gray-500">Press enter or click away to use custom value</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Catalogue() {
   // Tabs: Solutions (1st), Components (2nd), Countries (3rd), Reuse grid (4th)
   const [activeTab, setActiveTab] = useState<'solutions' | 'components' | 'countries' | 'reuse'>('solutions');
@@ -380,8 +467,19 @@ export default function Catalogue() {
   const [componentsSearch, setComponentsSearch] = useState('');
   const [countriesSearch, setCountriesSearch] = useState('');
 
-  // Revenue Sort State ('none' | 'asc' | 'desc')
-  const [revenueSort, setRevenueSort] = useState<'none' | 'asc' | 'desc'>('none');
+  // Unified Sorting States
+  const [solutionsSort, setSolutionsSort] = useState<{column: 'revenue' | 'score' | 'components' | null, direction: 'asc' | 'desc'}>({column: null, direction: 'asc'});
+  const [componentsSort, setComponentsSort] = useState<{column: 'reuse' | null, direction: 'asc' | 'desc'}>({column: null, direction: 'asc'});
+  const [countriesSort, setCountriesSort] = useState<{column: 'spend' | 'population' | 'total' | 'digital' | 'slice' | 'anchor' | null, direction: 'asc' | 'desc'}>({column: null, direction: 'asc'});
+
+  // Custom filter dropdown states and refs
+  const [isSolutionsFilterOpen, setIsSolutionsFilterOpen] = useState(false);
+  const solutionsFilterRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(solutionsFilterRef, () => setIsSolutionsFilterOpen(false));
+
+  const [isComponentsFilterOpen, setIsComponentsFilterOpen] = useState(false);
+  const componentsFilterRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(componentsFilterRef, () => setIsComponentsFilterOpen(false));
 
   // Unified Single Filter states
   const [solutionsUnifiedFilter, setSolutionsUnifiedFilter] = useState('All');
@@ -392,6 +490,8 @@ export default function Catalogue() {
   const [solutionsPage, setSolutionsPage] = useState(1);
   const [componentsPage, setComponentsPage] = useState(1);
   const [countriesPage, setCountriesPage] = useState(1);
+  const [reusePage, setReusePage] = useState(1);
+  const REUSE_ITEMS_PER_PAGE = 10;
 
   // Add Modals Form States
   const [showAddSolutionModal, setShowAddSolutionModal] = useState(false);
@@ -443,31 +543,52 @@ export default function Catalogue() {
       return matchesSearch && matchesFilter;
     });
 
-    if (revenueSort === 'asc') {
-      result = [...result].sort((a, b) => parseRevenueValue(a.revenue3Yr) - parseRevenueValue(b.revenue3Yr));
-    } else if (revenueSort === 'desc') {
-      result = [...result].sort((a, b) => parseRevenueValue(b.revenue3Yr) - parseRevenueValue(a.revenue3Yr));
+    if (solutionsSort.column) {
+      result = [...result].sort((a, b) => {
+        let valA = 0, valB = 0;
+        if (solutionsSort.column === 'revenue') {
+          valA = parseRevenueValue(a.revenue3Yr);
+          valB = parseRevenueValue(b.revenue3Yr);
+        } else if (solutionsSort.column === 'score') {
+          valA = parseFloat(a.score);
+          valB = parseFloat(b.score);
+        } else if (solutionsSort.column === 'components') {
+          valA = a.compCount;
+          valB = b.compCount;
+        }
+        return solutionsSort.direction === 'asc' ? valA - valB : valB - valA;
+      });
     }
 
     return result;
-  }, [solutions, solutionsSearch, solutionsUnifiedFilter, revenueSort]);
+  }, [solutions, solutionsSearch, solutionsUnifiedFilter, solutionsSort]);
 
   const filteredComponents = useMemo(() => {
-    return components.filter((c) => {
+    let result = components.filter((c) => {
       const matchesSearch = 
         c.name.toLowerCase().includes(componentsSearch.toLowerCase()) || 
         c.subtitle.toLowerCase().includes(componentsSearch.toLowerCase()) ||
         c.category.toLowerCase().includes(componentsSearch.toLowerCase());
       let matchesFilter = true;
       if (componentsUnifiedFilter !== 'All') {
-        matchesFilter = c.category === componentsUnifiedFilter || c.status === componentsUnifiedFilter;
+        matchesFilter = c.status === componentsUnifiedFilter;
       }
       return matchesSearch && matchesFilter;
     });
-  }, [components, componentsSearch, componentsUnifiedFilter]);
+    
+    if (componentsSort.column === 'reuse') {
+      result = [...result].sort((a, b) => {
+        const countA = (reuseMatrix[a.id] || []).length;
+        const countB = (reuseMatrix[b.id] || []).length;
+        return componentsSort.direction === 'asc' ? countA - countB : countB - countA;
+      });
+    }
+
+    return result;
+  }, [components, componentsSearch, componentsUnifiedFilter, componentsSort, reuseMatrix]);
 
   const filteredCountries = useMemo(() => {
-    return countries.filter((c) => {
+    let result = countries.filter((c) => {
       const matchesSearch = 
         c.name.toLowerCase().includes(countriesSearch.toLowerCase()) ||
         c.spendCapita.toLowerCase().includes(countriesSearch.toLowerCase()) ||
@@ -478,7 +599,35 @@ export default function Catalogue() {
       }
       return matchesSearch && matchesFilter;
     });
-  }, [countries, countriesSearch, countriesUnifiedFilter]);
+
+    if (countriesSort.column) {
+      result = [...result].sort((a, b) => {
+        let valA = 0, valB = 0;
+        if (countriesSort.column === 'spend') {
+          valA = parseRevenueValue(a.spendCapita);
+          valB = parseRevenueValue(b.spendCapita);
+        } else if (countriesSort.column === 'population') {
+          valA = parseRevenueValue(a.population);
+          valB = parseRevenueValue(b.population);
+        } else if (countriesSort.column === 'total') {
+          valA = parseRevenueValue(a.totalSpend);
+          valB = parseRevenueValue(b.totalSpend);
+        } else if (countriesSort.column === 'digital') {
+          valA = parseFloat(a.digitalShare.replace('%',''));
+          valB = parseFloat(b.digitalShare.replace('%',''));
+        } else if (countriesSort.column === 'slice') {
+          valA = parseRevenueValue(a.obtainableSlice);
+          valB = parseRevenueValue(b.obtainableSlice);
+        } else if (countriesSort.column === 'anchor') {
+          valA = parseRevenueValue(a.dealAnchor);
+          valB = parseRevenueValue(b.dealAnchor);
+        }
+        return countriesSort.direction === 'asc' ? valA - valB : valB - valA;
+      });
+    }
+
+    return result;
+  }, [countries, countriesSearch, countriesUnifiedFilter, countriesSort]);
 
   // Paginated Slices
   const totalSolutionsPages = Math.ceil(filteredSolutions.length / ITEMS_PER_PAGE) || 1;
@@ -498,6 +647,12 @@ export default function Catalogue() {
     const start = (countriesPage - 1) * ITEMS_PER_PAGE;
     return filteredCountries.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredCountries, countriesPage]);
+
+  const totalReusePages = Math.ceil(components.length / REUSE_ITEMS_PER_PAGE) || 1;
+  const paginatedReuseComponents = useMemo(() => {
+    const start = (reusePage - 1) * REUSE_ITEMS_PER_PAGE;
+    return components.slice(start, start + REUSE_ITEMS_PER_PAGE);
+  }, [components, reusePage]);
 
   // Solution detail profile data & mapped components
   const currentSolutionProfile = useMemo(() => {
@@ -541,7 +696,7 @@ export default function Catalogue() {
     setSolutions((prev) =>
       prev.map((s) =>
         s.id === editingSolution.id
-          ? { ...s, positioning: editSolutionPositioning, status: editSolutionStatus }
+          ? { ...editingSolution, positioning: editSolutionPositioning, status: editSolutionStatus }
           : s
       )
     );
@@ -559,7 +714,7 @@ export default function Catalogue() {
     setComponents((prev) =>
       prev.map((c) =>
         c.id === editingComponent.id
-          ? { ...c, status: editComponentStatus }
+          ? { ...editingComponent, status: editComponentStatus }
           : c
       )
     );
@@ -977,31 +1132,48 @@ export default function Catalogue() {
                   />
                 </div>
 
-                {/* Single Unified Filter Dropdown - 12px gap between icon and text */}
-                <div className="relative w-[116px]">
-                  <select
-                    value={solutionsUnifiedFilter}
-                    onChange={(e) => {
-                      setSolutionsUnifiedFilter(e.target.value);
-                      setSolutionsPage(1);
-                    }}
-                    className="w-full appearance-none bg-white border border-gray-200 rounded-lg pl-[38px] pr-[30px] py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                {/* Custom Filter Dropdown */}
+                <div className="relative w-[116px]" ref={solutionsFilterRef}>
+                  <button
+                    onClick={() => setIsSolutionsFilterOpen(!isSolutionsFilterOpen)}
+                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                   >
-                    <option value="All">Filters</option>
-                    <optgroup label="Positioning">
-                      <option value="Common">Common</option>
-                      <option value="Mixed">Mixed</option>
-                      <option value="Distinctive">Distinctive</option>
-                    </optgroup>
-                    <optgroup label="Status">
-                      <option value="Completed">Completed</option>
-                      <option value="In progress">In progress</option>
-                      <option value="New">New</option>
-                      <option value="Prioritised">Prioritised</option>
-                    </optgroup>
-                  </select>
-                  <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <div className="flex items-center gap-[12px]">
+                      <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                      <span className="truncate">{solutionsUnifiedFilter === 'All' ? 'Filters' : solutionsUnifiedFilter}</span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isSolutionsFilterOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isSolutionsFilterOpen && (
+                    <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                      <button 
+                        onClick={() => { setSolutionsUnifiedFilter('All'); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
+                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === 'All' ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        All
+                      </button>
+                      <div className="px-3 py-1 mt-1 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">Positioning</div>
+                      {['Common', 'Mixed', 'Distinctive'].map(opt => (
+                        <button 
+                          key={opt}
+                          onClick={() => { setSolutionsUnifiedFilter(opt); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                      <div className="px-3 py-1 mt-1 border-t border-gray-100 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider pt-2">Status</div>
+                      {['Completed', 'In progress', 'New', 'Prioritised'].map(opt => (
+                        <button 
+                          key={opt}
+                          onClick={() => { setSolutionsUnifiedFilter(opt); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Primary Add Solution Button with #ED4D19 Gradient */}
@@ -1025,21 +1197,52 @@ export default function Catalogue() {
                       <th className="py-3 px-6 font-normal">SOLUTION</th>
                       <th className="py-3 px-6 font-normal">POSITIONING</th>
                       <th className="py-3 px-6 font-normal">STATUS</th>
-                      <th className="py-3 px-6 font-normal">SCORE</th>
+                      <th 
+                        className="py-3 px-6 font-normal cursor-pointer select-none group"
+                        onClick={() => {
+                          setSolutionsSort(prev => ({
+                            column: 'score',
+                            direction: prev.column === 'score' && prev.direction === 'asc' ? 'desc' : 'asc'
+                          }));
+                          setSolutionsPage(1);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                          SCORE 
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'score' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                        </div>
+                      </th>
                       {/* Revenue Header with Up-Down Sort Icon */}
                       <th 
                         onClick={() => {
-                          setRevenueSort((prev) => (prev === 'none' ? 'desc' : prev === 'desc' ? 'asc' : 'none'));
+                          setSolutionsSort(prev => ({
+                            column: 'revenue',
+                            direction: prev.column === 'revenue' && prev.direction === 'asc' ? 'desc' : 'asc'
+                          }));
                           setSolutionsPage(1);
                         }}
                         className="py-3 px-6 font-normal cursor-pointer select-none group"
                       >
                         <div className="inline-flex items-center gap-1.5 hover:text-gray-800 transition-colors">
                           <span>REVENUE (3-YR)</span>
-                          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'revenue' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
                         </div>
                       </th>
-                      <th className="py-3 px-6 font-normal">COMP.</th>
+                      <th 
+                        className="py-3 px-6 font-normal cursor-pointer select-none group"
+                        onClick={() => {
+                          setSolutionsSort(prev => ({
+                            column: 'components',
+                            direction: prev.column === 'components' && prev.direction === 'asc' ? 'desc' : 'asc'
+                          }));
+                          setSolutionsPage(1);
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                          No. of Components 
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'components' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                        </div>
+                      </th>
                       <th className="py-3 px-6 font-normal text-right">ACTION</th>
                     </tr>
                   </thead>
@@ -1141,7 +1344,7 @@ export default function Catalogue() {
                       onClick={() => setSolutionsPage(pageNum)}
                       className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                         solutionsPage === pageNum
-                          ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                          ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
                           : 'text-gray-500 font-normal hover:text-gray-900'
                       }`}
                     >
@@ -1190,36 +1393,38 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Single Unified Filter - 12px gap between icon and text */}
-              <div className="relative w-[116px]">
-                <select
-                  value={componentsUnifiedFilter}
-                  onChange={(e) => {
-                    setComponentsUnifiedFilter(e.target.value);
-                    setComponentsPage(1);
-                  }}
-                  className="w-full appearance-none bg-white border border-gray-200 rounded-lg pl-[38px] pr-[30px] py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+              {/* Custom Filter Dropdown */}
+              <div className="relative w-[116px]" ref={componentsFilterRef}>
+                <button
+                  onClick={() => setIsComponentsFilterOpen(!isComponentsFilterOpen)}
+                  className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <option value="All">Filters</option>
-                  <optgroup label="Category">
-                    <option value="AI / GenAI">AI / GenAI</option>
-                    <option value="Payments">Payments</option>
-                    <option value="Core data">Core data</option>
-                    <option value="Data / BI">Data / BI</option>
-                    <option value="InsurTech / AI">InsurTech / AI</option>
-                    <option value="Workflow">Workflow</option>
-                    <option value="Telehealth">Telehealth</option>
-                    <option value="Genomics">Genomics</option>
-                  </optgroup>
-                  <optgroup label="Status">
-                    <option value="Completed">Completed</option>
-                    <option value="In progress">In progress</option>
-                    <option value="New">New</option>
-                    <option value="Prioritised">Prioritised</option>
-                  </optgroup>
-                </select>
-                <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <div className="flex items-center gap-[12px]">
+                    <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate">{componentsUnifiedFilter === 'All' ? 'Filters' : componentsUnifiedFilter}</span>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isComponentsFilterOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isComponentsFilterOpen && (
+                  <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                    <button 
+                      onClick={() => { setComponentsUnifiedFilter('All'); setIsComponentsFilterOpen(false); setComponentsPage(1); }}
+                      className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${componentsUnifiedFilter === 'All' ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      All
+                    </button>
+                    <div className="px-3 py-1 mt-1 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">Status</div>
+                    {['Completed', 'In progress', 'New', 'Prioritised'].map(opt => (
+                      <button 
+                        key={opt}
+                        onClick={() => { setComponentsUnifiedFilter(opt); setIsComponentsFilterOpen(false); setComponentsPage(1); }}
+                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${componentsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Primary Add Component Button */}
@@ -1241,7 +1446,21 @@ export default function Catalogue() {
                     <th className="py-3 px-6 font-normal">COMPONENT</th>
                     <th className="py-3 px-6 font-normal">CATEGORY</th>
                     <th className="py-3 px-6 font-normal">STATUS</th>
-                    <th className="py-3 px-6 font-normal">REUSE</th>
+                    <th 
+                      className="py-3 px-6 font-normal cursor-pointer select-none group"
+                      onClick={() => {
+                        setComponentsSort(prev => ({
+                          column: 'reuse',
+                          direction: prev.column === 'reuse' && prev.direction === 'asc' ? 'desc' : 'asc'
+                        }));
+                        setComponentsPage(1);
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        REUSE 
+                        <ArrowUpDown className={`w-3.5 h-3.5 ${componentsSort.column === 'reuse' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
                     <th className="py-3 px-6 font-normal text-right">ACTION</th>
                   </tr>
                 </thead>
@@ -1331,7 +1550,7 @@ export default function Catalogue() {
                     onClick={() => setComponentsPage(pageNum)}
                     className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                       componentsPage === pageNum
-                        ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                        ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
                         : 'text-gray-500 font-normal hover:text-gray-900'
                     }`}
                   >
@@ -1405,12 +1624,36 @@ export default function Catalogue() {
                 <thead>
                   <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
                     <th className="py-3 px-6 font-normal">COUNTRY</th>
-                    <th className="py-3 px-6 font-normal">SPEND / CAPITA</th>
-                    <th className="py-3 px-6 font-normal">POPULATION</th>
-                    <th className="py-3 px-6 font-normal">TOTAL HEALTH SPEND</th>
-                    <th className="py-3 px-6 font-normal">DIGITAL SHARE</th>
-                    <th className="py-3 px-6 font-normal">OBTAINABLE SLICE</th>
-                    <th className="py-3 px-6 font-normal">DEAL ANCHOR (PER-COUNTRY)</th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'spend', direction: prev.column === 'spend' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        SPEND / CAPITA <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'spend' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'population', direction: prev.column === 'population' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        POPULATION <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'population' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'total', direction: prev.column === 'total' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        TOTAL HEALTH SPEND <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'total' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'digital', direction: prev.column === 'digital' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        DIGITAL SHARE <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'digital' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'slice', direction: prev.column === 'slice' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        OBTAINABLE SLICE <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'slice' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
+                    <th className="py-3 px-6 font-normal cursor-pointer select-none group" onClick={() => { setCountriesSort(prev => ({ column: 'anchor', direction: prev.column === 'anchor' && prev.direction === 'asc' ? 'desc' : 'asc' })); setCountriesPage(1); }}>
+                      <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
+                        DEAL ANCHOR (PER-COUNTRY) <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'anchor' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                      </div>
+                    </th>
                     <th className="py-3 px-6 font-normal">CONFIDENCE</th>
                   </tr>
                 </thead>
@@ -1481,7 +1724,7 @@ export default function Catalogue() {
                     onClick={() => setCountriesPage(pageNum)}
                     className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
                       countriesPage === pageNum
-                        ? 'bg-gray-100 text-gray-900 font-bold border border-gray-200'
+                        ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
                         : 'text-gray-500 font-normal hover:text-gray-900'
                     }`}
                   >
@@ -1580,15 +1823,7 @@ export default function Catalogue() {
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleResetToBaseline}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
-                    title="Reset to v1.0 AI Baseline"
-                  >
-                    <RotateCcw className="w-3 h-3 text-gray-500" />
-                    <span>Reset</span>
-                  </button>
+                  {/* Reset button removed per user request */}
                   <button
                     type="button"
                     onClick={handleCancelEditingReuse}
@@ -1633,13 +1868,13 @@ export default function Catalogue() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-[0.8125rem]">
-                  {components.map((comp) => {
+                <tbody className="divide-y divide-gray-50 text-[0.8125rem]">
+                  {paginatedReuseComponents.map((comp) => {
                     const mappedSolutions = activeMatrix[comp.id] || [];
                     return (
                       <tr key={comp.id} className="hover:bg-gray-50/40 transition-colors">
                         {/* Component Name */}
-                        <td className="py-3.5 px-5 font-normal text-[#0D212C] text-xs border-r border-gray-200 bg-white sticky left-0 z-10 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.03)]">
+                        <td className="py-3.5 px-5 font-normal text-[#0D212C] text-xs border-r border-gray-100 bg-white sticky left-0 z-10 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.03)]">
                           {comp.name}
                         </td>
 
@@ -1650,7 +1885,7 @@ export default function Catalogue() {
                             <td
                               key={sol.id}
                               onClick={() => handleToggleCellEdit(comp.id, sol.id)}
-                              className={`py-3 px-3 text-center border-r border-gray-200 ${
+                              className={`py-3 px-3 text-center border-r border-gray-100 ${
                                 isEditingReuse
                                   ? 'cursor-pointer hover:bg-orange-50/50 select-none'
                                   : ''
@@ -1676,6 +1911,51 @@ export default function Catalogue() {
               </table>
             </div>
           </div>
+
+          {/* Reuse Grid Pagination */}
+          <div className="flex items-center justify-between text-xs text-gray-500 pt-1 px-1">
+            <div>
+              Showing {filteredComponents.length === 0 ? 0 : (reusePage - 1) * REUSE_ITEMS_PER_PAGE + 1}–
+              {Math.min(reusePage * REUSE_ITEMS_PER_PAGE, components.length)} of {components.length}
+            </div>
+            
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setReusePage((p) => Math.max(1, p - 1))}
+                disabled={reusePage === 1}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Previous page"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalReusePages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setReusePage(pageNum)}
+                    className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
+                      reusePage === pageNum
+                        ? 'bg-[#36c0c9] text-white font-bold border border-[#36c0c9]'
+                        : 'text-gray-500 font-normal hover:text-gray-900'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setReusePage((p) => Math.min(totalReusePages, p + 1))}
+                disabled={reusePage === totalReusePages}
+                className="p-1.5 text-gray-500 hover:text-gray-900 bg-transparent disabled:opacity-30 transition-colors cursor-pointer"
+                title="Next page"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -1697,16 +1977,8 @@ export default function Catalogue() {
             </div>
 
             <form onSubmit={handleConfirmSaveVersion} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Revision Description</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={saveNote}
-                  onChange={(e) => setSaveNote(e.target.value)}
-                  placeholder="Describe your adjustments..."
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-300 text-xs font-normal"
-                />
+              <div className="text-sm text-gray-600 mb-6 text-center">
+                Are you sure you want to save this matrix revision? This action will update the linkages across the platform.
               </div>
 
               <div className="flex gap-3 pt-3">
@@ -1746,14 +2018,14 @@ export default function Catalogue() {
             </div>
 
             <form onSubmit={handleSaveEditSolution} className="space-y-4 text-xs">
-              {/* Row 1: Solution Name (Uneditable) */}
+              {/* Row 1: Solution Name */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Solution Name</label>
                 <input
                   type="text"
-                  disabled
                   value={editingSolution.name}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingSolution({ ...editingSolution, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
@@ -1786,36 +2058,36 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Row 4: AI Score (Uneditable / View only) */}
+              {/* Row 4: AI Score */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">AI Score (0-100)</label>
                 <input
                   type="number"
-                  disabled
                   value={editingSolution.score}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingSolution({ ...editingSolution, score: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
-              {/* Row 5: Revenue (3-Yr) (Uneditable) */}
+              {/* Row 5: Revenue (3-Yr) */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Revenue (3-Yr)</label>
                 <input
                   type="text"
-                  disabled
                   value={editingSolution.revenue3Yr}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingSolution({ ...editingSolution, revenue3Yr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
-              {/* Row 6: Components Count (Comp) (Uneditable) */}
+              {/* Row 6: Components Count (Comp) */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Components Count (Comp)</label>
                 <input
                   type="number"
-                  disabled
                   value={editingSolution.compCount}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingSolution({ ...editingSolution, compCount: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
@@ -1861,9 +2133,9 @@ export default function Catalogue() {
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Component Name</label>
                 <input
                   type="text"
-                  disabled
                   value={editingComponent.name}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingComponent({ ...editingComponent, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
@@ -1871,19 +2143,27 @@ export default function Catalogue() {
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Subtitle / Description</label>
                 <input
                   type="text"
-                  disabled
                   value={editingComponent.subtitle}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  onChange={(e) => setEditingComponent({ ...editingComponent, subtitle: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Category</label>
-                <input
-                  type="text"
-                  disabled
+                <CustomComboBox
+                  label="Category"
                   value={editingComponent.category}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  options={[
+                    { label: 'AI / GenAI', value: 'AI / GenAI' },
+                    { label: 'Payments', value: 'Payments' },
+                    { label: 'Core data', value: 'Core data' },
+                    { label: 'Data / BI', value: 'Data / BI' },
+                    { label: 'InsurTech / AI', value: 'InsurTech / AI' },
+                    { label: 'Workflow', value: 'Workflow' },
+                    { label: 'Telehealth', value: 'Telehealth' },
+                    { label: 'Genomics', value: 'Genomics' },
+                  ]}
+                  onChange={(val) => setEditingComponent({ ...editingComponent, category: val })}
                 />
               </div>
 
@@ -1903,12 +2183,12 @@ export default function Catalogue() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Reuse Mappings</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Reuse Count</label>
                 <input
-                  type="text"
-                  disabled
-                  value={`${editingComponent.reuseCount} solutions`}
-                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal bg-gray-50/80 text-gray-600 cursor-not-allowed select-none"
+                  type="number"
+                  value={editingComponent.reuseCount}
+                  onChange={(e) => setEditingComponent({ ...editingComponent, reuseCount: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>
 
@@ -2050,28 +2330,37 @@ export default function Catalogue() {
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Attachment
                 </label>
-                <label className="flex items-center gap-3 px-3.5 py-2.5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors">
-                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
-                  <div className="flex-1 text-xs text-gray-500 truncate">
-                    {newSolutionFile ? newSolutionFile.name : 'Supporting file for AI to review'}
+                <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
+                  <Upload className="w-5 h-5 text-gray-400 shrink-0" />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[0.8125rem] font-medium text-gray-700">
+                      Add supporting file
+                    </span>
+                    <span className="text-[0.6875rem] text-gray-500 leading-tight">
+                      Max files is 3, Size 25MB<br/>
+                      Format: PDF/DOCX/PPTX/XLSX, Screenshot
+                    </span>
                   </div>
+                  {newSolutionFile && (
+                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-xs">
+                      <span className="text-xs font-medium text-gray-700 truncate max-w-[200px]">{newSolutionFile.name}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setNewSolutionFile(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600 p-0.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                   <input
                     type="file"
                     className="hidden"
                     onChange={(e) => setNewSolutionFile(e.target.files?.[0] || null)}
                   />
-                  {newSolutionFile && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setNewSolutionFile(null);
-                      }}
-                      className="text-gray-400 hover:text-gray-600 p-0.5"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
                 </label>
               </div>
 
@@ -2128,9 +2417,9 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Field 2: Category (Required Dropdown) */}
+              {/* Field 2: Category (Required ComboBox) */}
               <div>
-                <CustomSelect
+                <CustomComboBox
                   label={
                     <span>
                       Category <span className="text-red-500">*</span>
@@ -2218,28 +2507,37 @@ export default function Catalogue() {
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Attachment
                 </label>
-                <label className="flex items-center gap-3 px-3.5 py-2.5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors">
-                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
-                  <div className="flex-1 text-xs text-gray-500 truncate">
-                    {newComponentFile ? newComponentFile.name : 'Supporting file for AI to review'}
+                <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
+                  <Upload className="w-5 h-5 text-gray-400 shrink-0" />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[0.8125rem] font-medium text-gray-700">
+                      Add supporting file
+                    </span>
+                    <span className="text-[0.6875rem] text-gray-500 leading-tight">
+                      Max files is 3, Size 25MB<br/>
+                      Format: PDF/DOCX/PPTX/XLSX, Screenshot
+                    </span>
                   </div>
+                  {newComponentFile && (
+                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-xs">
+                      <span className="text-xs font-medium text-gray-700 truncate max-w-[200px]">{newComponentFile.name}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setNewComponentFile(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600 p-0.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                   <input
                     type="file"
                     className="hidden"
                     onChange={(e) => setNewComponentFile(e.target.files?.[0] || null)}
                   />
-                  {newComponentFile && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setNewComponentFile(null);
-                      }}
-                      className="text-gray-400 hover:text-gray-600 p-0.5"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
                 </label>
               </div>
 
