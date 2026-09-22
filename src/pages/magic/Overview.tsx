@@ -200,9 +200,9 @@ export default function Overview() {
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
                   <th className="py-3 px-6 font-normal">SOLUTION</th>
+                  <th className="py-3 px-6 font-normal">STATUS</th>
                   <th className="py-3 px-6 font-normal">BUILD EFFORT</th>
                   <th className="py-3 px-6 font-normal">3-YR REVENUE</th>
-                  <th className="py-3 px-6 font-normal">STATUS</th>
                   <th className="py-3 px-6 font-normal text-right">AI SCORE</th>
                 </tr>
               </thead>
@@ -219,12 +219,6 @@ export default function Overview() {
                       <td className="py-3.5 px-6 font-medium text-[0.8125rem] text-[#0D212C]">
                         {sol.name}
                       </td>
-                      <td className="py-3.5 px-6 text-xs text-gray-500 font-normal">
-                        {sol.effort}
-                      </td>
-                      <td className="py-3.5 px-6 text-xs sm:text-[0.8125rem] font-semibold text-[#0D212C] font-mono">
-                        {sol.revenue}
-                      </td>
                       <td className="py-3.5 px-6">
                         <span
                           className={`inline-block px-3 py-0.5 rounded-full text-[0.75rem] font-medium capitalize ${
@@ -239,6 +233,12 @@ export default function Overview() {
                         >
                           {sol.status}
                         </span>
+                      </td>
+                      <td className="py-3.5 px-6 text-xs text-gray-500 font-normal">
+                        {sol.effort}
+                      </td>
+                      <td className="py-3.5 px-6 text-xs sm:text-[0.8125rem] font-normal text-[#0D212C] font-mono">
+                        {sol.revenue}
                       </td>
                       <td className="py-3.5 px-6 text-right font-semibold text-xs sm:text-sm text-[#ED4D19] font-mono">
                         {sol.score}
