@@ -922,51 +922,57 @@ export default function BuildRoadmap() {
         <div className="space-y-4">
           {/* Solutions Progress Section */}
           <div className="space-y-3.5">
+            {/* Top Row: Title on Left, Search Bar on Right */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h3 className="text-[0.9375rem] font-semibold text-[#0D212C] font-['Poppins']">
                 Solution progress
               </h3>
 
-              {/* Right side: 2 sorting/filter chips (In progress & Unlocked) + Search Bar */}
-              <div className="flex flex-wrap items-center gap-3">
-                {/* 2 Sorting / Filter Chips */}
-                <div className="inline-flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setImpactSort(impactSort === 'in_progress' ? 'all' : 'in_progress')}
-                    className={`px-3 py-1 rounded-full text-xs transition-colors cursor-pointer border ${
-                      impactSort === 'in_progress'
-                        ? 'bg-amber-50 text-amber-700 border-amber-300 font-medium'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 font-normal'
-                    }`}
-                  >
-                    In progress
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setImpactSort(impactSort === 'unlocked' ? 'all' : 'unlocked')}
-                    className={`px-3 py-1 rounded-full text-xs transition-colors cursor-pointer border ${
-                      impactSort === 'unlocked'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300 font-medium'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 font-normal'
-                    }`}
-                  >
-                    Unlocked
-                  </button>
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative w-52 sm:w-60">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={impactSearch}
-                    onChange={(e) => setImpactSearch(e.target.value)}
-                    placeholder="Search solutions..."
-                    className="w-full bg-white border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
-                  />
-                </div>
+              {/* Search Bar on Right */}
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={impactSearch}
+                  onChange={(e) => setImpactSearch(e.target.value)}
+                  placeholder="Search solutions..."
+                  className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
+                />
               </div>
+            </div>
+
+            {/* Next Line: 3 Tabs (All, In progress, Unlocked) in reference pill styling */}
+            <div className="flex flex-wrap items-center gap-2 pt-0.5">
+              {[
+                { id: 'all', label: 'All', count: solutionImpactStatuses.length },
+                { id: 'in_progress', label: 'In progress', count: inProgressSolutions.length },
+                { id: 'unlocked', label: 'Unlocked', count: unlockedSolutions.length },
+              ].map((tab) => {
+                const isActive = impactSort === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setImpactSort(tab.id as 'all' | 'in_progress' | 'unlocked')}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-[0.8125rem] font-medium transition-all cursor-pointer border ${
+                      isActive
+                        ? 'bg-[#ED4D19] text-white border-[#ED4D19] shadow-xs'
+                        : 'bg-white text-gray-700 border-gray-200/90 hover:border-gray-300 hover:bg-gray-50/60'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span
+                      className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[0.6875rem] font-semibold min-w-[20px] ${
+                        isActive
+                          ? 'bg-white/25 text-white'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Grid of Solution Cards (3 columns on desktop) with Subtle Light Orange Progress Bars */}
