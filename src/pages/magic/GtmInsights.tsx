@@ -386,21 +386,15 @@ export default function GtmInsights() {
               (activeTab === 'country' ? !selectedCountry : !selectedSolution) ||
               generatedDeck !== null
             }
-            className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs font-semibold shadow-xs transition-all whitespace-nowrap ${
+            className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs font-semibold shadow-xs transition-all whitespace-nowrap bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] text-white ${
               isGenerating || 
               (activeTab === 'country' ? !selectedCountry : !selectedSolution) ||
               generatedDeck !== null
-                ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed shadow-none'
-                : 'bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white cursor-pointer shadow-xs'
+                ? 'opacity-40 cursor-not-allowed shadow-none'
+                : 'hover:opacity-95 cursor-pointer shadow-xs'
             }`}
           >
-            <Play className={`w-3.5 h-3.5 ${
-              isGenerating || 
-              (activeTab === 'country' ? !selectedCountry : !selectedSolution) ||
-              generatedDeck !== null
-                ? 'fill-gray-400 text-gray-400' 
-                : 'fill-current text-white'
-            }`} />
+            <Play className="w-3.5 h-3.5 fill-current text-white" />
             <span>{generatedDeck !== null ? 'Deck generated' : 'Generate deck'}</span>
           </button>
         </div>

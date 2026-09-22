@@ -1064,16 +1064,21 @@ export default function Catalogue() {
             </div>
 
             {/* Main Solution Card matching snapshot without Target Audience */}
-            <div className="bg-white rounded-2xl border border-gray-200/90 p-6 md:p-8 shadow-xs relative overflow-hidden">
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md text-[0.6875rem] font-medium uppercase tracking-wider border border-gray-200/70">
-                    {viewingSolution.shortCode}
-                  </span>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
+            <div className="bg-white rounded-2xl border border-gray-200/90 p-5 md:p-6 shadow-xs relative overflow-hidden">
+              <div className="space-y-2">
+                <h1 className="text-lg sm:text-xl font-medium text-[#0D212C] font-['Poppins'] tracking-tight">
+                  {viewingSolution.name}
+                </h1>
+
+                {/* Positioning and Status below title with labels and separator */}
+                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-normal">
+                  <span className="text-gray-400 font-normal">Positioning</span>
+                  <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
                     {viewingSolution.positioning}
                   </span>
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-normal ${
+                  <span className="text-gray-300 mx-1 select-none">·</span>
+                  <span className="text-gray-400 font-normal">Status</span>
+                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-normal ${
                     viewingSolution.status === 'Completed'
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       : viewingSolution.status === 'In progress'
@@ -1086,30 +1091,26 @@ export default function Catalogue() {
                   </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-semibold text-[#0D212C] font-['Poppins'] tracking-tight">
-                  {viewingSolution.name}
-                </h1>
-
-                <p className="text-sm text-gray-600 leading-relaxed font-normal max-w-4xl">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal max-w-4xl pt-1">
                   {currentSolutionProfile?.summary || 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows, lab bridges, and billing systems into unified FHIR-standard health records.'}
                 </p>
               </div>
 
-              {/* 4 Metric Highlights Cards using exact table column names */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100">
-                <div className="bg-orange-50/30 border border-orange-200/80 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">REVENUE (3-YR)</div>
-                  <div className="text-2xl font-bold text-[#ED4D19]">{viewingSolution.revenue3Yr}</div>
-                  <div className="text-[11px] text-gray-400">Cumulative addressable ARR</div>
+              {/* 4 Metric Highlights Cards with reduced font weight/size and compact card height */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5 pt-4 border-t border-gray-100">
+                <div className="bg-orange-50/30 border border-orange-200/80 rounded-xl p-3 space-y-0.5">
+                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">REVENUE (3-YR)</div>
+                  <div className="text-lg sm:text-xl font-semibold text-[#ED4D19]">{viewingSolution.revenue3Yr}</div>
+                  <div className="text-[11px] text-gray-400 font-normal">Cumulative addressable ARR</div>
                 </div>
 
-                <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">SCORE</div>
-                  <div className="text-2xl font-bold text-[#0D212C] flex items-center gap-1.5">
+                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
+                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">SCORE</div>
+                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C] flex items-center gap-1.5">
                     <span>{viewingSolution.score}</span>
-                    <span className="text-xs font-normal text-gray-400">/ 100</span>
+                    <span className="text-xs font-normal text-gray-400 font-sans">/ 100</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1 overflow-hidden">
+                  <div className="w-full bg-gray-200 rounded-full h-1 mt-1 overflow-hidden">
                     <div 
                       className="bg-[#ED4D19] h-full rounded-full" 
                       style={{ width: `${viewingSolution.score}%` }} 
@@ -1117,131 +1118,135 @@ export default function Catalogue() {
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">COMP.</div>
-                  <div className="text-2xl font-bold text-[#0D212C]">{viewingSolution.compCount} Modules</div>
-                  <div className="text-[11px] text-gray-400">
+                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
+                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COMP.</div>
+                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{viewingSolution.compCount} Modules</div>
+                  <div className="text-[11px] text-gray-400 font-normal">
                     80% portfolio synergy
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200/70 rounded-xl p-4 space-y-1">
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">COUNTRIES</div>
-                  <div className="text-2xl font-bold text-[#0D212C]">{targetCountryItems.length} Markets</div>
-                  <div className="text-[11px] text-gray-400">High-conviction expansion slice</div>
+                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
+                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COUNTRIES</div>
+                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{targetCountryItems.length} Markets</div>
+                  <div className="text-[11px] text-gray-400 font-normal">High-conviction expansion slice</div>
                 </div>
               </div>
             </div>
 
-            {/* Simple & Clean: Integrated Modules Section */}
-            <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            {/* Simple & Clean: Integrated Modules Section with Title Outside Table */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
                 <h3 className="text-sm font-semibold text-[#0D212C] font-['Poppins']">
                   Integrated Modules ({mappedSolutionComponents.length})
                 </h3>
-                <span className="text-xs text-gray-400">Component reuse across portfolio</span>
+                <span className="text-xs text-gray-400 font-normal">Component reuse across portfolio</span>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                      <th className="py-3 px-6 font-normal">COMPONENT</th>
-                      <th className="py-3 px-6 font-normal">CATEGORY</th>
-                      <th className="py-3 px-6 font-normal">STATUS</th>
-                      <th className="py-3 px-6 font-normal">REUSE</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
-                    {mappedSolutionComponents.map((component) => (
-                      <tr key={component.id} className="hover:bg-gray-50/70 transition-colors">
-                        <td className="py-3.5 px-6">
-                          <div className="flex flex-col">
-                            <span className="font-normal text-[#0D212C] text-[0.8125rem]">
-                              {component.name}
-                            </span>
-                            <span className="text-[0.75rem] text-gray-400 font-normal mt-0.5">
-                              {component.subtitle}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-gray-700">
-                          {component.category}
-                        </td>
-                        <td className="py-3.5 px-6">
-                          <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
-                            component.status === 'Completed'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : component.status === 'In progress'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : component.status === 'Prioritised'
-                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                              : 'bg-purple-50 text-purple-700 border border-purple-200'
-                          }`}>
-                            {component.status}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-[#0D212C]">
-                          {component.reuseCount} solutions
-                        </td>
+              <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                        <th className="py-3 px-6 font-normal">COMPONENT</th>
+                        <th className="py-3 px-6 font-normal">CATEGORY</th>
+                        <th className="py-3 px-6 font-normal">STATUS</th>
+                        <th className="py-3 px-6 font-normal">REUSE</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                      {mappedSolutionComponents.map((component) => (
+                        <tr key={component.id} className="hover:bg-gray-50/70 transition-colors">
+                          <td className="py-3.5 px-6">
+                            <div className="flex flex-col">
+                              <span className="font-normal text-[#0D212C] text-[0.8125rem]">
+                                {component.name}
+                              </span>
+                              <span className="text-[0.75rem] text-gray-400 font-normal mt-0.5">
+                                {component.subtitle}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-gray-700">
+                            {component.category}
+                          </td>
+                          <td className="py-3.5 px-6">
+                            <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
+                              component.status === 'Completed'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : component.status === 'In progress'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : component.status === 'Prioritised'
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'bg-purple-50 text-purple-700 border border-purple-200'
+                            }`}>
+                              {component.status}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-[#0D212C]">
+                            {component.reuseCount} solutions
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            {/* Simple & Clean: Target Countries Section */}
-            <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            {/* Simple & Clean: Target Countries Section with Title Outside Table */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
                 <h3 className="text-sm font-semibold text-[#0D212C] font-['Poppins']">
                   Target Countries ({targetCountryItems.length})
                 </h3>
-                <span className="text-xs text-gray-400">High-conviction expansion markets</span>
+                <span className="text-xs text-gray-400 font-normal">High-conviction expansion markets</span>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                      <th className="py-3 px-6 font-normal">COUNTRY</th>
-                      <th className="py-3 px-6 font-normal">TOTAL HEALTH SPEND</th>
-                      <th className="py-3 px-6 font-normal">DIGITAL SHARE</th>
-                      <th className="py-3 px-6 font-normal">DEAL ANCHOR (PER-COUNTRY)</th>
-                      <th className="py-3 px-6 font-normal">CONFIDENCE</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
-                    {targetCountryItems.map((country) => (
-                      <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
-                        <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
-                          <div className="flex items-center gap-2.5">
-                            <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
-                            <span>{country.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                          {country.totalSpend}
-                        </td>
-                        <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                          {country.digitalShare}
-                        </td>
-                        <td className="py-3.5 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
-                          {country.dealAnchor}
-                        </td>
-                        <td className="py-3.5 px-6">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
-                            country.confidence === 'High'
-                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                              : country.confidence === 'Medium'
-                              ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                              : 'bg-red-50 text-red-600 border border-red-200'
-                          }`}>
-                            {country.confidence}
-                          </span>
-                        </td>
+              <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                        <th className="py-3 px-6 font-normal">COUNTRY</th>
+                        <th className="py-3 px-6 font-normal">TOTAL HEALTH SPEND</th>
+                        <th className="py-3 px-6 font-normal">DIGITAL SHARE</th>
+                        <th className="py-3 px-6 font-normal">DEAL ANCHOR (PER-COUNTRY)</th>
+                        <th className="py-3 px-6 font-normal">CONFIDENCE</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                      {targetCountryItems.map((country) => (
+                        <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
+                          <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
+                            <div className="flex items-center gap-2.5">
+                              <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
+                              <span>{country.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
+                            {country.totalSpend}
+                          </td>
+                          <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
+                            {country.digitalShare}
+                          </td>
+                          <td className="py-3.5 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
+                            {country.dealAnchor}
+                          </td>
+                          <td className="py-3.5 px-6">
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
+                              country.confidence === 'High'
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                                : country.confidence === 'Medium'
+                                ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                                : 'bg-red-50 text-red-600 border border-red-200'
+                            }`}>
+                              {country.confidence}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

@@ -7,6 +7,9 @@ import {
   Globe, 
   ChevronRight,
   ChevronLeft,
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown,
   Search,
   Sparkles,
   TrendingUp,
@@ -19,6 +22,8 @@ export default function Overview() {
   const { solutions } = useMagicStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<'effort' | 'revenue' | 'score' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 5;
 
   // Navigation Button items
@@ -61,14 +66,49 @@ export default function Overview() {
     { id: 's3', rank: 8, name: 'Home & Community Care', effort: '~85 pd', revenue: '$17M', status: 'New', score: 58 },
   ], []);
 
-  // Filtered by search
+  const handleSort = (field: 'effort' | 'revenue' | 'score') => {
+    if (sortField === field) {
+      if (sortDirection === 'desc') {
+        setSortDirection('asc');
+      } else {
+        setSortField(null);
+        setSortDirection('desc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+    setCurrentPage(1);
+  };
+
+  // Filtered and Sorted list
   const filteredList = useMemo(() => {
-    return rawPriorityList.filter((item) =>
+    const list = rawPriorityList.filter((item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.revenue.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [rawPriorityList, searchQuery]);
+
+    if (!sortField) return list;
+
+    return [...list].sort((a, b) => {
+      let valA = 0;
+      let valB = 0;
+
+      if (sortField === 'effort') {
+        valA = parseFloat(a.effort.replace(/[^0-9.]/g, '')) || 0;
+        valB = parseFloat(b.effort.replace(/[^0-9.]/g, '')) || 0;
+      } else if (sortField === 'revenue') {
+        valA = parseFloat(a.revenue.replace(/[^0-9.]/g, '')) || 0;
+        valB = parseFloat(b.revenue.replace(/[^0-9.]/g, '')) || 0;
+      } else if (sortField === 'score') {
+        valA = a.score;
+        valB = b.score;
+      }
+
+      return sortDirection === 'asc' ? valA - valB : valB - valA;
+    });
+  }, [rawPriorityList, searchQuery, sortField, sortDirection]);
 
   // Paginated List
   const totalPages = Math.ceil(filteredList.length / itemsPerPage) || 1;
@@ -198,12 +238,57 @@ export default function Overview() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
+                <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
                   <th className="py-3 px-6 font-normal">SOLUTION</th>
                   <th className="py-3 px-6 font-normal">STATUS</th>
-                  <th className="py-3 px-6 font-normal">BUILD EFFORT</th>
-                  <th className="py-3 px-6 font-normal">3-YR REVENUE</th>
-                  <th className="py-3 px-6 font-normal text-right">AI SCORE</th>
+                  
+                  {/* BUILD EFFORT with Sort */}
+                  <th className="py-3 px-6 font-normal">
+                    <button
+                      type="button"
+                      onClick={() => handleSort('effort')}
+                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0"
+                    >
+                      <span>BUILD EFFORT</span>
+                      {sortField === 'effort' ? (
+                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
+                      )}
+                    </button>
+                  </th>
+
+                  {/* 3-YR REVENUE with Sort */}
+                  <th className="py-3 px-6 font-normal">
+                    <button
+                      type="button"
+                      onClick={() => handleSort('revenue')}
+                      className="inline-flex items-center gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0"
+                    >
+                      <span>3-YR REVENUE</span>
+                      {sortField === 'revenue' ? (
+                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
+                      )}
+                    </button>
+                  </th>
+
+                  {/* AI SCORE with Sort */}
+                  <th className="py-3 px-6 font-normal text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSort('score')}
+                      className="inline-flex items-center justify-end gap-1.5 hover:text-gray-900 transition-colors uppercase tracking-wider font-normal cursor-pointer bg-transparent border-0 p-0 ml-auto"
+                    >
+                      <span>AI SCORE</span>
+                      {sortField === 'score' ? (
+                        sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-[#ED4D19]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ED4D19]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-gray-400 opacity-60" />
+                      )}
+                    </button>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-[0.875rem]">
@@ -216,7 +301,7 @@ export default function Overview() {
                 ) : (
                   paginatedList.map((sol) => (
                     <tr key={sol.id} className="hover:bg-gray-50/70 transition-colors">
-                      <td className="py-3.5 px-6 font-medium text-[0.8125rem] text-[#0D212C]">
+                      <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
                         {sol.name}
                       </td>
                       <td className="py-3.5 px-6">

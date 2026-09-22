@@ -479,44 +479,31 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
               </p>
             </div>
 
-            {/* Action Buttons: Eye Icon + View Scoring Factors Button */}
-            <div className="flex items-center gap-2.5 shrink-0 pt-0.5">
-              {/* Eye Button with Tooltip */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsFactorsDrawerOpen(true)}
-                  onMouseEnter={() => setIsEyeTooltipHovered(true)}
-                  onMouseLeave={() => setIsEyeTooltipHovered(false)}
-                  className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
-                  aria-label="See what AI solution scoring means"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-
-                {/* Tooltip */}
-                {isEyeTooltipHovered && (
-                  <div className="absolute bottom-full mb-2 right-0 px-3.5 py-2 bg-[#1e293b] text-white text-xs font-normal rounded-xl shadow-xl z-50 whitespace-nowrap">
-                    See what AI solution scoring means
-                    <div className="absolute top-full right-4 -translate-x-1/2 border-4 border-transparent border-t-[#1e293b]" />
-                  </div>
-                )}
-              </div>
-
-              {/* View Scoring Factors Button */}
+            {/* Action Button: View Scoring Factors Button with Tooltip */}
+            <div className="relative shrink-0 pt-0.5">
               <button
                 type="button"
                 onClick={() => setIsFactorsDrawerOpen(true)}
+                onMouseEnter={() => setIsEyeTooltipHovered(true)}
+                onMouseLeave={() => setIsEyeTooltipHovered(false)}
                 className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-xs font-medium transition-colors shadow-2xs cursor-pointer group"
               >
                 <BookOpen className="w-4 h-4 text-[#ED4D19]" />
                 <span>View scoring factors</span>
                 <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
               </button>
+
+              {/* Tooltip */}
+              {isEyeTooltipHovered && (
+                <div className="absolute bottom-full mb-2 right-0 px-3.5 py-2 bg-[#1e293b] text-white text-xs font-normal rounded-xl shadow-xl z-50 whitespace-nowrap">
+                  See what AI solution scoring means
+                  <div className="absolute top-full right-6 -translate-x-1/2 border-4 border-transparent border-t-[#1e293b]" />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* STANDARDIZED SCORING RUBRIC (Snapshot 5) */}
+          {/* AI SCORING LOGIC */}
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
             <button
               type="button"
@@ -526,7 +513,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
               <div className="flex items-center gap-2">
                 <ChevronRight className={`w-4 h-4 text-gray-500 transition-transform ${isRubricOpen ? 'rotate-90' : ''}`} />
                 <span className="text-xs font-semibold text-[#0D212C] font-['Poppins']">
-                  Standardized scoring rubric — how each 1–5 score is decided (hover any score for its reason)
+                  AI Scoring Logic
                 </span>
               </div>
               <span className="text-[11px] text-gray-400 font-medium">
