@@ -149,11 +149,11 @@ export default function Overview() {
             <Link
               key={item.id}
               to={item.path}
-              className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white border border-gray-200/90 hover:border-gray-300 hover:bg-gray-50/80 rounded-xl shadow-2xs text-xs sm:text-sm font-medium text-gray-800 transition-all cursor-pointer group"
+              className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-gray-200/90 hover:border-gray-300 hover:bg-gray-50/80 rounded-xl shadow-2xs text-[0.6875rem] sm:text-xs font-normal text-gray-700 transition-all cursor-pointer group"
             >
-              <Icon className="w-4 h-4 text-[#ED4D19]" />
+              <Icon className="w-3.5 h-3.5 text-[#ED4D19]" />
               <span>{item.title}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#ED4D19] group-hover:translate-x-0.5 transition-all" />
+              <ChevronRight className="w-3 h-3 text-gray-400 group-hover:text-[#ED4D19] group-hover:translate-x-0.5 transition-all" />
             </Link>
           );
         })}

@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   Building2,
   Calendar,
-  DollarSign
+  DollarSign,
+  Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMagicStore } from '../../store/magicStore';
@@ -93,7 +94,7 @@ const EXACT_SLIDE_DATA = {
   spendCapitaBadge: 'High' as const,
   hospitalBeds: '2.2',
   hospitalBedsBadge: 'High' as const,
-  digitalMaturity: 'Growing',
+  digitalMaturity: 'Developing',
   digitalMaturityBadge: 'Medium' as const,
   insuredPopulation: '~68%',
   insuredPopulationBadge: 'Medium' as const,
@@ -171,23 +172,23 @@ const EXACT_SOLUTION_DATA = {
   tam: '$42M',
   addressableMarkets: '7',
   whyItScales: [
-    { prefix: 'Reuses ', bold: '8 components', suffix: ' — build once, sell many.' },
+    { prefix: 'Reuses ', bold: '8 components', suffix: ', build once, sell many.' },
     { prefix: 'Score ', bold: '65/100', suffix: ', sellable across 7 markets.' },
     { prefix: 'Effort ', bold: '~167 person-days', suffix: ' (1 FTE), rolled up from its components.' }
   ],
-  revenueLogic: 'Per market: deal anchor × revenue-depth (1.08) × win-likelihood (20–70%, from criticality, willingness-to-pay & competitiveness), summed across addressable markets. Conservative, 3-year, illustrative.',
+  revenueLogic: 'Per market: deal anchor × revenue-depth (1.2) × win-likelihood (30-70%, from criticality, willingness-to-pay & competitiveness), summed across addressable markets. Conservative, 3-year, illustrative.',
   topCountries: [
     {
       rank: 1,
       name: 'United States',
-      description: 'Fit 80/100 · By far the largest opportunity, but competitive and complex — win rates are lower even where deal sizes are highest. Win likelihood ~60% given common positioning and $12,555 spend/capita.',
+      description: 'Fit 80/100 · Largest opportunity with high deal sizes. Win likelihood ~60% given common positioning and $12,555 spend/capita.',
       revenue3Yr: '$10M',
       annualRev: '$3.5M per year · ~60% win'
     },
     {
       rank: 2,
       name: 'South Korea',
-      description: 'Fit 75/100 · Large, mature, high-spend market — strong deal sizes for differentiated solutions. Win likelihood ~57% given common positioning and $2,600 spend/capita.',
+      description: 'Fit 75/100 · Large, mature, high-spend market with strong deal sizes for differentiated solutions. Win likelihood ~57% given common positioning and $2,600 spend/capita.',
       revenue3Yr: '$5M',
       annualRev: '$1.7M per year · ~57% win'
     },
@@ -208,7 +209,7 @@ const EXACT_SOLUTION_DATA = {
     {
       rank: 5,
       name: 'Estonia',
-      description: 'Fit 85/100 · Small but digitally mature — a reference market for RPM, EMR and analytics with fast adoption. Win likelihood ~63% given common positioning and $1,733 spend/capita.',
+      description: 'Fit 85/100 · Digitally mature reference market for RPM, EMR and analytics with fast adoption. Win likelihood ~63% given common positioning and $1,733 spend/capita.',
       revenue3Yr: '$1.4M',
       annualRev: '$0.5M per year · ~63% win'
     }
@@ -312,7 +313,7 @@ export default function GtmInsights() {
         const profile = getCountryProfile(selectedCountry || 'Saudi Arabia');
         setGeneratedDeck({
           targetType: 'country',
-          title: `${selectedCountry || 'Saudi Arabia'} — Go-To-Market Pitch Deck`,
+          title: `${selectedCountry || 'Saudi Arabia'} - Go-To-Market Pitch Deck`,
           subtitle: `M42 Digital Health Expansion & Monetisation Strategy for ${selectedCountry || 'Saudi Arabia'}`,
           profile
         });
@@ -320,7 +321,7 @@ export default function GtmInsights() {
         const solutionProfile = getSolutionProfile(selectedSolution || 'EMR & Interoperability');
         setGeneratedDeck({
           targetType: 'solution',
-          title: `${selectedSolution || 'EMR & Interoperability'} — Go-To-Market Pitch Deck`,
+          title: `${selectedSolution || 'EMR & Interoperability'} - Go-To-Market Pitch Deck`,
           subtitle: `Commercialisation Strategy & Cross-Border Scaling for ${selectedSolution || 'EMR & Interoperability'}`,
           solutionProfile,
           solutionName: selectedSolution || 'EMR & Interoperability'
@@ -374,10 +375,10 @@ export default function GtmInsights() {
 
       {/* Input Selection Bar & Generate CTA */}
       <div className="space-y-2">
-        <label className="block text-xs font-semibold text-gray-700">
+        <label className="block text-xs font-medium text-gray-700">
           {activeTab === 'country' 
-            ? 'Target country — search any country' 
-            : 'Target solution — select any catalogue solution'}
+            ? 'Target country - search any country' 
+            : 'Target solution - select any catalogue solution'}
         </label>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -387,17 +388,14 @@ export default function GtmInsights() {
               <button
                 type="button"
                 onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                className="w-full bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-4 py-3 text-[0.875rem] text-left flex items-center justify-between shadow-2xs transition-colors cursor-pointer"
+                className="w-full bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2.5 text-xs text-left flex items-center justify-between shadow-2xs transition-colors cursor-pointer"
               >
                 {selectedCountry ? (
-                  <div className="flex items-center gap-2.5">
-                    <CountryFlag country={selectedCountry} className="w-5 h-3.5 rounded-2xs shadow-2xs" />
-                    <span className="font-medium text-[#0D212C]">{selectedCountry}</span>
-                  </div>
+                  <span className="font-normal text-[#0D212C]">{selectedCountry}</span>
                 ) : (
                   <span className="text-gray-400 font-normal">Select target country...</span>
                 )}
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isCountryDropdownOpen && (
@@ -411,17 +409,14 @@ export default function GtmInsights() {
                         setGeneratedDeck(null);
                         setIsCountryDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-2.5 text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                      className={`w-full px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
                         selectedCountry === c.name
-                          ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-gray-100 text-gray-900 font-normal'
+                          : 'text-gray-700 hover:bg-gray-50 font-normal'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <CountryFlag country={c.name} className="w-4 h-3 rounded-2xs" />
-                        <span>{c.name}</span>
-                      </div>
-                      {selectedCountry === c.name && <Check className="w-4 h-4 text-[#ED4D19]" />}
+                      <span>{c.name}</span>
+                      {selectedCountry === c.name && <Check className="w-3.5 h-3.5 text-gray-600" />}
                     </button>
                   ))}
                 </div>
@@ -435,17 +430,14 @@ export default function GtmInsights() {
               <button
                 type="button"
                 onClick={() => setIsSolutionDropdownOpen(!isSolutionDropdownOpen)}
-                className="w-full bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-4 py-3 text-[0.875rem] text-left flex items-center justify-between shadow-2xs transition-colors cursor-pointer"
+                className="w-full bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2.5 text-xs text-left flex items-center justify-between shadow-2xs transition-colors cursor-pointer"
               >
                 {selectedSolution ? (
-                  <div className="flex items-center gap-2.5">
-                    <Layers className="w-4 h-4 text-[#ED4D19]" />
-                    <span className="font-medium text-[#0D212C]">{selectedSolution}</span>
-                  </div>
+                  <span className="font-normal text-[#0D212C]">{selectedSolution}</span>
                 ) : (
                   <span className="text-gray-400 font-normal">Select target solution...</span>
                 )}
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isSolutionDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isSolutionDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isSolutionDropdownOpen && (
@@ -459,17 +451,17 @@ export default function GtmInsights() {
                         setGeneratedDeck(null);
                         setIsSolutionDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-2.5 text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                      className={`w-full px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
                         selectedSolution === s.name
-                          ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-gray-100 text-gray-900 font-normal'
+                          : 'text-gray-700 hover:bg-gray-50 font-normal'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="font-medium">{s.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span>{s.name}</span>
                         <span className="text-[11px] text-gray-400">({s.positioning})</span>
                       </div>
-                      {selectedSolution === s.name && <Check className="w-4 h-4 text-[#ED4D19]" />}
+                      {selectedSolution === s.name && <Check className="w-3.5 h-3.5 text-gray-600" />}
                     </button>
                   ))}
                 </div>
@@ -486,7 +478,7 @@ export default function GtmInsights() {
               (activeTab === 'country' ? !selectedCountry : !selectedSolution) ||
               generatedDeck !== null
             }
-            className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs font-semibold shadow-xs transition-all whitespace-nowrap bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] text-white ${
+            className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium shadow-xs transition-all whitespace-nowrap bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] text-white ${
               isGenerating || 
               (activeTab === 'country' ? !selectedCountry : !selectedSolution) ||
               generatedDeck !== null
@@ -498,6 +490,14 @@ export default function GtmInsights() {
             <span>{generatedDeck !== null ? 'Deck generated' : 'Generate deck'}</span>
           </button>
         </div>
+
+        {/* Note below Country Dropdown */}
+        {activeTab === 'country' && (
+          <p className="text-[0.75rem] text-gray-500 flex items-center gap-1.5 font-normal">
+            <Info className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <span>Please ensure that the country you are looking for is already added in the catalogue country list.</span>
+          </p>
+        )}
       </div>
 
       {/* Main Content Area */}
@@ -517,7 +517,7 @@ export default function GtmInsights() {
         {/* GENERATED DECK PRESENTATION VIEW (Matching Reference Slides & Clean Header) */}
         {generatedDeck && (
           <div className="space-y-6">
-            {/* Header: Title Only (Removed Chip and Subtitle as requested) */}
+            {/* Header: Title Only */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
               <div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-[#0D212C] font-['Poppins']">
@@ -537,7 +537,7 @@ export default function GtmInsights() {
               </button>
             </div>
 
-            {/* The 3 Branded Slides matching Reference Images in Part B Minimal Branding */}
+            {/* The 3 Branded Slides */}
             <div className="space-y-6 pt-2">
               
               {/* ========================================================================= */}
@@ -549,61 +549,61 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 1 · COUNTRY OVERVIEW
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
                           {generatedDeck.profile.name}
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 1 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-5 bg-white">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
                       {/* 4 Metrics / Attribute Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Population</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Population</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.population}
                           </div>
                         </div>
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Income group</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Income group</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.incomeGroup}
                           </div>
                         </div>
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Payer model</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Payer model</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.payerModel}
                           </div>
                         </div>
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Key driver</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Key driver</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.keyDriver}
                           </div>
                         </div>
                       </div>
 
                       {/* Summary Sentence */}
-                      <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed">
+                      <p className="text-xs text-gray-600 font-normal leading-relaxed">
                         {generatedDeck.profile.summarySentence}
                       </p>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
@@ -612,33 +612,33 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 2 · HEALTHCARE LANDSCAPE & MATURITY
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
-                          {generatedDeck.profile.name} — market context
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
+                          {generatedDeck.profile.name} - Market context
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 2 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-5 bg-white">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
                       {/* 4 Cards with Badges Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Health spend / capita</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1.5 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Health spend / capita</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.spendCapita}
                           </div>
                           <div>
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal border ${
                               generatedDeck.profile.spendCapitaBadge === 'High'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                 : generatedDeck.profile.spendCapitaBadge === 'Medium'
@@ -650,13 +650,13 @@ export default function GtmInsights() {
                           </div>
                         </div>
 
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Hospital beds / 1k</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1.5 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Hospital beds / 1k</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.hospitalBeds}
                           </div>
                           <div>
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal border ${
                               generatedDeck.profile.hospitalBedsBadge === 'High'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                 : generatedDeck.profile.hospitalBedsBadge === 'Medium'
@@ -668,13 +668,13 @@ export default function GtmInsights() {
                           </div>
                         </div>
 
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Digital-health maturity</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1.5 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Digital-health maturity</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.digitalMaturity}
                           </div>
                           <div>
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal border ${
                               generatedDeck.profile.digitalMaturityBadge === 'High'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                 : generatedDeck.profile.digitalMaturityBadge === 'Medium'
@@ -686,13 +686,13 @@ export default function GtmInsights() {
                           </div>
                         </div>
 
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Insured population</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1.5 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Insured population</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.profile.insuredPopulation}
                           </div>
                           <div>
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal border ${
                               generatedDeck.profile.insuredPopulationBadge === 'High'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                 : generatedDeck.profile.insuredPopulationBadge === 'Medium'
@@ -706,14 +706,14 @@ export default function GtmInsights() {
                       </div>
 
                       {/* Context Note in Italics */}
-                      <p className="text-xs sm:text-sm text-gray-500 italic font-normal leading-relaxed">
+                      <p className="text-xs text-gray-500 italic font-normal leading-relaxed">
                         Health-system context that drives which solutions fit and what the market will pay.
                       </p>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
@@ -722,34 +722,34 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 3 · RECOMMENDED SOLUTIONS & REVENUE
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
-                          {generatedDeck.profile.name} — where M42 wins
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
+                          {generatedDeck.profile.name} - Where M42 wins
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 3 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-5 bg-white">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
                       {/* Recommended Solutions List */}
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {generatedDeck.profile.solutions.map((sol, index) => (
-                          <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-gray-100 last:border-0 last:pb-0">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2.5">
-                                <span className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+                          <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-gray-100 last:border-0 last:pb-0">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                                   {sol.name}
                                 </span>
-                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                                <span className={`inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal border ${
                                   sol.status === 'Completed'
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                     : sol.status === 'In progress'
@@ -761,16 +761,16 @@ export default function GtmInsights() {
                                   {sol.status}
                                 </span>
                               </div>
-                              <div className="text-xs text-gray-500 font-normal">
-                                Fit {sol.fit}/100 · score {sol.score}/100 · win ~{sol.win}% — {sol.description}
+                              <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">
+                                Fit {sol.fit}/100 · score {sol.score}/100 · win ~{sol.win}% · {sol.description}
                               </div>
                             </div>
 
                             <div className="text-left sm:text-right shrink-0">
-                              <div className="text-base sm:text-lg font-semibold text-[#ED4D19] font-['Poppins']">
-                                {sol.revenue3Yr} <span className="text-gray-400 text-xs font-normal">(3 - YR)</span>
+                              <div className="text-xs sm:text-sm font-medium text-[#ED4D19] font-['Poppins']">
+                                {sol.revenue3Yr} <span className="text-gray-400 text-xs font-normal">(3-yr)</span>
                               </div>
-                              <div className="text-[0.6875rem] text-gray-400 italic font-normal">
+                              <div className="text-[0.625rem] text-gray-400 font-normal">
                                 ~{sol.annualRev}
                               </div>
                             </div>
@@ -779,14 +779,14 @@ export default function GtmInsights() {
                       </div>
 
                       {/* Formula Footnote */}
-                      <p className="text-[0.6875rem] text-gray-500 italic font-normal leading-relaxed pt-2">
+                      <p className="text-[0.625rem] text-gray-500 italic font-normal leading-relaxed pt-1">
                         Revenue = {generatedDeck.profile.name} deal anchor {generatedDeck.profile.dealAnchor} × solution revenue-depth × win-likelihood. Only catalogue solutions carry a score and a $; research-only ideas would show as candidates to add.
                       </p>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
@@ -802,44 +802,44 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 1 · SOLUTION OVERVIEW
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
                           {generatedDeck.solutionProfile.name}
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 1 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-6 bg-white">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {/* Left Column */}
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                        <div className="space-y-3.5">
+                          <div className="space-y-1">
+                            <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                               THE PROBLEM IT SOLVES
                             </div>
-                            <p className="text-xs sm:text-sm text-gray-700 font-normal leading-relaxed">
+                            <p className="text-xs text-gray-600 font-normal leading-relaxed">
                               {generatedDeck.solutionProfile.problemSolves}
                             </p>
                           </div>
 
-                          <div className="space-y-2.5">
-                            <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                          <div className="space-y-1.5">
+                            <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                               VALUE FOR PEOPLE & BUYERS
                             </div>
-                            <ul className="space-y-2 text-xs sm:text-sm text-gray-600 font-normal">
+                            <ul className="space-y-1 text-xs text-gray-600 font-normal">
                               {generatedDeck.solutionProfile.valueBullets.map((bullet, idx) => (
                                 <li key={idx} className="flex items-start gap-2">
-                                  <span className="text-gray-400 font-bold">•</span>
+                                  <span className="text-gray-400">•</span>
                                   <span>{bullet}</span>
                                 </li>
                               ))}
@@ -848,30 +848,30 @@ export default function GtmInsights() {
                         </div>
 
                         {/* Right Column */}
-                        <div className="space-y-6">
-                          <div className="space-y-2.5">
-                            <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                        <div className="space-y-3.5">
+                          <div className="space-y-1.5">
+                            <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                               KEY FEATURES
                             </div>
-                            <ul className="space-y-2 text-xs sm:text-sm text-gray-800 font-normal">
+                            <ul className="space-y-1 text-xs text-gray-700 font-normal">
                               {generatedDeck.solutionProfile.keyFeatures.map((feat, idx) => (
                                 <li key={idx} className="flex items-start gap-2">
-                                  <span className="text-gray-400 font-bold">•</span>
-                                  <span className="font-semibold text-[#0D212C]">{feat}</span>
+                                  <span className="text-gray-400">•</span>
+                                  <span className="text-[#0D212C] font-normal">{feat}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
 
-                          <div className="space-y-2">
-                            <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                          <div className="space-y-1">
+                            <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                               STATUS & POSITIONING
                             </div>
-                            <div className="flex items-center gap-2 pt-1">
-                              <span className="inline-block px-3 py-0.5 rounded-full text-[0.6875rem] font-semibold tracking-wide uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <div className="flex items-center gap-2 pt-0.5">
+                              <span className="inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal tracking-wide uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 {generatedDeck.solutionProfile.status}
                               </span>
-                              <span className="inline-block px-3 py-0.5 rounded-full text-[0.6875rem] font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                              <span className="inline-block px-2 py-0.5 rounded-full text-[0.625rem] font-normal bg-gray-100 text-gray-700 border border-gray-200">
                                 {generatedDeck.solutionProfile.positioning}
                               </span>
                             </div>
@@ -880,9 +880,9 @@ export default function GtmInsights() {
                       </div>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
@@ -891,65 +891,65 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 2 · REVENUE & SCALABILITY
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
-                          {generatedDeck.solutionProfile.name} — the business case
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
+                          {generatedDeck.solutionProfile.name} - The business case
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 2 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-6 bg-white">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
                       {/* 3 Metric Cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Expected revenue</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#ED4D19] font-['Poppins']">
-                            {generatedDeck.solutionProfile.expectedRevenue} <span className="text-gray-400 text-xs font-normal">(3 - YR)</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Expected revenue</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#ED4D19] font-['Poppins']">
+                            {generatedDeck.solutionProfile.expectedRevenue} <span className="text-gray-400 text-xs font-normal">(3-yr)</span>
                           </div>
-                          <div className="text-[0.6875rem] text-gray-400 italic font-normal">
+                          <div className="text-[0.625rem] text-gray-400 font-normal">
                             ~{generatedDeck.solutionProfile.expectedRevenuePerYear}
                           </div>
                         </div>
 
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">TAM (gross obtainable)</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">TAM (gross obtainable)</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.solutionProfile.tam}
                           </div>
                         </div>
 
-                        <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
-                          <div className="text-xs text-gray-500 font-normal">Addressable markets</div>
-                          <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-100/90">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal">Addressable markets</div>
+                          <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                             {generatedDeck.solutionProfile.addressableMarkets}
                           </div>
                         </div>
                       </div>
 
                       {/* 2 Columns: Why It Scales & Revenue Logic */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-0.5">
                         {/* WHY IT SCALES */}
-                        <div className="space-y-3">
-                          <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                        <div className="space-y-1.5">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                             WHY IT SCALES
                           </div>
-                          <ul className="space-y-2.5 text-xs sm:text-sm text-gray-600 font-normal">
+                          <ul className="space-y-1.5 text-xs text-gray-600 font-normal">
                             {generatedDeck.solutionProfile.whyItScales.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
-                                <span className="text-gray-400 font-bold">•</span>
+                                <span className="text-gray-400">•</span>
                                 <span>
                                   {item.prefix}
-                                  <span className="font-semibold text-[#0D212C]">{item.bold}</span>
+                                  <span className="font-medium text-[#0D212C]">{item.bold}</span>
                                   {item.suffix}
                                 </span>
                               </li>
@@ -958,20 +958,20 @@ export default function GtmInsights() {
                         </div>
 
                         {/* REVENUE LOGIC */}
-                        <div className="space-y-3">
-                          <div className="text-[0.6875rem] uppercase font-semibold text-gray-400 tracking-wider">
+                        <div className="space-y-1.5">
+                          <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-semibold text-gray-500 tracking-wider">
                             REVENUE LOGIC
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed">
+                          <p className="text-xs text-gray-600 font-normal leading-relaxed">
                             {generatedDeck.solutionProfile.revenueLogic}
                           </p>
                         </div>
                       </div>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
@@ -980,47 +980,47 @@ export default function GtmInsights() {
                   <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
                     {/* Clean Minimal Header with Orange Accent Line */}
                     <div className="h-1 w-full bg-[#ED4D19]" />
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-gray-100">
                       <div>
-                        <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                        <div className="text-[0.625rem] sm:text-[0.6875rem] uppercase font-medium text-[#ED4D19] tracking-wider">
                           SLIDE 3 · TOP TARGET COUNTRIES
                         </div>
-                        <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
-                          {generatedDeck.solutionProfile.name} — where to sell first
+                        <div className="text-sm sm:text-[0.9375rem] font-medium text-[#0D212C] font-['Poppins'] mt-0.5">
+                          {generatedDeck.solutionProfile.name} - Where to sell first
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                        <span className="font-semibold text-sm sm:text-base text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                           M42
                         </span>
                       </div>
                     </div>
 
                     {/* Slide 3 Content Body */}
-                    <div className="p-6 sm:p-7 space-y-5 bg-white">
+                    <div className="p-5 sm:p-6 space-y-4 bg-white">
                       {/* Ranked Countries List */}
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {generatedDeck.solutionProfile.topCountries.map((country) => (
-                          <div key={country.rank} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-gray-100 last:border-0 last:pb-0">
-                            <div className="flex items-start gap-4">
-                              <span className="text-base sm:text-lg font-bold text-[#0D212C] w-4 shrink-0 font-['Poppins']">
+                          <div key={country.rank} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-gray-100 last:border-0 last:pb-0">
+                            <div className="flex items-start gap-3">
+                              <span className="text-xs sm:text-sm font-medium text-gray-400 w-4 shrink-0 font-['Poppins']">
                                 {country.rank}
                               </span>
-                              <div className="space-y-1">
-                                <div className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+                              <div className="space-y-0.5">
+                                <div className="text-xs sm:text-sm font-medium text-[#0D212C] font-['Poppins']">
                                   {country.name}
                                 </div>
-                                <div className="text-xs text-gray-500 font-normal leading-relaxed max-w-2xl">
+                                <div className="text-[0.625rem] sm:text-[0.6875rem] text-gray-500 font-normal leading-relaxed max-w-2xl">
                                   {country.description}
                                 </div>
                               </div>
                             </div>
 
                             <div className="text-left sm:text-right shrink-0 sm:pl-4">
-                              <div className="text-base sm:text-lg font-semibold text-[#ED4D19] font-['Poppins']">
-                                {country.revenue3Yr} <span className="text-gray-400 text-xs font-normal">(3 - YR)</span>
+                              <div className="text-xs sm:text-sm font-medium text-[#ED4D19] font-['Poppins']">
+                                {country.revenue3Yr} <span className="text-gray-400 text-xs font-normal">(3-yr)</span>
                               </div>
-                              <div className="text-[0.6875rem] text-gray-400 italic font-normal">
+                              <div className="text-[0.625rem] text-gray-400 font-normal">
                                 ~{country.annualRev}
                               </div>
                             </div>
@@ -1029,20 +1029,19 @@ export default function GtmInsights() {
                       </div>
 
                       {/* Footnote */}
-                      <p className="text-[0.6875rem] text-gray-500 italic font-normal leading-relaxed pt-2">
-                        Countries ranked by expected revenue — logical and unbiased: driven by each market's spend, fit and win-likelihood, with no market over-claimed.
+                      <p className="text-[0.625rem] text-gray-500 italic font-normal leading-relaxed pt-1">
+                        Countries ranked by expected revenue, driven by each market's spend, fit and win-likelihood, with no market over-claimed.
                       </p>
 
                       {/* Slide Confidential Footer */}
-                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                      <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.625rem] text-gray-400 font-normal">
                         <span>M42 · Go-To-Market · Strategy team · Confidential</span>
-                        <span>Illustrative estimate — figures to be validated</span>
+                        <span>Illustrative estimate (figures to be validated)</span>
                       </div>
                     </div>
                   </div>
                 </>
               )}
-
             </div>
           </div>
         )}
