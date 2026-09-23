@@ -36,7 +36,7 @@ export default function Overview() {
     },
     {
       id: 'scoring',
-      title: 'Solution scoring',
+      title: 'AI Scoring & Wightage',
       path: '/ai-scoring',
       icon: BarChart2,
     },
