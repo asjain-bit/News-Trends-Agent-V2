@@ -37,17 +37,17 @@ export interface CountryGtmProfile {
   keyDriver: string;
   summarySentence: string;
   spendCapita: string;
-  spendCapitaBadge: 'HIGH' | 'MED' | 'LOW';
+  spendCapitaBadge: 'High' | 'Med' | 'Low';
   hospitalBeds: string;
-  hospitalBedsBadge: 'HIGH' | 'MED' | 'LOW';
+  hospitalBedsBadge: 'High' | 'Med' | 'Low';
   digitalMaturity: string;
-  digitalMaturityBadge: 'HIGH' | 'MED' | 'LOW';
+  digitalMaturityBadge: 'High' | 'Med' | 'Low';
   insuredPopulation: string;
-  insuredPopulationBadge: 'HIGH' | 'MED' | 'LOW';
+  insuredPopulationBadge: 'High' | 'Med' | 'Low';
   dealAnchor: string;
   solutions: {
     name: string;
-    status: 'IN PROGRESS' | 'PRIORITISED' | 'COMPLETED' | 'NEW';
+    status: 'In progress' | 'Prioritised' | 'Completed' | 'New';
     fit: number;
     score: number;
     win: number;
@@ -66,18 +66,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'Vision 2030 build-out',
     summarySentence: 'Large market with heavy public investment; hospital-ops and insurance solutions scale with the reform programme.',
     spendCapita: '$1,485',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '2.2',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Growing',
-    digitalMaturityBadge: 'MED',
+    digitalMaturityBadge: 'Med',
     insuredPopulation: '~68%',
-    insuredPopulationBadge: 'MED',
+    insuredPopulationBadge: 'Med',
     dealAnchor: '$6M',
     solutions: [
       {
         name: 'Hospital Ops & Clinical Workflow',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 86,
         score: 75,
         win: 63,
@@ -87,7 +87,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'InsurTech & Reimbursement',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 78,
         score: 80,
         win: 59,
@@ -97,7 +97,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Pharmacy & Medication',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 72,
         score: 59,
         win: 56,
@@ -107,7 +107,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 68,
         score: 66,
         win: 54,
@@ -117,7 +117,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Remote Patient Monitoring',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 60,
         score: 78,
         win: 50,
@@ -135,18 +135,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'Unified Malaffi / Nabidh HIE',
     summarySentence: 'Premium digital-first market with high private and public willingness-to-pay for distinctive AI and clinical workflow tools.',
     spendCapita: '$1,842',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '2.9',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Advanced',
-    digitalMaturityBadge: 'HIGH',
+    digitalMaturityBadge: 'High',
     insuredPopulation: '~98%',
-    insuredPopulationBadge: 'HIGH',
+    insuredPopulationBadge: 'High',
     dealAnchor: '$5M',
     solutions: [
       {
         name: 'InsurTech & Reimbursement',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 88,
         score: 80,
         win: 68,
@@ -156,7 +156,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 84,
         score: 66,
         win: 65,
@@ -166,7 +166,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Hospital Ops & Clinical Workflow',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 80,
         score: 75,
         win: 60,
@@ -176,7 +176,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Remote Patient Monitoring',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 75,
         score: 78,
         win: 58,
@@ -186,7 +186,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Population Health & Analytics',
-        status: 'NEW',
+        status: 'New',
         fit: 70,
         score: 73,
         win: 52,
@@ -204,18 +204,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'Hakeem Program Modernisation',
     summarySentence: 'Emerging regional healthcare hub with strong medical tourism and government digitization initiatives.',
     spendCapita: '$304',
-    spendCapitaBadge: 'MED',
+    spendCapitaBadge: 'Med',
     hospitalBeds: '1.8',
-    hospitalBedsBadge: 'MED',
+    hospitalBedsBadge: 'Med',
     digitalMaturity: 'Moderate',
-    digitalMaturityBadge: 'MED',
+    digitalMaturityBadge: 'Med',
     insuredPopulation: '~72%',
-    insuredPopulationBadge: 'MED',
+    insuredPopulationBadge: 'Med',
     dealAnchor: '$1.3M',
     solutions: [
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 82,
         score: 66,
         win: 58,
@@ -225,7 +225,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Hospital Ops & Clinical Workflow',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 74,
         score: 75,
         win: 52,
@@ -235,7 +235,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Pharmacy & Medication',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 68,
         score: 59,
         win: 48,
@@ -253,18 +253,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'e-Health 2.0 & Genomic Data',
     summarySentence: 'Global benchmark for digital governance with 99% electronic health data and high AI adoption willingness.',
     spendCapita: '$1,733',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '3.4',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Mature',
-    digitalMaturityBadge: 'HIGH',
+    digitalMaturityBadge: 'High',
     insuredPopulation: '~95%',
-    insuredPopulationBadge: 'HIGH',
+    insuredPopulationBadge: 'High',
     dealAnchor: '$2M',
     solutions: [
       {
         name: 'Population Health & Analytics',
-        status: 'NEW',
+        status: 'New',
         fit: 88,
         score: 73,
         win: 64,
@@ -274,7 +274,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Remote Patient Monitoring',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 80,
         score: 78,
         win: 60,
@@ -284,7 +284,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'InsurTech & Reimbursement',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 75,
         score: 80,
         win: 55,
@@ -302,18 +302,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'Smart Hospital Initiative',
     summarySentence: 'High-density tech-forward healthcare infrastructure with massive clinical data volumes and hospital automation demand.',
     spendCapita: '$2,600',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '12.8',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Advanced',
-    digitalMaturityBadge: 'HIGH',
+    digitalMaturityBadge: 'High',
     insuredPopulation: '~97%',
-    insuredPopulationBadge: 'HIGH',
+    insuredPopulationBadge: 'High',
     dealAnchor: '$8M',
     solutions: [
       {
         name: 'Hospital Ops & Clinical Workflow',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 90,
         score: 75,
         win: 66,
@@ -323,7 +323,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Drug Discovery',
-        status: 'NEW',
+        status: 'New',
         fit: 85,
         score: 69,
         win: 60,
@@ -333,7 +333,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Remote Patient Monitoring',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 82,
         score: 78,
         win: 58,
@@ -351,18 +351,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'HTI-1 / HTI-2 Interoperability',
     summarySentence: 'Massive addressable spend with intense focus on value-based care risk adjustments and automated claim denials management.',
     spendCapita: '$12,555',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '2.8',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Advanced',
-    digitalMaturityBadge: 'HIGH',
+    digitalMaturityBadge: 'High',
     insuredPopulation: '~92%',
-    insuredPopulationBadge: 'HIGH',
+    insuredPopulationBadge: 'High',
     dealAnchor: '$16M',
     solutions: [
       {
         name: 'InsurTech & Reimbursement',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 92,
         score: 80,
         win: 70,
@@ -372,7 +372,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 86,
         score: 66,
         win: 62,
@@ -382,7 +382,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Remote Patient Monitoring',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 80,
         score: 78,
         win: 56,
@@ -400,18 +400,18 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'National Digital Transformation',
     summarySentence: 'Rapidly modernizing healthcare system with recent mandatory insurance rollout and central E-Health portal expansion.',
     spendCapita: '$230',
-    spendCapitaBadge: 'LOW',
+    spendCapitaBadge: 'Low',
     hospitalBeds: '4.1',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Developing',
-    digitalMaturityBadge: 'LOW',
+    digitalMaturityBadge: 'Low',
     insuredPopulation: '~85%',
-    insuredPopulationBadge: 'MED',
+    insuredPopulationBadge: 'Med',
     dealAnchor: '$1M',
     solutions: [
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 78,
         score: 66,
         win: 55,
@@ -421,7 +421,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Pharmacy & Medication',
-        status: 'PRIORITISED',
+        status: 'Prioritised',
         fit: 70,
         score: 59,
         win: 50,
@@ -431,7 +431,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
       },
       {
         name: 'Population Health & Analytics',
-        status: 'NEW',
+        status: 'New',
         fit: 65,
         score: 73,
         win: 45,
@@ -456,18 +456,18 @@ function getCountryProfile(countryName: string, allCountries: any[]): CountryGtm
     keyDriver: 'National Health Digitization Strategy',
     summarySentence: `Strategic target market with active investments in digital health records, hospital operational efficiency, and automated claims workflows.`,
     spendCapita: matched ? matched.spendCapita : '$1,200',
-    spendCapitaBadge: 'HIGH',
+    spendCapitaBadge: 'High',
     hospitalBeds: '2.5',
-    hospitalBedsBadge: 'HIGH',
+    hospitalBedsBadge: 'High',
     digitalMaturity: 'Growing',
-    digitalMaturityBadge: 'MED',
+    digitalMaturityBadge: 'Med',
     insuredPopulation: '~75%',
-    insuredPopulationBadge: 'MED',
+    insuredPopulationBadge: 'Med',
     dealAnchor: matched ? matched.dealAnchor : '$3M',
     solutions: [
       {
         name: 'Hospital Ops & Clinical Workflow',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 82,
         score: 75,
         win: 60,
@@ -477,7 +477,7 @@ function getCountryProfile(countryName: string, allCountries: any[]): CountryGtm
       },
       {
         name: 'InsurTech & Reimbursement',
-        status: 'IN PROGRESS',
+        status: 'In progress',
         fit: 78,
         score: 80,
         win: 56,
@@ -487,7 +487,7 @@ function getCountryProfile(countryName: string, allCountries: any[]): CountryGtm
       },
       {
         name: 'EMR & Interoperability',
-        status: 'COMPLETED',
+        status: 'Completed',
         fit: 74,
         score: 66,
         win: 54,
@@ -819,18 +819,19 @@ export default function GtmInsights() {
               
               {/* SLIDE 1: COUNTRY OVERVIEW */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Clean Header Banner */}
-                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                {/* Part B Vibrant Gradient Header Banner */}
+                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
+                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
                   <div>
-                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
                       SLIDE 1 · COUNTRY OVERVIEW
                     </div>
-                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
                       {generatedDeck.profile.name}
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
                       M42
                     </span>
                   </div>
@@ -881,18 +882,19 @@ export default function GtmInsights() {
 
               {/* SLIDE 2: HEALTHCARE LANDSCAPE & MATURITY */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Clean Header Banner */}
-                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                {/* Part B Vibrant Gradient Header Banner */}
+                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
+                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
                   <div>
-                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
                       SLIDE 2 · HEALTHCARE LANDSCAPE & MATURITY
                     </div>
-                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
                       {generatedDeck.profile.name} — market context
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
                       M42
                     </span>
                   </div>
@@ -908,7 +910,13 @@ export default function GtmInsights() {
                         {generatedDeck.profile.spendCapita}
                       </div>
                       <div>
-                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold bg-[#E8F8F8] text-[#0E7C86] uppercase tracking-wider">
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                          generatedDeck.profile.spendCapitaBadge === 'High'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : generatedDeck.profile.spendCapitaBadge === 'Med'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
+                        }`}>
                           {generatedDeck.profile.spendCapitaBadge}
                         </span>
                       </div>
@@ -920,7 +928,13 @@ export default function GtmInsights() {
                         {generatedDeck.profile.hospitalBeds}
                       </div>
                       <div>
-                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold bg-[#E8F8F8] text-[#0E7C86] uppercase tracking-wider">
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                          generatedDeck.profile.hospitalBedsBadge === 'High'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : generatedDeck.profile.hospitalBedsBadge === 'Med'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
+                        }`}>
                           {generatedDeck.profile.hospitalBedsBadge}
                         </span>
                       </div>
@@ -932,8 +946,12 @@ export default function GtmInsights() {
                         {generatedDeck.profile.digitalMaturity}
                       </div>
                       <div>
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
-                          generatedDeck.profile.digitalMaturityBadge === 'HIGH' ? 'bg-[#E8F8F8] text-[#0E7C86]' : 'bg-[#FEF6E9] text-[#B56B12]'
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                          generatedDeck.profile.digitalMaturityBadge === 'High'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : generatedDeck.profile.digitalMaturityBadge === 'Med'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
                           {generatedDeck.profile.digitalMaturityBadge}
                         </span>
@@ -946,8 +964,12 @@ export default function GtmInsights() {
                         {generatedDeck.profile.insuredPopulation}
                       </div>
                       <div>
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
-                          generatedDeck.profile.insuredPopulationBadge === 'HIGH' ? 'bg-[#E8F8F8] text-[#0E7C86]' : 'bg-[#FEF6E9] text-[#B56B12]'
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                          generatedDeck.profile.insuredPopulationBadge === 'High'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : generatedDeck.profile.insuredPopulationBadge === 'Med'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
                           {generatedDeck.profile.insuredPopulationBadge}
                         </span>
@@ -970,18 +992,19 @@ export default function GtmInsights() {
 
               {/* SLIDE 3: RECOMMENDED SOLUTIONS & REVENUE */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Clean Header Banner */}
-                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                {/* Part B Vibrant Gradient Header Banner */}
+                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
+                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
                   <div>
-                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
                       SLIDE 3 · RECOMMENDED SOLUTIONS & REVENUE
                     </div>
-                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
                       {generatedDeck.profile.name} — where M42 wins
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
                       M42
                     </span>
                   </div>
@@ -998,10 +1021,14 @@ export default function GtmInsights() {
                             <span className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
                               {sol.name}
                             </span>
-                            <span className={`px-2.5 py-0.5 rounded-md text-[0.625rem] font-semibold uppercase tracking-wider ${
-                              sol.status === 'COMPLETED' || sol.status === 'IN PROGRESS'
-                                ? 'bg-[#E8F8F8] text-[#0E7C86]'
-                                : 'bg-[#FEF6E9] text-[#B56B12]'
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
+                              sol.status === 'Completed'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : sol.status === 'In progress'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : sol.status === 'Prioritised'
+                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                : 'bg-purple-50 text-purple-700 border-purple-200'
                             }`}>
                               {sol.status}
                             </span>
