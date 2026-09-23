@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft, Search, Filter } from 'lucide-react';
 import { useMagicStore, ComponentItem } from '../../store/magicStore';
 
@@ -394,6 +394,18 @@ export default function BuildRoadmap() {
   // Build Impact Search & Sort state
   const [impactSearch, setImpactSearch] = useState('');
   const [impactSort, setImpactSort] = useState<'all' | 'in_progress' | 'unlocked'>('all');
+  const [isImpactFilterOpen, setIsImpactFilterOpen] = useState(false);
+  const impactFilterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (impactFilterRef.current && !impactFilterRef.current.contains(event.target as Node)) {
+        setIsImpactFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredSolutionImpactStatuses = useMemo(() => {
     return solutionImpactStatuses.filter((sol) => {
@@ -943,18 +955,46 @@ export default function BuildRoadmap() {
                 </div>
 
                 {/* Filter by Status Button / Dropdown on Right Side of Search Bar */}
-                <div className="relative w-[130px]">
-                  <select
-                    value={impactSort}
-                    onChange={(e) => setImpactSort(e.target.value as 'all' | 'in_progress' | 'unlocked')}
-                    className="w-full appearance-none bg-white border border-gray-200 rounded-xl pl-8 pr-7 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                <div className="relative w-[130px]" ref={impactFilterRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsImpactFilterOpen(!isImpactFilterOpen)}
+                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                   >
-                    <option value="all">All Status</option>
-                    <option value="in_progress">In progress</option>
-                    <option value="unlocked">Unlocked</option>
-                  </select>
-                  <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <div className="flex items-center gap-[12px]">
+                      <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                      <span className="truncate">
+                        {impactSort === 'all' ? 'All Status' : impactSort === 'in_progress' ? 'In progress' : 'Unlocked'}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isImpactFilterOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isImpactFilterOpen && (
+                    <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                      {([
+                        { value: 'all', label: 'All Status' },
+                        { value: 'in_progress', label: 'In progress' },
+                        { value: 'unlocked', label: 'Unlocked' },
+                      ] as const).map((opt) => (
+                        <button 
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setImpactSort(opt.value);
+                            setIsImpactFilterOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${
+                            impactSort === opt.value
+                              ? 'bg-gray-100 text-gray-900 font-medium'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {impactSort === opt.value && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

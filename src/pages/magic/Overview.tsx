@@ -280,12 +280,12 @@ export default function Overview() {
                     }}
                     className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
                       statusFilter === st
-                        ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
+                        ? 'bg-gray-100 text-gray-900 font-medium'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     <span>{st === 'All' ? 'All statuses' : st}</span>
-                    {statusFilter === st && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
+                    {statusFilter === st && <Check className="w-3.5 h-3.5 text-gray-700" />}
                   </button>
                 ))}
               </div>

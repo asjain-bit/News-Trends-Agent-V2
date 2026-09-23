@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Info, 
@@ -264,6 +264,19 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
   const [isEyeTooltipHovered, setIsEyeTooltipHovered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [isStatusFilterOpen, setIsStatusFilterOpen] = useState(false);
+  const statusFilterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusFilterRef.current && !statusFilterRef.current.contains(event.target as Node)) {
+        setIsStatusFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const [scoringPage, setScoringPage] = useState(1);
   const [activeHoverCell, setActiveHoverCell] = useState<{ solId: string; factorId: string } | null>(null);
 
@@ -581,23 +594,41 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 </div>
 
                 {/* Filters Dropdown */}
-                <div className="relative w-[116px]">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => {
-                      setStatusFilter(e.target.value);
-                      setScoringPage(1);
-                    }}
-                    className="w-full appearance-none bg-white border border-gray-200 rounded-lg pl-[38px] pr-[30px] py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                <div className="relative w-[116px]" ref={statusFilterRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsStatusFilterOpen(!isStatusFilterOpen)}
+                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                   >
-                    <option value="All">Filters</option>
-                    <option value="Completed">Completed</option>
-                    <option value="In progress">In progress</option>
-                    <option value="Prioritised">Prioritised</option>
-                    <option value="New">New</option>
-                  </select>
-                  <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <div className="flex items-center gap-[12px]">
+                      <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                      <span className="truncate">{statusFilter === 'All' ? 'Filters' : statusFilter}</span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isStatusFilterOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isStatusFilterOpen && (
+                    <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                      {(['All', 'Completed', 'In progress', 'Prioritised', 'New'] as const).map((st) => (
+                        <button 
+                          key={st}
+                          type="button"
+                          onClick={() => {
+                            setStatusFilter(st);
+                            setIsStatusFilterOpen(false);
+                            setScoringPage(1);
+                          }}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${
+                            statusFilter === st
+                              ? 'bg-gray-100 text-gray-900 font-medium'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{st === 'All' ? 'All statuses' : st}</span>
+                          {statusFilter === st && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

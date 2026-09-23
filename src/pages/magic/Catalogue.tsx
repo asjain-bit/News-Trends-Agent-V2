@@ -748,6 +748,10 @@ export default function Catalogue() {
   const componentsFilterRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(componentsFilterRef, () => setIsComponentsFilterOpen(false));
 
+  const [isCountriesFilterOpen, setIsCountriesFilterOpen] = useState(false);
+  const countriesFilterRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(countriesFilterRef, () => setIsCountriesFilterOpen(false));
+
   // Unified Single Filter states
   const [solutionsUnifiedFilter, setSolutionsUnifiedFilter] = useState('All');
   const [componentsUnifiedFilter, setComponentsUnifiedFilter] = useState('All');
@@ -1493,18 +1497,20 @@ export default function Catalogue() {
                     <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                       <button 
                         onClick={() => { setSolutionsUnifiedFilter('All'); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
-                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === 'All' ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${solutionsUnifiedFilter === 'All' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                       >
-                        All
+                        <span>All</span>
+                        {solutionsUnifiedFilter === 'All' && <Check className="w-3.5 h-3.5 text-gray-700" />}
                       </button>
                       <div className="px-3 py-1 mt-1 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">Positioning</div>
                       {['Common', 'Mixed', 'Distinctive'].map(opt => (
                         <button 
                           key={opt}
                           onClick={() => { setSolutionsUnifiedFilter(opt); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
-                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${solutionsUnifiedFilter === opt ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                         >
-                          {opt}
+                          <span>{opt}</span>
+                          {solutionsUnifiedFilter === opt && <Check className="w-3.5 h-3.5 text-gray-700" />}
                         </button>
                       ))}
                       <div className="px-3 py-1 mt-1 border-t border-gray-100 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider pt-2">Status</div>
@@ -1512,9 +1518,10 @@ export default function Catalogue() {
                         <button 
                           key={opt}
                           onClick={() => { setSolutionsUnifiedFilter(opt); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
-                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${solutionsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                          className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${solutionsUnifiedFilter === opt ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                         >
-                          {opt}
+                          <span>{opt}</span>
+                          {solutionsUnifiedFilter === opt && <Check className="w-3.5 h-3.5 text-gray-700" />}
                         </button>
                       ))}
                     </div>
@@ -1783,18 +1790,20 @@ export default function Catalogue() {
                   <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                     <button 
                       onClick={() => { setComponentsUnifiedFilter('All'); setIsComponentsFilterOpen(false); setComponentsPage(1); }}
-                      className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${componentsUnifiedFilter === 'All' ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                      className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${componentsUnifiedFilter === 'All' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                     >
-                      All
+                      <span>All</span>
+                      {componentsUnifiedFilter === 'All' && <Check className="w-3.5 h-3.5 text-gray-700" />}
                     </button>
                     <div className="px-3 py-1 mt-1 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">Status</div>
                     {['Completed', 'In progress', 'New', 'Prioritised'].map(opt => (
                       <button 
                         key={opt}
                         onClick={() => { setComponentsUnifiedFilter(opt); setIsComponentsFilterOpen(false); setComponentsPage(1); }}
-                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] ${componentsUnifiedFilter === opt ? 'bg-[#e6f7f8] text-[#0E7C86] font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${componentsUnifiedFilter === opt ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                       >
-                        {opt}
+                        <span>{opt}</span>
+                        {componentsUnifiedFilter === opt && <Check className="w-3.5 h-3.5 text-gray-700" />}
                       </button>
                     ))}
                   </div>
@@ -2005,23 +2014,43 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Single Unified Filter with High, Medium, Low - 12px gap */}
-              <div className="relative w-[116px]">
-                <select
-                  value={countriesUnifiedFilter}
-                  onChange={(e) => {
-                    setCountriesUnifiedFilter(e.target.value);
-                    setCountriesPage(1);
-                  }}
-                  className="w-full appearance-none bg-white border border-gray-200 rounded-lg pl-[38px] pr-[30px] py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+              {/* Single Unified Filter with High, Medium, Low - Custom Dropdown */}
+              <div className="relative w-[116px]" ref={countriesFilterRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsCountriesFilterOpen(!isCountriesFilterOpen)}
+                  className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <option value="All">Filters</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
-                </select>
-                <Filter className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <div className="flex items-center gap-[12px]">
+                    <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate">{countriesUnifiedFilter === 'All' ? 'Filters' : countriesUnifiedFilter}</span>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isCountriesFilterOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isCountriesFilterOpen && (
+                  <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                    <button 
+                      type="button"
+                      onClick={() => { setCountriesUnifiedFilter('All'); setIsCountriesFilterOpen(false); setCountriesPage(1); }}
+                      className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${countriesUnifiedFilter === 'All' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <span>All</span>
+                      {countriesUnifiedFilter === 'All' && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                    </button>
+                    <div className="px-3 py-1 mt-1 text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">Confidence</div>
+                    {['High', 'Medium', 'Low'].map(opt => (
+                      <button 
+                        key={opt}
+                        type="button"
+                        onClick={() => { setCountriesUnifiedFilter(opt); setIsCountriesFilterOpen(false); setCountriesPage(1); }}
+                        className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${countriesUnifiedFilter === opt ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        <span>{opt}</span>
+                        {countriesUnifiedFilter === opt && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button
