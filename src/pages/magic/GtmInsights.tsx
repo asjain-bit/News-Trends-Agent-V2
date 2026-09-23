@@ -37,13 +37,13 @@ export interface CountryGtmProfile {
   keyDriver: string;
   summarySentence: string;
   spendCapita: string;
-  spendCapitaBadge: 'High' | 'Med' | 'Low';
+  spendCapitaBadge: 'High' | 'Medium' | 'Low';
   hospitalBeds: string;
-  hospitalBedsBadge: 'High' | 'Med' | 'Low';
+  hospitalBedsBadge: 'High' | 'Medium' | 'Low';
   digitalMaturity: string;
-  digitalMaturityBadge: 'High' | 'Med' | 'Low';
+  digitalMaturityBadge: 'High' | 'Medium' | 'Low';
   insuredPopulation: string;
-  insuredPopulationBadge: 'High' | 'Med' | 'Low';
+  insuredPopulationBadge: 'High' | 'Medium' | 'Low';
   dealAnchor: string;
   solutions: {
     name: string;
@@ -70,9 +70,9 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     hospitalBeds: '2.2',
     hospitalBedsBadge: 'High',
     digitalMaturity: 'Growing',
-    digitalMaturityBadge: 'Med',
+    digitalMaturityBadge: 'Medium',
     insuredPopulation: '~68%',
-    insuredPopulationBadge: 'Med',
+    insuredPopulationBadge: 'Medium',
     dealAnchor: '$6M',
     solutions: [
       {
@@ -204,13 +204,13 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     keyDriver: 'Hakeem Program Modernisation',
     summarySentence: 'Emerging regional healthcare hub with strong medical tourism and government digitization initiatives.',
     spendCapita: '$304',
-    spendCapitaBadge: 'Med',
+    spendCapitaBadge: 'Medium',
     hospitalBeds: '1.8',
-    hospitalBedsBadge: 'Med',
+    hospitalBedsBadge: 'Medium',
     digitalMaturity: 'Moderate',
-    digitalMaturityBadge: 'Med',
+    digitalMaturityBadge: 'Medium',
     insuredPopulation: '~72%',
-    insuredPopulationBadge: 'Med',
+    insuredPopulationBadge: 'Medium',
     dealAnchor: '$1.3M',
     solutions: [
       {
@@ -406,7 +406,7 @@ const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
     digitalMaturity: 'Developing',
     digitalMaturityBadge: 'Low',
     insuredPopulation: '~85%',
-    insuredPopulationBadge: 'Med',
+    insuredPopulationBadge: 'Medium',
     dealAnchor: '$1M',
     solutions: [
       {
@@ -460,9 +460,9 @@ function getCountryProfile(countryName: string, allCountries: any[]): CountryGtm
     hospitalBeds: '2.5',
     hospitalBedsBadge: 'High',
     digitalMaturity: 'Growing',
-    digitalMaturityBadge: 'Med',
+    digitalMaturityBadge: 'Medium',
     insuredPopulation: '~75%',
-    insuredPopulationBadge: 'Med',
+    insuredPopulationBadge: 'Medium',
     dealAnchor: matched ? matched.dealAnchor : '$3M',
     solutions: [
       {
@@ -794,7 +794,7 @@ export default function GtmInsights() {
                   <Sparkles className="w-3 h-3" />
                   <span>M42 GTM DECK READY</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#0D212C] font-['Poppins']">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[#0D212C] font-['Poppins']">
                   {generatedDeck.title}
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-500 font-normal">
@@ -814,24 +814,24 @@ export default function GtmInsights() {
               </button>
             </div>
 
-            {/* The 3 Branded Slides matching Reference Images in Part B Orange Branding */}
+            {/* The 3 Branded Slides matching Reference Images in Part B Minimal Branding */}
             <div className="space-y-6 pt-2">
               
               {/* SLIDE 1: COUNTRY OVERVIEW */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Vibrant Gradient Header Banner */}
-                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
-                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
+                {/* Clean Minimal Header with Orange Accent Line */}
+                <div className="h-1 w-full bg-[#ED4D19]" />
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
                       SLIDE 1 · COUNTRY OVERVIEW
                     </div>
-                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
                       {generatedDeck.profile.name}
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                       M42
                     </span>
                   </div>
@@ -882,19 +882,19 @@ export default function GtmInsights() {
 
               {/* SLIDE 2: HEALTHCARE LANDSCAPE & MATURITY */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Vibrant Gradient Header Banner */}
-                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
-                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
+                {/* Clean Minimal Header with Orange Accent Line */}
+                <div className="h-1 w-full bg-[#ED4D19]" />
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
                       SLIDE 2 · HEALTHCARE LANDSCAPE & MATURITY
                     </div>
-                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
                       {generatedDeck.profile.name} — market context
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                       M42
                     </span>
                   </div>
@@ -913,7 +913,7 @@ export default function GtmInsights() {
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
                           generatedDeck.profile.spendCapitaBadge === 'High'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : generatedDeck.profile.spendCapitaBadge === 'Med'
+                            : generatedDeck.profile.spendCapitaBadge === 'Medium'
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
                             : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
@@ -931,7 +931,7 @@ export default function GtmInsights() {
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
                           generatedDeck.profile.hospitalBedsBadge === 'High'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : generatedDeck.profile.hospitalBedsBadge === 'Med'
+                            : generatedDeck.profile.hospitalBedsBadge === 'Medium'
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
                             : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
@@ -949,7 +949,7 @@ export default function GtmInsights() {
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
                           generatedDeck.profile.digitalMaturityBadge === 'High'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : generatedDeck.profile.digitalMaturityBadge === 'Med'
+                            : generatedDeck.profile.digitalMaturityBadge === 'Medium'
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
                             : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
@@ -967,7 +967,7 @@ export default function GtmInsights() {
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium border ${
                           generatedDeck.profile.insuredPopulationBadge === 'High'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : generatedDeck.profile.insuredPopulationBadge === 'Med'
+                            : generatedDeck.profile.insuredPopulationBadge === 'Medium'
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
                             : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
@@ -992,19 +992,19 @@ export default function GtmInsights() {
 
               {/* SLIDE 3: RECOMMENDED SOLUTIONS & REVENUE */}
               <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-                {/* Part B Vibrant Gradient Header Banner */}
-                <div className="h-1 w-full bg-gradient-to-r from-[#FF6B38] via-[#ED4D19] to-[#FFA07A]" />
-                <div className="bg-gradient-to-r from-[#FFE8DE] via-[#FFF3EC] to-[#FFFFFF] px-6 py-4.5 flex items-center justify-between border-b border-[#FDD5C6]">
+                {/* Clean Minimal Header with Orange Accent Line */}
+                <div className="h-1 w-full bg-[#ED4D19]" />
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/90 border border-[#FDB49B] text-[#ED4D19] text-[0.6875rem] font-bold tracking-wider uppercase shadow-2xs">
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
                       SLIDE 3 · RECOMMENDED SOLUTIONS & REVENUE
                     </div>
-                    <div className="text-lg sm:text-xl font-bold text-[#0D212C] font-['Poppins'] mt-1">
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
                       {generatedDeck.profile.name} — where M42 wins
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-extrabold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5 tracking-tight">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
                       M42
                     </span>
                   </div>
