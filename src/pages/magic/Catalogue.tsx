@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useMagicStore } from '../../store/magicStore';
 import { 
   ChevronDown, 
@@ -26,6 +27,8 @@ import {
   CheckCircle2,
   Upload,
   FileText,
+  Paperclip,
+  Download,
   MoreVertical,
   AlertTriangle,
   Trash2,
@@ -62,6 +65,12 @@ export interface ComponentItem {
   category: string;
   status: 'In progress' | 'Completed' | 'New' | 'Prioritised';
   reuseCount: number;
+  description?: string;
+  keyCapabilities?: string | string[];
+  dependencies?: string | string[];
+  constraints?: string;
+  attachments?: string | string[];
+  file?: string;
 }
 
 export interface SolutionItem {
@@ -73,7 +82,156 @@ export interface SolutionItem {
   score: number;
   revenue3Yr: string;
   compCount: number;
+  description?: string;
+  keyCapabilities?: string | string[];
+  constraints?: string;
+  attachments?: string | string[];
+  file?: string;
 }
+
+// Fallback & Helper Getters for Solutions
+export const getSolutionKeyCaps = (s: SolutionItem): string => {
+  if (s.keyCapabilities) return typeof s.keyCapabilities === 'string' ? s.keyCapabilities : s.keyCapabilities.join(', ');
+  const defaultMap: Record<string, string> = {
+    s1: 'FHIR & HL7 exchange, Master patient index, Clinical charts sync',
+    s2: 'Bed capacity forecasting, Smart scheduling, Ambient voice triage',
+    s3: 'Offline clinician sync, Remote vitals logging, Caregiver portal',
+    s4: 'IoT telemetry ingestion, Real-time anomaly alerts, Biomarker trends',
+    s5: 'Automated pre-auth, Graph neural fraud scoring, Eligibility verification',
+    s6: 'Variant annotation, Molecular docking scoring, Trial cohort matching',
+    s7: 'Interaction screening, Barcode dispensing, Digital prescription sign',
+    s8: 'Risk stratification, Outbreak heatmaps, WHO indicator dashboards',
+  };
+  return defaultMap[s.id] || 'Clinical workflows, data exchange, role access';
+};
+
+export const getSolutionDescription = (s: SolutionItem): string => {
+  if (s.description) return s.description;
+  const defaultMap: Record<string, string> = {
+    s1: 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows.',
+    s2: 'Operational orchestration suite streamlining bed management, emergency triage, and appointment logistics.',
+    s3: 'Decentralized healthcare delivery platform connecting home care providers and family caregivers.',
+    s4: 'Continuous physiological monitoring and predictive deterioration alert system for chronic illness.',
+    s5: 'AI-driven claims adjudicator and automated pre-authorization engine bridging providers with insurance payers.',
+    s6: 'Genomic biomarker intelligence and clinical trial cohort matching platform powered by deep learning.',
+    s7: 'End-to-end e-prescription management and centralized pharmacy inventory fulfillment system.',
+    s8: 'Epidemiological surveillance, risk stratification, and preventive health intervention analytics platform.',
+  };
+  return defaultMap[s.id] || 'Strategic enterprise healthcare solution optimizing clinical and operational outcomes.';
+};
+
+export const getSolutionConstraints = (s: SolutionItem): string => {
+  if (s.constraints) return s.constraints;
+  const defaultMap: Record<string, string> = {
+    s1: 'HIPAA & GDPR data residency, FHIR R4 standard',
+    s2: 'Sub-second latency SLA, On-premise fallback',
+    s3: 'Offline-first mobile support, Low bandwidth',
+    s4: 'FDA Class II telemetry, ISO 27001',
+    s5: 'Payer API compliance, Regional insurance rules',
+    s6: 'High-compute GPU infrastructure required',
+    s7: 'National drug formulary regulation',
+    s8: 'De-identified data governance, Multi-tenant DB',
+  };
+  return defaultMap[s.id] || 'Standard compliance & data governance';
+};
+
+export const getSolutionAttachments = (s: SolutionItem): string[] => {
+  if (s.attachments) {
+    return Array.isArray(s.attachments) ? s.attachments : [s.attachments];
+  }
+  const defaultMap: Record<string, string[]> = {
+    s1: ['EMR_Architecture_v2.pdf', 'FHIR_Endpoints.xlsx', 'HL7_Interface.docx'],
+    s2: ['Hospital_Ops_Spec.pdf', 'Triage_Flowchart.pdf'],
+    s3: ['Home_Care_Flow.docx', 'Caregiver_App_Guide.pdf'],
+    s4: ['RPM_Device_Matrix.xlsx', 'Telemetry_Specs.pdf', 'FDA_Validation.pdf'],
+    s5: ['Claims_Rulebook.pdf', 'Fraud_Heuristics.docx'],
+    s6: ['Genomics_Pipeline.pdf', 'Docking_Models.xlsx', 'Cohort_Criteria.pdf'],
+    s7: ['Pharmacy_SOP_v1.pdf'],
+    s8: ['PopHealth_Methodology.pdf', 'WHO_Metrics.xlsx'],
+  };
+  return defaultMap[s.id] || [];
+};
+
+export const getSolutionAttachment = (s: SolutionItem): string | undefined => {
+  const all = getSolutionAttachments(s);
+  return all.length > 0 ? all[0] : undefined;
+};
+
+// Fallback & Helper Getters for Components
+export const getComponentKeyCaps = (c: ComponentItem): string => {
+  if (c.keyCapabilities) return typeof c.keyCapabilities === 'string' ? c.keyCapabilities : c.keyCapabilities.join(', ');
+  const defaultMap: Record<string, string> = {
+    c1: 'Clinical query RAG, Citations grounding, Multi-lingual patient triage',
+    c2: 'Multi-currency checkout, Split settlement, Insurance co-pay routing',
+    c3: 'Longitudinal health history, Consent management, Biometric identity',
+    c4: 'Ambient conversation capture, SOAP note structuring, ICD-10 tagging',
+    c5: 'Real-time KPI aggregation, Custom visual builders, Scheduled export',
+    c6: 'Anomaly detection, Payer pattern clustering, Flagging workflow',
+    c7: 'Multi-provider slot calendar, Automated SMS/WhatsApp, Waitlist queuing',
+    c8: 'Rx digital signature, Drug contraindication check, Pharmacy dispatch',
+    c9: 'HL7 instrument bridge, Specimen barcode tracking, Auto-validation',
+    c10: 'Payer rules engine, Real-time benefit check, Policy versioning',
+  };
+  return defaultMap[c.id] || 'Modular functional capability, API endpoints, SDK support';
+};
+
+export const getComponentDescription = (c: ComponentItem): string => {
+  if (c.description) return c.description;
+  const defaultMap: Record<string, string> = {
+    c1: 'GenAI clinical assistant powered by Corrective Retrieval-Augmented Generation.',
+    c2: 'Billing & checkout core supporting clinical transactions and claims co-pay.',
+    c3: 'Master patient record unifying demographic, insurance, and medical timeline data.',
+    c4: 'Ambient documentation engine converting physician-patient dialogue into EHR notes.',
+    c5: 'Operational BI and clinical analytics dashboard engine.',
+    c6: 'Claims anomaly engine identifying irregular billing patterns before submission.',
+    c7: 'Scheduling module coordinating provider availability and patient visits.',
+    c8: 'Prescribing and medication fulfillment workflow component.',
+    c9: 'Diagnostic lab bridge connecting pathology equipment directly to patient records.',
+    c10: 'Payer directory managing reimbursement rules and coverage criteria.',
+  };
+  return defaultMap[c.id] || c.subtitle || 'Reusable enterprise digital health component.';
+};
+
+export const getComponentDependencies = (c: ComponentItem): string => {
+  if (c.dependencies) return typeof c.dependencies === 'string' ? c.dependencies : c.dependencies.join(', ');
+  const defaultMap: Record<string, string> = {
+    c1: 'Patient Profile (c3), Analytics (c5)',
+    c2: 'Insurance Directory (c10)',
+    c3: 'None (Core foundation)',
+    c4: 'AI Chatbot (c1), Patient Profile (c3)',
+    c5: 'Patient Profile (c3)',
+    c6: 'Payment Module (c2), Insurance Directory (c10)',
+    c7: 'Patient Profile (c3)',
+    c8: 'Patient Profile (c3), Appointment Booking (c7)',
+    c9: 'Patient Profile (c3)',
+    c10: 'None (Core rules)',
+  };
+  return defaultMap[c.id] || 'None';
+};
+
+export const getComponentAttachments = (c: ComponentItem): string[] => {
+  if (c.attachments) {
+    return Array.isArray(c.attachments) ? c.attachments : [c.attachments];
+  }
+  const defaultMap: Record<string, string[]> = {
+    c1: ['CRAG_Model_Card.pdf', 'Prompt_Templates.docx', 'Eval_Benchmark.xlsx'],
+    c2: ['Payment_Gateway_Spec.pdf', 'Settlement_Rules.xlsx'],
+    c3: ['Master_Patient_Schema.pdf', 'Consent_Spec.pdf', 'HL7_MPI_Guide.pdf'],
+    c4: ['NLP_Benchmark.pdf', 'SOAP_Template.docx'],
+    c5: ['Dashboard_Metrics.xlsx', 'BI_Widgets_Guide.pdf'],
+    c6: ['Fraud_Heuristics.pdf'],
+    c7: ['Booking_API.pdf', 'Calendar_Sync_Doc.docx'],
+    c8: ['eRx_Validation.pdf', 'Signature_Crypto.pdf', 'Pharmacy_Rules.pdf'],
+    c9: ['LIS_Interface_Spec.pdf', 'Instrument_Bridge.xlsx'],
+    c10: ['Payer_Directory_v3.xlsx'],
+  };
+  return defaultMap[c.id] || [];
+};
+
+export const getComponentAttachment = (c: ComponentItem): string | undefined => {
+  const all = getComponentAttachments(c);
+  return all.length > 0 ? all[0] : undefined;
+};
 
 export interface CountryItem {
   id: string;
@@ -351,6 +509,285 @@ function CustomSelect({
               {option.value === value && <Check className="w-3.5 h-3.5 text-gray-700" />}
             </button>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Instant Tooltip Component (Appears instantly on hover with 0ms delay, no clipping)
+function InstantTooltip({
+  content,
+  children,
+  className = "",
+}: {
+  content: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [coords, setCoords] = useState<{ x: number; y: number; placeAbove: boolean } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (!content || !targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const placeAbove = rect.top > 80;
+    const tooltipWidth = 320;
+    let x = rect.left;
+    if (x + tooltipWidth > window.innerWidth - 16) {
+      x = Math.max(16, window.innerWidth - tooltipWidth - 16);
+    }
+    setCoords({
+      x: Math.max(16, x),
+      y: placeAbove ? window.innerHeight - rect.top + 6 : rect.bottom + 6,
+      placeAbove,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setCoords(null);
+  };
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScrollOrResize = () => setCoords(null);
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed pointer-events-none z-[99999] max-w-xs md:max-w-sm px-2.5 py-1.5 bg-gray-900/95 text-white text-[11px] leading-relaxed rounded-md shadow-2xl backdrop-blur-xs whitespace-normal break-words border border-gray-700/50"
+          style={{
+            left: `${coords.x}px`,
+            ...(coords.placeAbove
+              ? { bottom: `${coords.y}px` }
+              : { top: `${coords.y}px` }),
+          }}
+        >
+          {content}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+// Merged Description & Attachments Cell Component for Tables
+function DescriptionCell({
+  title,
+  description,
+  files = [],
+  alignUpward = false,
+}: {
+  title: string;
+  description: string;
+  files?: string[];
+  alignUpward?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(containerRef, () => setIsOpen(false));
+
+  const getFileExt = (filename: string) => {
+    const parts = filename.split('.');
+    return (parts.length > 1 ? parts.pop() : 'FILE')?.toUpperCase() || 'FILE';
+  };
+
+  const getBadgeStyle = (ext: string) => {
+    switch (ext) {
+      case 'PDF':
+        return 'bg-orange-50 text-[#ED4D19] border-orange-200/80';
+      case 'XLSX':
+      case 'XLS':
+      case 'CSV':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+      case 'DOCX':
+      case 'DOC':
+        return 'bg-blue-50 text-blue-700 border-blue-200/80';
+      case 'PPTX':
+      case 'PPT':
+        return 'bg-amber-50 text-amber-700 border-amber-200/80';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200/80';
+    }
+  };
+
+  const getIconStyle = (ext: string) => {
+    switch (ext) {
+      case 'PDF':
+        return { bg: 'bg-orange-50', text: 'text-[#ED4D19]' };
+      case 'XLSX':
+      case 'XLS':
+      case 'CSV':
+        return { bg: 'bg-emerald-50', text: 'text-emerald-700' };
+      case 'DOCX':
+      case 'DOC':
+        return { bg: 'bg-blue-50', text: 'text-blue-700' };
+      case 'PPTX':
+      case 'PPT':
+        return { bg: 'bg-amber-50', text: 'text-amber-700' };
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-700' };
+    }
+  };
+
+  const getFileSize = (filename: string) => {
+    let hash = 0;
+    for (let i = 0; i < filename.length; i++) hash = (hash * 31 + filename.charCodeAt(i)) % 1000;
+    const kb = 420 + (hash % 1800);
+    return kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+  };
+
+  return (
+    <div className="relative inline-block w-full min-w-0" ref={containerRef} onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between gap-1.5 min-w-0 w-full">
+        <InstantTooltip content={isOpen ? '' : description} className="flex-1 min-w-0">
+          <p 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
+            className="truncate leading-relaxed text-xs text-gray-600 font-normal min-w-0 cursor-pointer hover:text-gray-900 transition-colors" 
+          >
+            {description}
+          </p>
+        </InstantTooltip>
+
+        {/* Attachment / Details Trigger Button: No fill, no stroke, only icon and count */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
+          className="shrink-0 inline-flex items-center gap-1 p-0.5 bg-transparent border-0 text-xs cursor-pointer select-none transition-opacity hover:opacity-75"
+          title={files.length > 0 ? `View full description & ${files.length} attachment${files.length > 1 ? 's' : ''}` : 'View full description'}
+        >
+          <Paperclip className={`w-3.5 h-3.5 ${files.length > 0 ? 'text-[#ED4D19]' : 'text-gray-400'}`} />
+          {files.length > 0 && (
+            <span className="text-[11px] font-medium font-mono text-[#ED4D19]">{files.length}</span>
+          )}
+        </button>
+      </div>
+
+      {/* Floating Popover Card with Full Description & Attachments */}
+      {isOpen && (
+        <div
+          className={`absolute left-0 ${alignUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5'} z-50 w-80 sm:w-96 bg-white rounded-xl border border-gray-200 shadow-2xl p-4 text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-gray-100">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-semibold text-xs text-[#0D212C] truncate font-['Poppins']">
+                {title}
+              </span>
+              {files.length > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-orange-50 border border-orange-200 text-[#ED4D19] text-[10px] font-medium shrink-0">
+                  {files.length} {files.length === 1 ? 'attachment' : 'attachments'}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+              }}
+              className="text-gray-400 hover:text-gray-600 p-1 rounded-md transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Full Description Section */}
+          <div className="mb-3.5">
+            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              Description
+            </div>
+            <div className="p-3 bg-gray-50/80 border border-gray-100 rounded-lg text-xs text-gray-700 leading-relaxed max-h-36 overflow-y-auto">
+              {description}
+            </div>
+          </div>
+
+          {/* Attachments Section */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                Attachments ({files.length})
+              </span>
+              {files.length > 0 && (
+                <span className="text-[10px] text-gray-400">Click to download</span>
+              )}
+            </div>
+
+            {files.length === 0 ? (
+              <div className="p-3 bg-gray-50/50 border border-dashed border-gray-200 rounded-lg text-center text-xs text-gray-400 italic">
+                No attachments uploaded for this item.
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-44 overflow-y-auto pr-0.5">
+                {files.map((file, idx) => {
+                  const ext = getFileExt(file);
+                  const iconStyle = getIconStyle(ext);
+                  const sizeStr = getFileSize(file);
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between gap-2 p-2 rounded-lg bg-gray-50/80 hover:bg-gray-100/90 border border-gray-200/60 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${iconStyle.bg}`}>
+                          <FileText className={`w-3.5 h-3.5 ${iconStyle.text}`} />
+                        </div>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="text-xs font-medium text-gray-800 truncate" title={file}>
+                            {file}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-normal">
+                            {ext} • {sizeStr}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const blob = new Blob(['Sample attachment: ' + file], { type: 'text/plain' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = file;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="p-1.5 text-gray-400 hover:text-[#ED4D19] hover:bg-orange-50 rounded-md transition-colors cursor-pointer shrink-0"
+                        title={`Download ${file}`}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -775,7 +1212,7 @@ export default function Catalogue() {
   const [newSolutionDescription, setNewSolutionDescription] = useState('');
   const [newSolutionKeyCapabilities, setNewSolutionKeyCapabilities] = useState('');
   const [newSolutionConstraints, setNewSolutionConstraints] = useState('');
-  const [newSolutionFile, setNewSolutionFile] = useState<File | null>(null);
+  const [newSolutionFiles, setNewSolutionFiles] = useState<File[]>([]);
 
   // Component Form Fields
   const [newComponentName, setNewComponentName] = useState('');
@@ -784,7 +1221,7 @@ export default function Catalogue() {
   const [newComponentDescription, setNewComponentDescription] = useState('');
   const [newComponentKeyCapabilities, setNewComponentKeyCapabilities] = useState('');
   const [newComponentDependencies, setNewComponentDependencies] = useState('');
-  const [newComponentFile, setNewComponentFile] = useState<File | null>(null);
+  const [newComponentFiles, setNewComponentFiles] = useState<File[]>([]);
 
   // Edit Modals: Only Status and Positioning editable for Solution
   const [editingSolution, setEditingSolution] = useState<SolutionItem | null>(null);
@@ -806,7 +1243,11 @@ export default function Catalogue() {
   // Filtered & Sorted lists
   const filteredSolutions = useMemo(() => {
     let result = solutions.filter((s) => {
-      const matchesSearch = s.name.toLowerCase().includes(solutionsSearch.toLowerCase());
+      const searchLower = solutionsSearch.toLowerCase();
+      const matchesSearch = 
+        s.name.toLowerCase().includes(searchLower) ||
+        getSolutionKeyCaps(s).toLowerCase().includes(searchLower) ||
+        getSolutionDescription(s).toLowerCase().includes(searchLower);
       let matchesFilter = true;
       if (solutionsUnifiedFilter !== 'All') {
         matchesFilter = s.positioning === solutionsUnifiedFilter || s.status === solutionsUnifiedFilter;
@@ -836,10 +1277,12 @@ export default function Catalogue() {
 
   const filteredComponents = useMemo(() => {
     let result = components.filter((c) => {
+      const searchLower = componentsSearch.toLowerCase();
       const matchesSearch = 
-        c.name.toLowerCase().includes(componentsSearch.toLowerCase()) || 
-        c.subtitle.toLowerCase().includes(componentsSearch.toLowerCase()) ||
-        c.category.toLowerCase().includes(componentsSearch.toLowerCase());
+        c.name.toLowerCase().includes(searchLower) || 
+        getComponentKeyCaps(c).toLowerCase().includes(searchLower) ||
+        getComponentDescription(c).toLowerCase().includes(searchLower) ||
+        c.category.toLowerCase().includes(searchLower);
       let matchesFilter = true;
       if (componentsUnifiedFilter !== 'All') {
         matchesFilter = c.status === componentsUnifiedFilter;
@@ -1056,7 +1499,7 @@ export default function Catalogue() {
 
   const handleAddSolution = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSolutionName.trim() || !newSolutionDescription.trim()) return;
+    if (!newSolutionName.trim() || !newSolutionDescription.trim() || !newSolutionKeyCapabilities.trim()) return;
     const newSol: SolutionItem = {
       id: `s_${Date.now()}`,
       name: newSolutionName.trim(),
@@ -1066,6 +1509,10 @@ export default function Catalogue() {
       score: 72,
       revenue3Yr: '$18M',
       compCount: 4,
+      description: newSolutionDescription.trim(),
+      keyCapabilities: newSolutionKeyCapabilities.trim(),
+      constraints: newSolutionConstraints.trim() || 'Standard compliance',
+      attachments: newSolutionFiles.length > 0 ? newSolutionFiles.map((f) => f.name) : undefined,
     };
     setSolutions((prev) => [newSol, ...prev]);
     setNewSolutionName('');
@@ -1074,20 +1521,24 @@ export default function Catalogue() {
     setNewSolutionDescription('');
     setNewSolutionKeyCapabilities('');
     setNewSolutionConstraints('');
-    setNewSolutionFile(null);
+    setNewSolutionFiles([]);
     setShowAddSolutionModal(false);
   };
 
   const handleAddComponent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComponentName.trim() || !newComponentDescription.trim()) return;
+    if (!newComponentName.trim() || !newComponentDescription.trim() || !newComponentKeyCapabilities.trim()) return;
     const newComp: ComponentItem = {
       id: `c_${Date.now()}`,
       name: newComponentName.trim(),
-      subtitle: newComponentDescription.trim().slice(0, 48) || 'Enterprise component module',
+      subtitle: newComponentKeyCapabilities.trim(),
       category: newComponentCategory.trim() || 'General',
       status: newComponentStatus,
       reuseCount: 0,
+      description: newComponentDescription.trim(),
+      keyCapabilities: newComponentKeyCapabilities.trim(),
+      dependencies: newComponentDependencies.trim() || 'None',
+      attachments: newComponentFiles.length > 0 ? newComponentFiles.map((f) => f.name) : undefined,
     };
     setComponents((prev) => [newComp, ...prev]);
     setNewComponentName('');
@@ -1096,7 +1547,7 @@ export default function Catalogue() {
     setNewComponentDescription('');
     setNewComponentKeyCapabilities('');
     setNewComponentDependencies('');
-    setNewComponentFile(null);
+    setNewComponentFiles([]);
     setShowAddComponentModal(false);
   };
 
@@ -1348,7 +1799,7 @@ export default function Catalogue() {
                 <span className="text-xs text-gray-400 font-normal">Component reuse across portfolio</span>
               </div>
               <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto subtle-scrollbar">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
@@ -1366,9 +1817,12 @@ export default function Catalogue() {
                               <span className="font-normal text-[#0D212C] text-[0.8125rem]">
                                 {component.name}
                               </span>
-                              <span className="text-[0.75rem] text-gray-400 font-normal mt-0.5">
-                                {component.subtitle}
-                              </span>
+                              <InstantTooltip content={`Key capabilities: ${getComponentKeyCaps(component)}`} className="w-full min-w-0">
+                                <span className="text-[0.75rem] text-gray-500 font-normal mt-0.5 truncate block">
+                                  <span className="text-gray-400 font-medium">Key capabilities: </span>
+                                  {getComponentKeyCaps(component)}
+                                </span>
+                              </InstantTooltip>
                             </div>
                           </td>
                           <td className="py-3.5 px-6 text-[0.8125rem] font-normal text-gray-700">
@@ -1407,7 +1861,7 @@ export default function Catalogue() {
                 <span className="text-xs text-gray-400 font-normal">High-conviction expansion markets</span>
               </div>
               <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto subtle-scrollbar">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
@@ -1541,16 +1995,17 @@ export default function Catalogue() {
 
             {/* Solutions Table Card */}
             <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto subtle-scrollbar">
+                <table className="w-full table-fixed text-left border-collapse">
                   <thead>
                     {/* Table Header row - font weight reduced by 1 unit to font-normal */}
                     <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                      <th className="py-3 px-6 font-normal">SOLUTION</th>
-                      <th className="py-3 px-6 font-normal">POSITIONING</th>
-                      <th className="py-3 px-6 font-normal">STATUS</th>
+                      <th className="py-3 px-3.5 font-normal w-[20%]">SOLUTION</th>
+                      <th className="py-3 px-3.5 font-normal w-[18%]">DESCRIPTION</th>
+                      <th className="py-3 px-3.5 font-normal w-[11%]">POSITIONING</th>
+                      <th className="py-3 px-3.5 font-normal w-[10%]">STATUS</th>
                       <th 
-                        className="py-3 px-6 font-normal cursor-pointer select-none group"
+                        className="py-3 px-3.5 font-normal cursor-pointer select-none group w-[6%]"
                         onClick={() => {
                           setSolutionsSort(prev => ({
                             column: 'score',
@@ -1559,9 +2014,9 @@ export default function Catalogue() {
                           setSolutionsPage(1);
                         }}
                       >
-                        <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
-                          SCORE 
-                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'score' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                        <div className="flex items-center gap-1 group-hover:text-gray-700 transition-colors">
+                          <span>SCORE</span>
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'score' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors shrink-0`} />
                         </div>
                       </th>
                       {/* Revenue Header with Up-Down Sort Icon */}
@@ -1573,15 +2028,15 @@ export default function Catalogue() {
                           }));
                           setSolutionsPage(1);
                         }}
-                        className="py-3 px-6 font-normal cursor-pointer select-none group"
+                        className="py-3 px-3.5 font-normal cursor-pointer select-none group w-[11%]"
                       >
-                        <div className="inline-flex items-center gap-1.5 hover:text-gray-800 transition-colors">
+                        <div className="inline-flex items-center gap-1 hover:text-gray-800 transition-colors">
                           <span>REVENUE (3-YR)</span>
-                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'revenue' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'revenue' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-600'} transition-colors shrink-0`} />
                         </div>
                       </th>
                       <th 
-                        className="py-3 px-6 font-normal cursor-pointer select-none group"
+                        className="py-3 px-3.5 font-normal cursor-pointer select-none group w-[10%]"
                         onClick={() => {
                           setSolutionsSort(prev => ({
                             column: 'components',
@@ -1590,43 +2045,64 @@ export default function Catalogue() {
                           setSolutionsPage(1);
                         }}
                       >
-                        <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
-                          No. of Components 
-                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'components' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                        <div className="flex items-center gap-1 group-hover:text-gray-700 transition-colors">
+                          <span>COMPONENTS</span>
+                          <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'components' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors shrink-0`} />
                         </div>
                       </th>
-                      <th className="py-3 px-6 font-normal text-right">ACTION</th>
+                      <th className="py-3 px-3.5 font-normal w-[10%]">CONSTRAINTS</th>
+                      <th className="py-3 px-3.5 font-normal text-right w-[4%]">ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                     {paginatedSolutions.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-12 text-center text-gray-400 text-sm">
+                        <td colSpan={9} className="py-12 text-center text-gray-400 text-sm">
                           No solutions found matching the search or filters.
                         </td>
                       </tr>
                     ) : (
-                      paginatedSolutions.map((solution) => (
+                      paginatedSolutions.map((solution, idx) => (
                         <tr 
                           key={solution.id} 
                           onClick={() => setViewingSolution(solution)}
                           className="hover:bg-gray-50/70 transition-colors cursor-pointer group"
                         >
-                          {/* Solution Name */}
-                          <td className="py-4 px-6 font-normal text-[0.8125rem] text-[#0D212C] group-hover:text-[#ED4D19] transition-colors">
-                            {solution.name}
+                          {/* Solution Name + Key Capabilities below */}
+                          <td className="py-3.5 px-3.5 min-w-0">
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-normal text-[0.8125rem] text-[#0D212C] group-hover:text-[#ED4D19] transition-colors truncate">
+                                {solution.name}
+                              </span>
+                              <InstantTooltip content={`Key capabilities: ${getSolutionKeyCaps(solution)}`} className="w-full min-w-0">
+                                <span className="text-[0.75rem] text-gray-500 font-normal mt-0.5 truncate block">
+                                  <span className="text-gray-400 font-medium">Key capabilities: </span>
+                                  {getSolutionKeyCaps(solution)}
+                                </span>
+                              </InstantTooltip>
+                            </div>
+                          </td>
+
+                          {/* Description (with full description & attachments popup) */}
+                          <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0" onClick={(e) => e.stopPropagation()}>
+                            <DescriptionCell
+                              title={solution.name}
+                              description={getSolutionDescription(solution)}
+                              files={getSolutionAttachments(solution)}
+                              alignUpward={idx >= 4}
+                            />
                           </td>
 
                           {/* Positioning */}
-                          <td className="py-4 px-6">
-                            <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[0.75rem] font-normal border border-gray-200/70">
+                          <td className="py-3.5 px-3.5 min-w-0">
+                            <span className="inline-block bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-[0.72rem] font-normal border border-gray-200/70 truncate max-w-full">
                               {solution.positioning}
                             </span>
                           </td>
 
-                          {/* Status (New chip with distinct purple styling) */}
-                          <td className="py-4 px-6">
-                            <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
+                          {/* Status */}
+                          <td className="py-3.5 px-3.5 min-w-0">
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.72rem] font-normal truncate max-w-full ${
                               solution.status === 'Completed'
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : solution.status === 'In progress'
@@ -1639,28 +2115,37 @@ export default function Catalogue() {
                             </span>
                           </td>
 
-                          {/* Score - same font size as comp, reduced font weight */}
-                          <td className="py-4 px-6 text-[0.875rem] font-normal text-gray-700">
+                          {/* Score */}
+                          <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-gray-700 whitespace-nowrap">
                             {solution.score}
                           </td>
 
                           {/* Revenue */}
-                          <td className="py-4 px-6">
+                          <td className="py-3.5 px-3.5 whitespace-nowrap min-w-0">
                             <div className="flex flex-col leading-tight">
-                              <span className="text-[0.875rem] font-normal text-[#0D212C]">{solution.revenue3Yr}</span>
+                              <span className="text-[0.8125rem] font-normal text-[#0D212C]">{solution.revenue3Yr}</span>
                               <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
-                                ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M per year
+                                ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M / yr
                               </span>
                             </div>
                           </td>
 
-                          {/* Comp Count - reduced font weight */}
-                          <td className="py-4 px-6 text-[0.875rem] font-normal text-[#0D212C]">
+                          {/* Comp Count */}
+                          <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-[#0D212C] whitespace-nowrap">
                             {solution.compCount}
                           </td>
 
+                          {/* Constraints (1 line with instant tooltip) */}
+                          <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0">
+                            <InstantTooltip content={getSolutionConstraints(solution)} className="w-full min-w-0">
+                              <span className="truncate block leading-relaxed">
+                                {getSolutionConstraints(solution)}
+                              </span>
+                            </InstantTooltip>
+                          </td>
+
                           {/* Action Column - 3-dot menu */}
-                          <td className="py-4 px-6 text-right relative" onClick={(e) => e.stopPropagation()}>
+                          <td className="py-3.5 px-3.5 text-right relative whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1671,7 +2156,7 @@ export default function Catalogue() {
                               <MoreVertical className="w-4 h-4" />
                             </button>
                             {activeMenuId === solution.id && (
-                              <div ref={menuRef} className="absolute right-6 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
+                              <div ref={menuRef} className="absolute right-3.5 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleOpenEditSolution(solution); setActiveMenuId(null); }}
                                   className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
@@ -1819,7 +2304,7 @@ export default function Catalogue() {
                   setNewComponentDescription('');
                   setNewComponentKeyCapabilities('');
                   setNewComponentDependencies('');
-                  setNewComponentFile(null);
+                  setNewComponentFiles([]);
                   setShowAddComponentModal(true);
                 }}
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 active:opacity-90 text-white text-[0.8125rem] font-medium rounded-lg transition-all shadow-xs cursor-pointer"
@@ -1831,15 +2316,16 @@ export default function Catalogue() {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto subtle-scrollbar">
+              <table className="w-full table-fixed text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
-                    <th className="py-3 px-6 font-normal">COMPONENT</th>
-                    <th className="py-3 px-6 font-normal">CATEGORY</th>
-                    <th className="py-3 px-6 font-normal">STATUS</th>
+                    <th className="py-3 px-3.5 font-normal w-[24%]">COMPONENT</th>
+                    <th className="py-3 px-3.5 font-normal w-[22%]">DESCRIPTION</th>
+                    <th className="py-3 px-3.5 font-normal w-[12%]">CATEGORY</th>
+                    <th className="py-3 px-3.5 font-normal w-[11%]">STATUS</th>
                     <th 
-                      className="py-3 px-6 font-normal cursor-pointer select-none group"
+                      className="py-3 px-3.5 font-normal cursor-pointer select-none group w-[11%]"
                       onClick={() => {
                         setComponentsSort(prev => ({
                           column: 'reuse',
@@ -1849,41 +2335,57 @@ export default function Catalogue() {
                       }}
                     >
                       <div className="flex items-center gap-1.5 group-hover:text-gray-700 transition-colors">
-                        REUSE 
-                        <ArrowUpDown className={`w-3.5 h-3.5 ${componentsSort.column === 'reuse' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
+                        <span>REUSE</span>
+                        <ArrowUpDown className={`w-3.5 h-3.5 ${componentsSort.column === 'reuse' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors shrink-0`} />
                       </div>
                     </th>
-                    <th className="py-3 px-6 font-normal text-right">ACTION</th>
+                    <th className="py-3 px-3.5 font-normal w-[16%]">DEPENDENCY</th>
+                    <th className="py-3 px-3.5 font-normal text-right w-[4%]">ACTION</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                   {paginatedComponents.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-gray-400 text-sm">
+                      <td colSpan={7} className="py-12 text-center text-gray-400 text-sm">
                         No components found matching the search or filters.
                       </td>
                     </tr>
                   ) : (
-                    paginatedComponents.map((component) => (
+                    paginatedComponents.map((component, idx) => (
                       <tr key={component.id} className="hover:bg-gray-50/70 transition-colors">
-                        <td className="py-4 px-6">
-                          <div className="flex flex-col">
-                            <span className="font-normal text-[#0D212C] text-[0.8125rem]">
+                        {/* Component Name + Key Capabilities below (replacing old subtitle) */}
+                        <td className="py-3.5 px-3.5 min-w-0">
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-normal text-[#0D212C] text-[0.8125rem] truncate">
                               {component.name}
                             </span>
-                            <span className="text-[0.75rem] text-gray-400 font-normal mt-0.5">
-                              {component.subtitle}
-                            </span>
+                            <InstantTooltip content={`Key capabilities: ${getComponentKeyCaps(component)}`} className="w-full min-w-0">
+                              <span className="text-[0.75rem] text-gray-500 font-normal mt-0.5 truncate block">
+                                <span className="text-gray-400 font-medium">Key capabilities: </span>
+                                {getComponentKeyCaps(component)}
+                              </span>
+                            </InstantTooltip>
                           </div>
                         </td>
 
+                        {/* Description (with full description & attachments popup) */}
+                        <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0" onClick={(e) => e.stopPropagation()}>
+                          <DescriptionCell
+                            title={component.name}
+                            description={getComponentDescription(component)}
+                            files={getComponentAttachments(component)}
+                            alignUpward={idx >= 4}
+                          />
+                        </td>
+
                         {/* Category shown as OPEN TEXT instead of a chip */}
-                        <td className="py-4 px-6 text-[0.8125rem] font-normal text-gray-700">
+                        <td className="py-3.5 px-3.5 text-[0.8125rem] font-normal text-gray-700 whitespace-nowrap">
                           {component.category}
                         </td>
 
-                        <td className="py-4 px-6">
-                          <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
+                        {/* Status */}
+                        <td className="py-3.5 px-3.5 whitespace-nowrap min-w-0">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.72rem] font-normal truncate max-w-full ${
                             component.status === 'Completed'
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : component.status === 'In progress'
@@ -1897,12 +2399,21 @@ export default function Catalogue() {
                         </td>
 
                         {/* Reuse text size matching component title text size (text-[0.8125rem]) */}
-                        <td className="py-4 px-6 text-[0.8125rem] font-normal text-[#0D212C]">
+                        <td className="py-3.5 px-3.5 text-[0.8125rem] font-normal text-[#0D212C] whitespace-nowrap">
                           {component.reuseCount} solutions
                         </td>
 
+                        {/* Dependency (1 line with tooltip) */}
+                        <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0">
+                          <InstantTooltip content={getComponentDependencies(component)} className="w-full min-w-0">
+                            <span className="truncate block leading-relaxed">
+                              {getComponentDependencies(component)}
+                            </span>
+                          </InstantTooltip>
+                        </td>
+
                         {/* Action Column - 3-dot menu */}
-                        <td className="py-4 px-6 text-right relative" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-3.5 px-3.5 text-right relative whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1913,7 +2424,7 @@ export default function Catalogue() {
                             <MoreVertical className="w-4 h-4" />
                           </button>
                           {activeMenuId === component.id && (
-                            <div ref={menuRef} className="absolute right-6 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
+                            <div ref={menuRef} className="absolute right-3.5 top-10 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-[180px] py-1 overflow-hidden">
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleOpenEditComponent(component); setActiveMenuId(null); }}
                                 className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer border-0 bg-transparent"
@@ -2065,7 +2576,7 @@ export default function Catalogue() {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto subtle-scrollbar">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
@@ -2304,7 +2815,7 @@ export default function Catalogue() {
 
           {/* Reuse Grid Table Card with Horizontal Scroll + Sticky Columns (Vertical scroll removed) */}
           <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto subtle-scrollbar">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="bg-gray-50">
                   <tr className="border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase">
@@ -2810,7 +3321,10 @@ export default function Catalogue() {
               </h3>
               <button
                 type="button"
-                onClick={() => setShowAddSolutionModal(false)}
+                onClick={() => {
+                  setShowAddSolutionModal(false);
+                  setNewSolutionFiles([]);
+                }}
                 className="text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent p-1.5 transition-colors cursor-pointer border-0"
               >
                 <X className="w-5 h-5" />
@@ -2885,12 +3399,13 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Field 5: Key Capabilities (Optional) */}
+              {/* Field 5: Key Capabilities (Required) */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Key Capabilities
+                  Key Capabilities <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  required
                   rows={2}
                   placeholder="Main capabilities of the solution"
                   value={newSolutionKeyCapabilities}
@@ -2914,48 +3429,81 @@ export default function Catalogue() {
               </div>
 
               {/* Field 7: Attachment (Optional) */}
+              {/* Field 7: Attachment (Optional, up to 3 files) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Attachment
-                </label>
-                <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
-                  <Upload className="w-5 h-5 text-gray-400 shrink-0" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[0.8125rem] font-medium text-gray-700">
-                      Add supporting file
-                    </span>
-                    <span className="text-[0.6875rem] text-gray-500 leading-tight">
-                      Max files is 3, Size 25MB<br/>
-                      Format: PDF/DOCX/PPTX/XLSX, Screenshot
-                    </span>
-                  </div>
-                  {newSolutionFile && (
-                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-xs">
-                      <span className="text-xs font-medium text-gray-700 truncate max-w-[200px]">{newSolutionFile.name}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setNewSolutionFile(null);
-                        }}
-                        className="text-gray-400 hover:text-gray-600 p-0.5"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-medium text-gray-700">
+                    Attachments (Optional)
+                  </label>
+                  <span className="text-[11px] text-gray-400">
+                    {newSolutionFiles.length}/3 attached
+                  </span>
+                </div>
+                {newSolutionFiles.length < 3 ? (
+                  <label className="flex flex-col items-center justify-center gap-2 px-4 py-5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
+                    <Upload className="w-5 h-5 text-gray-400 shrink-0" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[0.8125rem] font-medium text-gray-700">
+                        Upload supporting files (up to 3)
+                      </span>
+                      <span className="text-[0.6875rem] text-gray-400 leading-tight">
+                        PDF, DOCX, PPTX, XLSX (max 25MB each)
+                      </span>
                     </div>
-                  )}
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => setNewSolutionFile(e.target.files?.[0] || null)}
-                  />
-                </label>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        if (!e.target.files) return;
+                        const picked = Array.from(e.target.files);
+                        setNewSolutionFiles((prev) => [...prev, ...picked].slice(0, 3));
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-center text-xs text-gray-500">
+                    Maximum 3 files reached. Remove a file below to add another.
+                  </div>
+                )}
+                {newSolutionFiles.length > 0 && (
+                  <div className="mt-2.5 space-y-1.5">
+                    {newSolutionFiles.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200/90 shadow-2xs text-left"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="w-4 h-4 text-[#ED4D19] shrink-0" />
+                          <span className="text-xs font-medium text-gray-700 truncate max-w-[280px]">
+                            {file.name}
+                          </span>
+                          <span className="text-[10px] text-gray-400 shrink-0">
+                            ({(file.size / 1024).toFixed(0)} KB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setNewSolutionFiles((prev) => prev.filter((_, i) => i !== idx))}
+                          className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
+                          title="Remove file"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setShowAddSolutionModal(false)}
+                  onClick={() => {
+                    setShowAddSolutionModal(false);
+                    setNewSolutionFiles([]);
+                  }}
                   className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition-colors cursor-pointer"
                 >
                   Cancel
@@ -2982,7 +3530,10 @@ export default function Catalogue() {
               </h3>
               <button
                 type="button"
-                onClick={() => setShowAddComponentModal(false)}
+                onClick={() => {
+                  setShowAddComponentModal(false);
+                  setNewComponentFiles([]);
+                }}
                 className="text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent p-1.5 transition-colors cursor-pointer border-0"
               >
                 <X className="w-5 h-5" />
@@ -3070,12 +3621,13 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Field 5: Key Capabilities (Optional Free Text) */}
+              {/* Field 5: Key Capabilities (Required Free Text) */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Key Capabilities
+                  Key Capabilities <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  required
                   rows={2}
                   placeholder="Main capabilities of the component"
                   value={newComponentKeyCapabilities}
@@ -3098,49 +3650,81 @@ export default function Catalogue() {
                 />
               </div>
 
-              {/* Field 7: Attachment (Optional File) */}
+              {/* Field 7: Attachment (Optional File, up to 3 files) */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Attachment
-                </label>
-                <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
-                  <Upload className="w-5 h-5 text-gray-400 shrink-0" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[0.8125rem] font-medium text-gray-700">
-                      Add supporting file
-                    </span>
-                    <span className="text-[0.6875rem] text-gray-500 leading-tight">
-                      Max files is 3, Size 25MB<br/>
-                      Format: PDF/DOCX/PPTX/XLSX, Screenshot
-                    </span>
-                  </div>
-                  {newComponentFile && (
-                    <div className="mt-2 flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-xs">
-                      <span className="text-xs font-medium text-gray-700 truncate max-w-[200px]">{newComponentFile.name}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setNewComponentFile(null);
-                        }}
-                        className="text-gray-400 hover:text-gray-600 p-0.5"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-medium text-gray-700">
+                    Attachments (Optional)
+                  </label>
+                  <span className="text-[11px] text-gray-400">
+                    {newComponentFiles.length}/3 attached
+                  </span>
+                </div>
+                {newComponentFiles.length < 3 ? (
+                  <label className="flex flex-col items-center justify-center gap-2 px-4 py-5 border border-dashed border-gray-300 rounded-lg hover:border-gray-400 bg-gray-50/50 cursor-pointer transition-colors text-center">
+                    <Upload className="w-5 h-5 text-gray-400 shrink-0" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[0.8125rem] font-medium text-gray-700">
+                        Upload supporting files (up to 3)
+                      </span>
+                      <span className="text-[0.6875rem] text-gray-400 leading-tight">
+                        PDF, DOCX, PPTX, XLSX (max 25MB each)
+                      </span>
                     </div>
-                  )}
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => setNewComponentFile(e.target.files?.[0] || null)}
-                  />
-                </label>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        if (!e.target.files) return;
+                        const picked = Array.from(e.target.files);
+                        setNewComponentFiles((prev) => [...prev, ...picked].slice(0, 3));
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-center text-xs text-gray-500">
+                    Maximum 3 files reached. Remove a file below to add another.
+                  </div>
+                )}
+                {newComponentFiles.length > 0 && (
+                  <div className="mt-2.5 space-y-1.5">
+                    {newComponentFiles.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200/90 shadow-2xs text-left"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="w-4 h-4 text-[#ED4D19] shrink-0" />
+                          <span className="text-xs font-medium text-gray-700 truncate max-w-[280px]">
+                            {file.name}
+                          </span>
+                          <span className="text-[10px] text-gray-400 shrink-0">
+                            ({(file.size / 1024).toFixed(0)} KB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setNewComponentFiles((prev) => prev.filter((_, i) => i !== idx))}
+                          className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
+                          title="Remove file"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-6 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setShowAddComponentModal(false)}
+                  onClick={() => {
+                    setShowAddComponentModal(false);
+                    setNewComponentFiles([]);
+                  }}
                   className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition-colors cursor-pointer"
                 >
                   Cancel

@@ -9,8 +9,12 @@ export interface ComponentItem {
   reuseCount: number;
   complexity?: 'Low' | 'Medium' | 'High';
   effort?: string;
-  dependencies?: string[];
-  keyCapabilities?: string[];
+  dependencies?: string[] | string;
+  keyCapabilities?: string[] | string;
+  description?: string;
+  constraints?: string;
+  attachments?: string[] | string;
+  file?: string;
   isDeactivated?: boolean;
 }
 
@@ -24,6 +28,11 @@ export interface SolutionItem {
   revenue3Yr: string;
   compCount: number;
   annualRev?: string;
+  description?: string;
+  keyCapabilities?: string[] | string;
+  constraints?: string;
+  attachments?: string[] | string;
+  file?: string;
   isDeactivated?: boolean;
 }
 
@@ -40,27 +49,27 @@ export interface CountryItem {
 }
 
 export const DEFAULT_COMPONENTS: ComponentItem[] = [
-  { id: 'c1', name: 'AI Chatbot · CRAG', subtitle: 'GenAI clinical assistant', category: 'AI / GenAI', status: 'In progress', reuseCount: 7, complexity: 'High', effort: '~50 pd' },
-  { id: 'c2', name: 'Payment Module', subtitle: 'Billing & checkout core', category: 'Payments', status: 'Completed', reuseCount: 6, complexity: 'Medium', effort: '~15 pd' },
-  { id: 'c3', name: 'Patient Profile', subtitle: 'Master patient record', category: 'Core data', status: 'Completed', reuseCount: 5, complexity: 'Low', effort: '~12 pd' },
-  { id: 'c4', name: 'Clinical Notes · NLP', subtitle: 'Ambient documentation', category: 'AI / GenAI', status: 'New', reuseCount: 4, complexity: 'Medium', effort: '~28 pd' },
-  { id: 'c5', name: 'Analytics & Dashboards', subtitle: 'Operational BI & Metrics', category: 'Data / BI', status: 'Prioritised', reuseCount: 4, complexity: 'Medium', effort: '~20 pd' },
-  { id: 'c6', name: 'Fraud-Claim Detection', subtitle: 'Claims anomaly engine', category: 'InsurTech / AI', status: 'In progress', reuseCount: 1, complexity: 'High', effort: '~35 pd' },
-  { id: 'c7', name: 'Appointment Booking', subtitle: 'Scheduling module', category: 'Workflow', status: 'Completed', reuseCount: 3, complexity: 'Low', effort: '~18 pd' },
-  { id: 'c8', name: 'e-Prescription', subtitle: 'Prescribing & pharmacy', category: 'Workflow', status: 'Prioritised', reuseCount: 3, complexity: 'Low', effort: '~14 pd' },
-  { id: 'c9', name: 'LIS · Lab Information', subtitle: 'Diagnostic lab bridge', category: 'Diagnostics', status: 'Completed', reuseCount: 3, complexity: 'Medium', effort: '~22 pd' },
-  { id: 'c10', name: 'Insurance Directory', subtitle: 'Payer rules engine', category: 'InsurTech', status: 'In progress', reuseCount: 1, complexity: 'Medium', effort: '~16 pd' },
+  { id: 'c1', name: 'AI Chatbot · CRAG', subtitle: 'GenAI clinical assistant', category: 'AI / GenAI', status: 'In progress', reuseCount: 7, complexity: 'High', effort: '~50 pd', keyCapabilities: 'Clinical query RAG, Citations grounding, Multi-lingual patient triage', description: 'GenAI clinical assistant powered by Corrective Retrieval-Augmented Generation.', dependencies: 'Patient Profile (c3), Analytics (c5)', attachments: ['CRAG_Model_Card.pdf', 'Prompt_Templates.docx', 'Eval_Benchmark.xlsx'] },
+  { id: 'c2', name: 'Payment Module', subtitle: 'Billing & checkout core', category: 'Payments', status: 'Completed', reuseCount: 6, complexity: 'Medium', effort: '~15 pd', keyCapabilities: 'Multi-currency checkout, Split settlement, Insurance co-pay routing', description: 'Billing & checkout core supporting clinical transactions and claims co-pay.', dependencies: 'Insurance Directory (c10)', attachments: ['Payment_Gateway_Spec.pdf', 'Settlement_Rules.xlsx'] },
+  { id: 'c3', name: 'Patient Profile', subtitle: 'Master patient record', category: 'Core data', status: 'Completed', reuseCount: 5, complexity: 'Low', effort: '~12 pd', keyCapabilities: 'Longitudinal health history, Consent management, Biometric identity', description: 'Master patient record unifying demographic, insurance, and medical timeline data.', dependencies: 'None (Core foundation)', attachments: ['Master_Patient_Schema.pdf', 'Consent_Spec.pdf', 'HL7_MPI_Guide.pdf'] },
+  { id: 'c4', name: 'Clinical Notes · NLP', subtitle: 'Ambient documentation', category: 'AI / GenAI', status: 'New', reuseCount: 4, complexity: 'Medium', effort: '~28 pd', keyCapabilities: 'Ambient conversation capture, SOAP note structuring, ICD-10 tagging', description: 'Ambient documentation engine converting physician-patient dialogue into EHR notes.', dependencies: 'AI Chatbot (c1), Patient Profile (c3)', attachments: ['NLP_Benchmark.pdf', 'SOAP_Template.docx'] },
+  { id: 'c5', name: 'Analytics & Dashboards', subtitle: 'Operational BI & Metrics', category: 'Data / BI', status: 'Prioritised', reuseCount: 4, complexity: 'Medium', effort: '~20 pd', keyCapabilities: 'Real-time KPI aggregation, Custom visual builders, Scheduled export', description: 'Operational BI and clinical analytics dashboard engine.', dependencies: 'Patient Profile (c3)', attachments: ['Dashboard_Metrics.xlsx', 'BI_Widgets_Guide.pdf'] },
+  { id: 'c6', name: 'Fraud-Claim Detection', subtitle: 'Claims anomaly engine', category: 'InsurTech / AI', status: 'In progress', reuseCount: 1, complexity: 'High', effort: '~35 pd', keyCapabilities: 'Anomaly detection, Payer pattern clustering, Flagging workflow', description: 'Claims anomaly engine identifying irregular billing patterns before submission.', dependencies: 'Payment Module (c2), Insurance Directory (c10)', attachments: ['Fraud_Heuristics.pdf'] },
+  { id: 'c7', name: 'Appointment Booking', subtitle: 'Scheduling module', category: 'Workflow', status: 'Completed', reuseCount: 3, complexity: 'Low', effort: '~18 pd', keyCapabilities: 'Multi-provider slot calendar, Automated SMS/WhatsApp, Waitlist queuing', description: 'Scheduling module coordinating provider availability and patient visits.', dependencies: 'Patient Profile (c3)', attachments: ['Booking_API.pdf', 'Calendar_Sync_Doc.docx'] },
+  { id: 'c8', name: 'e-Prescription', subtitle: 'Prescribing & pharmacy', category: 'Workflow', status: 'Prioritised', reuseCount: 3, complexity: 'Low', effort: '~14 pd', keyCapabilities: 'Rx digital signature, Drug contraindication check, Pharmacy dispatch', description: 'Prescribing and medication fulfillment workflow component.', dependencies: 'Patient Profile (c3), Appointment Booking (c7)', attachments: ['eRx_Validation.pdf', 'Signature_Crypto.pdf', 'Pharmacy_Rules.pdf'] },
+  { id: 'c9', name: 'LIS · Lab Information', subtitle: 'Diagnostic lab bridge', category: 'Diagnostics', status: 'Completed', reuseCount: 3, complexity: 'Medium', effort: '~22 pd', keyCapabilities: 'HL7 instrument bridge, Specimen barcode tracking, Auto-validation', description: 'Diagnostic lab bridge connecting pathology equipment directly to patient records.', dependencies: 'Patient Profile (c3)', attachments: ['LIS_Interface_Spec.pdf', 'Instrument_Bridge.xlsx'] },
+  { id: 'c10', name: 'Insurance Directory', subtitle: 'Payer rules engine', category: 'InsurTech', status: 'In progress', reuseCount: 1, complexity: 'Medium', effort: '~16 pd', keyCapabilities: 'Payer rules engine, Real-time benefit check, Policy versioning', description: 'Payer directory managing reimbursement rules and coverage criteria.', dependencies: 'None (Core rules)', attachments: ['Payer_Directory_v3.xlsx'] },
 ];
 
 export const DEFAULT_SOLUTIONS: SolutionItem[] = [
-  { id: 's1', name: 'EMR & Interoperability', shortCode: 'EMR', positioning: 'Common', status: 'Completed', score: 66, revenue3Yr: '$24M', compCount: 8, annualRev: '8.0' },
-  { id: 's2', name: 'Hospital Ops & Clinical Workflow', shortCode: 'HOSP OPS', positioning: 'Mixed', status: 'In progress', score: 75, revenue3Yr: '$27M', compCount: 8, annualRev: '9.0' },
-  { id: 's3', name: 'Home & Community Care', shortCode: 'HOME CARE', positioning: 'Mixed', status: 'New', score: 58, revenue3Yr: '$17M', compCount: 5, annualRev: '5.7' },
-  { id: 's4', name: 'Remote Patient Monitoring', shortCode: 'RPM', positioning: 'Distinctive', status: 'Prioritised', score: 78, revenue3Yr: '$25M', compCount: 4, annualRev: '8.3' },
-  { id: 's5', name: 'InsurTech & Reimbursement', shortCode: 'INSURTECH', positioning: 'Distinctive', status: 'In progress', score: 80, revenue3Yr: '$21M', compCount: 5, annualRev: '7.0' },
-  { id: 's6', name: 'Drug Discovery', shortCode: 'DRUG DISC', positioning: 'Distinctive', status: 'New', score: 69, revenue3Yr: '$19M', compCount: 1, annualRev: '6.5' },
-  { id: 's7', name: 'Pharmacy & Medication', shortCode: 'PHARMACY', positioning: 'Mixed', status: 'Prioritised', score: 59, revenue3Yr: '$11M', compCount: 3, annualRev: '3.7' },
-  { id: 's8', name: 'Population Health & Analytics', shortCode: 'POP HEALTH', positioning: 'Distinctive', status: 'New', score: 73, revenue3Yr: '$25M', compCount: 4, annualRev: '8.3' },
+  { id: 's1', name: 'EMR & Interoperability', shortCode: 'EMR', positioning: 'Common', status: 'Completed', score: 66, revenue3Yr: '$24M', compCount: 8, annualRev: '8.0', keyCapabilities: 'FHIR & HL7 exchange, Master patient index, Clinical charts sync', description: 'Comprehensive healthcare interoperability and electronic medical records core connecting clinical workflows.', constraints: 'HIPAA & GDPR data residency, FHIR R4 standard', attachments: ['EMR_Architecture_v2.pdf', 'FHIR_Endpoints.xlsx', 'HL7_Interface.docx'] },
+  { id: 's2', name: 'Hospital Ops & Clinical Workflow', shortCode: 'HOSP OPS', positioning: 'Mixed', status: 'In progress', score: 75, revenue3Yr: '$27M', compCount: 8, annualRev: '9.0', keyCapabilities: 'Bed capacity forecasting, Smart scheduling, Ambient voice triage', description: 'Operational orchestration suite streamlining bed management, emergency triage, and appointment logistics.', constraints: 'Sub-second latency SLA, On-premise fallback', attachments: ['Hospital_Ops_Spec.pdf', 'Triage_Flowchart.pdf'] },
+  { id: 's3', name: 'Home & Community Care', shortCode: 'HOME CARE', positioning: 'Mixed', status: 'New', score: 58, revenue3Yr: '$17M', compCount: 5, annualRev: '5.7', keyCapabilities: 'Offline clinician sync, Remote vitals logging, Caregiver portal', description: 'Decentralized healthcare delivery platform connecting home care providers and family caregivers.', constraints: 'Offline-first mobile support, Low bandwidth', attachments: ['Home_Care_Flow.docx', 'Caregiver_App_Guide.pdf'] },
+  { id: 's4', name: 'Remote Patient Monitoring', shortCode: 'RPM', positioning: 'Distinctive', status: 'Prioritised', score: 78, revenue3Yr: '$25M', compCount: 4, annualRev: '8.3', keyCapabilities: 'IoT telemetry ingestion, Real-time anomaly alerts, Biomarker trends', description: 'Continuous physiological monitoring and predictive deterioration alert system for chronic illness.', constraints: 'FDA Class II telemetry, ISO 27001', attachments: ['RPM_Device_Matrix.xlsx', 'Telemetry_Specs.pdf', 'FDA_Validation.pdf'] },
+  { id: 's5', name: 'InsurTech & Reimbursement', shortCode: 'INSURTECH', positioning: 'Distinctive', status: 'In progress', score: 80, revenue3Yr: '$21M', compCount: 5, annualRev: '7.0', keyCapabilities: 'Automated pre-auth, Graph neural fraud scoring, Eligibility verification', description: 'AI-driven claims adjudicator and automated pre-authorization engine bridging providers with insurance payers.', constraints: 'Payer API compliance, Regional insurance rules', attachments: ['Claims_Rulebook.pdf', 'Fraud_Heuristics.docx'] },
+  { id: 's6', name: 'Drug Discovery', shortCode: 'DRUG DISC', positioning: 'Distinctive', status: 'New', score: 69, revenue3Yr: '$19M', compCount: 1, annualRev: '6.5', keyCapabilities: 'Variant annotation, Molecular docking scoring, Trial cohort matching', description: 'Genomic biomarker intelligence and clinical trial cohort matching platform powered by deep learning.', constraints: 'High-compute GPU infrastructure required', attachments: ['Genomics_Pipeline.pdf', 'Docking_Models.xlsx', 'Cohort_Criteria.pdf'] },
+  { id: 's7', name: 'Pharmacy & Medication', shortCode: 'PHARMACY', positioning: 'Mixed', status: 'Prioritised', score: 59, revenue3Yr: '$11M', compCount: 3, annualRev: '3.7', keyCapabilities: 'Interaction screening, Barcode dispensing, Digital prescription sign', description: 'End-to-end e-prescription management and centralized pharmacy inventory fulfillment system.', constraints: 'National drug formulary regulation', attachments: ['Pharmacy_SOP_v1.pdf'] },
+  { id: 's8', name: 'Population Health & Analytics', shortCode: 'POP HEALTH', positioning: 'Distinctive', status: 'New', score: 73, revenue3Yr: '$25M', compCount: 4, annualRev: '8.3', keyCapabilities: 'Risk stratification, Outbreak heatmaps, WHO indicator dashboards', description: 'Epidemiological surveillance, risk stratification, and preventive health intervention analytics platform.', constraints: 'De-identified data governance, Multi-tenant DB', attachments: ['PopHealth_Methodology.pdf', 'WHO_Metrics.xlsx'] },
 ];
 
 export const DEFAULT_COUNTRIES: CountryItem[] = [
