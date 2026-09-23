@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Layers, 
@@ -14,17 +14,34 @@ import {
   Sparkles,
   TrendingUp,
   CheckCircle2,
-  Clock
+  Clock,
+  Filter,
+  Check
 } from 'lucide-react';
 import { useMagicStore } from '../../store/magicStore';
 
 export default function Overview() {
   const { solutions } = useMagicStore();
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Completed' | 'In progress' | 'Prioritised' | 'New'>('All');
+  const [isStatusFilterOpen, setIsStatusFilterOpen] = useState(false);
+  const statusFilterRef = useRef<HTMLDivElement>(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<'effort' | 'revenue' | 'score' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 5;
+
+  // Close status filter dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusFilterRef.current && !statusFilterRef.current.contains(event.target as Node)) {
+        setIsStatusFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Navigation Button items
   const navButtons = [
@@ -83,11 +100,15 @@ export default function Overview() {
 
   // Filtered and Sorted list
   const filteredList = useMemo(() => {
-    const list = rawPriorityList.filter((item) =>
+    let list = rawPriorityList.filter((item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.revenue.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    if (statusFilter !== 'All') {
+      list = list.filter(item => item.status === statusFilter);
+    }
 
     if (!sortField) return list;
 
@@ -108,7 +129,7 @@ export default function Overview() {
 
       return sortDirection === 'asc' ? valA - valB : valB - valA;
     });
-  }, [rawPriorityList, searchQuery, sortField, sortDirection]);
+  }, [rawPriorityList, searchQuery, statusFilter, sortField, sortDirection]);
 
   // Paginated List
   const totalPages = Math.ceil(filteredList.length / itemsPerPage) || 1;
@@ -204,7 +225,7 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* 3. Section Title, Tag & Search Bar on the Right */}
+      {/* 3. Section Title, Tag & Controls (Search + Custom Status Filter) on the Right */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
         <div className="flex items-center gap-3">
           <h2 className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
@@ -216,19 +237,60 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* Search Bar on the right side of the title */}
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search solutions..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full pl-9 pr-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs placeholder:text-gray-400 focus:outline-none focus:border-gray-400 transition-colors shadow-2xs"
-          />
+        {/* Search Bar & Custom Status Filter Dropdown on the right side of the title */}
+        <div className="flex items-center gap-2.5">
+          <div className="relative w-full sm:w-60">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search solutions..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-9 pr-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs placeholder:text-gray-400 focus:outline-none focus:border-gray-400 transition-colors shadow-2xs"
+            />
+          </div>
+
+          {/* Custom Status Filter Dropdown */}
+          <div className="relative" ref={statusFilterRef}>
+            <button
+              type="button"
+              onClick={() => setIsStatusFilterOpen(!isStatusFilterOpen)}
+              className="flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2 text-xs text-[#0D212C] font-medium transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+            >
+              <div className="flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-gray-400" />
+                <span>{statusFilter === 'All' ? 'Status: All' : statusFilter}</span>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isStatusFilterOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isStatusFilterOpen && (
+              <div className="absolute top-full mt-1.5 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                {(['All', 'Completed', 'In progress', 'Prioritised', 'New'] as const).map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => {
+                      setStatusFilter(st);
+                      setIsStatusFilterOpen(false);
+                      setCurrentPage(1);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                      statusFilter === st
+                        ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span>{st === 'All' ? 'All statuses' : st}</span>
+                    {statusFilter === st && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
