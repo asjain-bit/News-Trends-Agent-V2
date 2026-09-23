@@ -151,11 +151,12 @@ export default function Overview() {
             </div>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins']">
-              $170M
+            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+              <span>$170M</span>
+              <span className="text-xs font-normal text-gray-400 font-sans">over 3 years</span>
             </div>
             <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              over 3 yrs (~$57M/yr) · 8 solutions · illustrative
+              ~$57M per year · 8 solutions · illustrative
             </p>
           </div>
         </div>
