@@ -29,6 +29,476 @@ const GTM_GENERATION_STEPS = [
   "Assembling branded M42 presentation slides & offline PPT assets"
 ];
 
+export interface CountryGtmProfile {
+  name: string;
+  population: string;
+  incomeGroup: string;
+  payerModel: string;
+  keyDriver: string;
+  summarySentence: string;
+  spendCapita: string;
+  spendCapitaBadge: 'HIGH' | 'MED' | 'LOW';
+  hospitalBeds: string;
+  hospitalBedsBadge: 'HIGH' | 'MED' | 'LOW';
+  digitalMaturity: string;
+  digitalMaturityBadge: 'HIGH' | 'MED' | 'LOW';
+  insuredPopulation: string;
+  insuredPopulationBadge: 'HIGH' | 'MED' | 'LOW';
+  dealAnchor: string;
+  solutions: {
+    name: string;
+    status: 'IN PROGRESS' | 'PRIORITISED' | 'COMPLETED' | 'NEW';
+    fit: number;
+    score: number;
+    win: number;
+    description: string;
+    revenue3Yr: string;
+    annualRev: string;
+  }[];
+}
+
+const COUNTRY_GTM_DATA: Record<string, CountryGtmProfile> = {
+  'Saudi Arabia': {
+    name: 'Saudi Arabia',
+    population: '36.9M',
+    incomeGroup: 'High income',
+    payerModel: 'Expanding insurance',
+    keyDriver: 'Vision 2030 build-out',
+    summarySentence: 'Large market with heavy public investment; hospital-ops and insurance solutions scale with the reform programme.',
+    spendCapita: '$1,485',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '2.2',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Growing',
+    digitalMaturityBadge: 'MED',
+    insuredPopulation: '~68%',
+    insuredPopulationBadge: 'MED',
+    dealAnchor: '$6M',
+    solutions: [
+      {
+        name: 'Hospital Ops & Clinical Workflow',
+        status: 'IN PROGRESS',
+        fit: 86,
+        score: 75,
+        win: 63,
+        description: 'streamlined admission-to-discharge.',
+        revenue3Yr: '$4.7M',
+        annualRev: '$1.6M/yr'
+      },
+      {
+        name: 'InsurTech & Reimbursement',
+        status: 'IN PROGRESS',
+        fit: 78,
+        score: 80,
+        win: 59,
+        description: 'automated, fraud-aware claims.',
+        revenue3Yr: '$4.4M',
+        annualRev: '$1.5M/yr'
+      },
+      {
+        name: 'Pharmacy & Medication',
+        status: 'PRIORITISED',
+        fit: 72,
+        score: 59,
+        win: 56,
+        description: 'e-prescription through to fulfilment.',
+        revenue3Yr: '$3.6M',
+        annualRev: '$1.2M/yr'
+      },
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 68,
+        score: 66,
+        win: 54,
+        description: 'single longitudinal patient record.',
+        revenue3Yr: '$3.5M',
+        annualRev: '$1.2M/yr'
+      },
+      {
+        name: 'Remote Patient Monitoring',
+        status: 'PRIORITISED',
+        fit: 60,
+        score: 78,
+        win: 50,
+        description: 'continuous vitals & early alerts.',
+        revenue3Yr: '$3.7M',
+        annualRev: '$1.2M/yr'
+      }
+    ]
+  },
+  'United Arab Emirates': {
+    name: 'United Arab Emirates',
+    population: '9.4M',
+    incomeGroup: 'High income',
+    payerModel: 'Universal mandatory insurance',
+    keyDriver: 'Unified Malaffi / Nabidh HIE',
+    summarySentence: 'Premium digital-first market with high private and public willingness-to-pay for distinctive AI and clinical workflow tools.',
+    spendCapita: '$1,842',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '2.9',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Advanced',
+    digitalMaturityBadge: 'HIGH',
+    insuredPopulation: '~98%',
+    insuredPopulationBadge: 'HIGH',
+    dealAnchor: '$5M',
+    solutions: [
+      {
+        name: 'InsurTech & Reimbursement',
+        status: 'IN PROGRESS',
+        fit: 88,
+        score: 80,
+        win: 68,
+        description: 'automated pre-auth & fraud claims anomaly detection.',
+        revenue3Yr: '$4.8M',
+        annualRev: '$1.6M/yr'
+      },
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 84,
+        score: 66,
+        win: 65,
+        description: 'Malaffi/Nabidh FHIR integration core.',
+        revenue3Yr: '$4.2M',
+        annualRev: '$1.4M/yr'
+      },
+      {
+        name: 'Hospital Ops & Clinical Workflow',
+        status: 'IN PROGRESS',
+        fit: 80,
+        score: 75,
+        win: 60,
+        description: 'smart capacity allocation & bedside routing.',
+        revenue3Yr: '$4.0M',
+        annualRev: '$1.3M/yr'
+      },
+      {
+        name: 'Remote Patient Monitoring',
+        status: 'PRIORITISED',
+        fit: 75,
+        score: 78,
+        win: 58,
+        description: 'chronic disease management telemetry.',
+        revenue3Yr: '$3.8M',
+        annualRev: '$1.3M/yr'
+      },
+      {
+        name: 'Population Health & Analytics',
+        status: 'NEW',
+        fit: 70,
+        score: 73,
+        win: 52,
+        description: 'preventive cohort risk scoring.',
+        revenue3Yr: '$3.2M',
+        annualRev: '$1.1M/yr'
+      }
+    ]
+  },
+  'Jordan': {
+    name: 'Jordan',
+    population: '11.3M',
+    incomeGroup: 'Upper middle income',
+    payerModel: 'Mixed Public & Military',
+    keyDriver: 'Hakeem Program Modernisation',
+    summarySentence: 'Emerging regional healthcare hub with strong medical tourism and government digitization initiatives.',
+    spendCapita: '$304',
+    spendCapitaBadge: 'MED',
+    hospitalBeds: '1.8',
+    hospitalBedsBadge: 'MED',
+    digitalMaturity: 'Moderate',
+    digitalMaturityBadge: 'MED',
+    insuredPopulation: '~72%',
+    insuredPopulationBadge: 'MED',
+    dealAnchor: '$1.3M',
+    solutions: [
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 82,
+        score: 66,
+        win: 58,
+        description: 'national clinical data repository linkage.',
+        revenue3Yr: '$1.1M',
+        annualRev: '$0.37M/yr'
+      },
+      {
+        name: 'Hospital Ops & Clinical Workflow',
+        status: 'IN PROGRESS',
+        fit: 74,
+        score: 75,
+        win: 52,
+        description: 'bed turnaround and patient routing.',
+        revenue3Yr: '$0.9M',
+        annualRev: '$0.30M/yr'
+      },
+      {
+        name: 'Pharmacy & Medication',
+        status: 'PRIORITISED',
+        fit: 68,
+        score: 59,
+        win: 48,
+        description: 'formulary integration & dispensary controls.',
+        revenue3Yr: '$0.7M',
+        annualRev: '$0.23M/yr'
+      }
+    ]
+  },
+  'Estonia': {
+    name: 'Estonia',
+    population: '1.3M',
+    incomeGroup: 'High income',
+    payerModel: 'Single-payer EHIF',
+    keyDriver: 'e-Health 2.0 & Genomic Data',
+    summarySentence: 'Global benchmark for digital governance with 99% electronic health data and high AI adoption willingness.',
+    spendCapita: '$1,733',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '3.4',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Mature',
+    digitalMaturityBadge: 'HIGH',
+    insuredPopulation: '~95%',
+    insuredPopulationBadge: 'HIGH',
+    dealAnchor: '$2M',
+    solutions: [
+      {
+        name: 'Population Health & Analytics',
+        status: 'NEW',
+        fit: 88,
+        score: 73,
+        win: 64,
+        description: 'genomic risk stratification & cohort modeling.',
+        revenue3Yr: '$1.8M',
+        annualRev: '$0.60M/yr'
+      },
+      {
+        name: 'Remote Patient Monitoring',
+        status: 'PRIORITISED',
+        fit: 80,
+        score: 78,
+        win: 60,
+        description: 'decentralized chronic patient telemetry.',
+        revenue3Yr: '$1.5M',
+        annualRev: '$0.50M/yr'
+      },
+      {
+        name: 'InsurTech & Reimbursement',
+        status: 'IN PROGRESS',
+        fit: 75,
+        score: 80,
+        win: 55,
+        description: 'automated DRG audit & anomaly scoring.',
+        revenue3Yr: '$1.2M',
+        annualRev: '$0.40M/yr'
+      }
+    ]
+  },
+  'South Korea': {
+    name: 'South Korea',
+    population: '51.7M',
+    incomeGroup: 'High income',
+    payerModel: 'NHIS Single-payer',
+    keyDriver: 'Smart Hospital Initiative',
+    summarySentence: 'High-density tech-forward healthcare infrastructure with massive clinical data volumes and hospital automation demand.',
+    spendCapita: '$2,600',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '12.8',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Advanced',
+    digitalMaturityBadge: 'HIGH',
+    insuredPopulation: '~97%',
+    insuredPopulationBadge: 'HIGH',
+    dealAnchor: '$8M',
+    solutions: [
+      {
+        name: 'Hospital Ops & Clinical Workflow',
+        status: 'IN PROGRESS',
+        fit: 90,
+        score: 75,
+        win: 66,
+        description: 'AI robotic triage & acute ward workflow.',
+        revenue3Yr: '$6.5M',
+        annualRev: '$2.17M/yr'
+      },
+      {
+        name: 'Drug Discovery',
+        status: 'NEW',
+        fit: 85,
+        score: 69,
+        win: 60,
+        description: 'genomics AI target identification.',
+        revenue3Yr: '$5.8M',
+        annualRev: '$1.93M/yr'
+      },
+      {
+        name: 'Remote Patient Monitoring',
+        status: 'PRIORITISED',
+        fit: 82,
+        score: 78,
+        win: 58,
+        description: 'elderly home care physiological alerts.',
+        revenue3Yr: '$5.2M',
+        annualRev: '$1.73M/yr'
+      }
+    ]
+  },
+  'United States': {
+    name: 'United States',
+    population: '333M',
+    incomeGroup: 'High income',
+    payerModel: 'Commercial & Medicare/Medicaid',
+    keyDriver: 'HTI-1 / HTI-2 Interoperability',
+    summarySentence: 'Massive addressable spend with intense focus on value-based care risk adjustments and automated claim denials management.',
+    spendCapita: '$12,555',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '2.8',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Advanced',
+    digitalMaturityBadge: 'HIGH',
+    insuredPopulation: '~92%',
+    insuredPopulationBadge: 'HIGH',
+    dealAnchor: '$16M',
+    solutions: [
+      {
+        name: 'InsurTech & Reimbursement',
+        status: 'IN PROGRESS',
+        fit: 92,
+        score: 80,
+        win: 70,
+        description: 'automated prior-auth & claims dispute engine.',
+        revenue3Yr: '$14.2M',
+        annualRev: '$4.73M/yr'
+      },
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 86,
+        score: 66,
+        win: 62,
+        description: 'cross-EHR TEFCA interoperability bridge.',
+        revenue3Yr: '$12.5M',
+        annualRev: '$4.17M/yr'
+      },
+      {
+        name: 'Remote Patient Monitoring',
+        status: 'PRIORITISED',
+        fit: 80,
+        score: 78,
+        win: 56,
+        description: 'reimbursable RPM CPT code telemetry platform.',
+        revenue3Yr: '$11.0M',
+        annualRev: '$3.67M/yr'
+      }
+    ]
+  },
+  'Azerbaijan': {
+    name: 'Azerbaijan',
+    population: '10.1M',
+    incomeGroup: 'Upper middle income',
+    payerModel: 'Mandatory Health Insurance (ITS)',
+    keyDriver: 'National Digital Transformation',
+    summarySentence: 'Rapidly modernizing healthcare system with recent mandatory insurance rollout and central E-Health portal expansion.',
+    spendCapita: '$230',
+    spendCapitaBadge: 'LOW',
+    hospitalBeds: '4.1',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Developing',
+    digitalMaturityBadge: 'LOW',
+    insuredPopulation: '~85%',
+    insuredPopulationBadge: 'MED',
+    dealAnchor: '$1M',
+    solutions: [
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 78,
+        score: 66,
+        win: 55,
+        description: 'regional clinic digitization & unified record.',
+        revenue3Yr: '$0.8M',
+        annualRev: '$0.27M/yr'
+      },
+      {
+        name: 'Pharmacy & Medication',
+        status: 'PRIORITISED',
+        fit: 70,
+        score: 59,
+        win: 50,
+        description: 'electronic prescribing & reimbursement audit.',
+        revenue3Yr: '$0.6M',
+        annualRev: '$0.20M/yr'
+      },
+      {
+        name: 'Population Health & Analytics',
+        status: 'NEW',
+        fit: 65,
+        score: 73,
+        win: 45,
+        description: 'regional health indicators surveillance.',
+        revenue3Yr: '$0.5M',
+        annualRev: '$0.17M/yr'
+      }
+    ]
+  }
+};
+
+function getCountryProfile(countryName: string, allCountries: any[]): CountryGtmProfile {
+  if (COUNTRY_GTM_DATA[countryName]) {
+    return COUNTRY_GTM_DATA[countryName];
+  }
+  const matched = allCountries.find(c => c.name === countryName);
+  return {
+    name: countryName,
+    population: matched ? matched.population : '15M',
+    incomeGroup: 'High income',
+    payerModel: 'Expanding universal coverage',
+    keyDriver: 'National Health Digitization Strategy',
+    summarySentence: `Strategic target market with active investments in digital health records, hospital operational efficiency, and automated claims workflows.`,
+    spendCapita: matched ? matched.spendCapita : '$1,200',
+    spendCapitaBadge: 'HIGH',
+    hospitalBeds: '2.5',
+    hospitalBedsBadge: 'HIGH',
+    digitalMaturity: 'Growing',
+    digitalMaturityBadge: 'MED',
+    insuredPopulation: '~75%',
+    insuredPopulationBadge: 'MED',
+    dealAnchor: matched ? matched.dealAnchor : '$3M',
+    solutions: [
+      {
+        name: 'Hospital Ops & Clinical Workflow',
+        status: 'IN PROGRESS',
+        fit: 82,
+        score: 75,
+        win: 60,
+        description: 'streamlined admission-to-discharge.',
+        revenue3Yr: '$2.5M',
+        annualRev: '$0.83M/yr'
+      },
+      {
+        name: 'InsurTech & Reimbursement',
+        status: 'IN PROGRESS',
+        fit: 78,
+        score: 80,
+        win: 56,
+        description: 'automated pre-authorization and claims verification.',
+        revenue3Yr: '$2.2M',
+        annualRev: '$0.73M/yr'
+      },
+      {
+        name: 'EMR & Interoperability',
+        status: 'COMPLETED',
+        fit: 74,
+        score: 66,
+        win: 54,
+        description: 'single longitudinal patient record & FHIR core.',
+        revenue3Yr: '$2.0M',
+        annualRev: '$0.67M/yr'
+      }
+    ]
+  };
+}
+
 export default function GtmInsights() {
   const [activeTab, setActiveTab] = useState<'country' | 'solution'>('country');
   
@@ -48,16 +518,8 @@ export default function GtmInsights() {
     targetType: 'country' | 'solution';
     title: string;
     subtitle: string;
-    dealAnchor: string;
-    tam: string;
-    targetDate: string;
-    slides: {
-      slideNumber: number;
-      title: string;
-      category: string;
-      keyPoints: string[];
-      highlight: string;
-    }[];
+    profile: CountryGtmProfile;
+    solutionName?: string;
   } | null>(null);
 
   const countryDropdownRef = useRef<HTMLDivElement>(null);
@@ -116,105 +578,22 @@ export default function GtmInsights() {
 
       // Create Generated Deck Mock Data
       if (activeTab === 'country') {
-        const cnt = countries.find(c => c.name === selectedCountry) || countries[0];
+        const profile = getCountryProfile(selectedCountry || 'Saudi Arabia', countries);
         setGeneratedDeck({
           targetType: 'country',
-          title: `${selectedCountry || 'Target Market'} — Go-To-Market Pitch Deck`,
-          subtitle: `M42 Digital Health Expansion & Monetisation Strategy for ${selectedCountry || 'Target Market'}`,
-          dealAnchor: cnt ? cnt.dealAnchor : '$5M',
-          tam: cnt ? cnt.totalSpend : '$17B',
-          targetDate: 'Q3 2026',
-          slides: [
-            {
-              slideNumber: 1,
-              title: "Market Profile & Digital Health Landscape",
-              category: "Market Landscape",
-              keyPoints: [
-                `Total healthcare spend estimated at ${cnt.totalSpend} with ${cnt.spendCapita} spend per capita.`,
-                `Digital health adoption currently represents ${cnt.digitalShare} of aggregate expenditure with strong tailwinds.`,
-                "National priorities center on unified health records, predictive population wellness, and automated reimbursement."
-              ],
-              highlight: `Addressable Market: ${cnt.totalSpend} (${cnt.confidence} Conviction)`
-            },
-            {
-              slideNumber: 2,
-              title: "Strategic Solution Bundling & Deal Anchor",
-              category: "Commercial Strategy",
-              keyPoints: [
-                `Conservative 3-year deal anchor sized at ${cnt.dealAnchor} per health network deployment.`,
-                "Lead offer combines EMR Interoperability core with InsurTech automated claims verification.",
-                "Fast deployment timeline using pre-built FHIR connectors and scalable containerized modules."
-              ],
-              highlight: `Deal Anchor: ${cnt.dealAnchor} ARR`
-            },
-            {
-              slideNumber: 3,
-              title: "Competitive Edge & Defensibility",
-              category: "Differentiation",
-              keyPoints: [
-                "Built-once foundation with 80% portfolio synergy reduces deployment friction by 60%.",
-                "Proven compliance across regional data sovereignty standards and national privacy frameworks.",
-                "End-to-end telemetry and clinical decision support integrated at point of care."
-              ],
-              highlight: "Moat: 80% Shared Architecture Reuse"
-            },
-            {
-              slideNumber: 4,
-              title: "Rollout Roadmap & Key Milestone Delivery",
-              category: "Implementation",
-              keyPoints: [
-                "Phase 1 (Months 1–3): Core EMR & Lab Bridge Integration.",
-                "Phase 2 (Months 4–6): Provider Portal & Automated Claims Pilot.",
-                "Phase 3 (Months 7–12): Multi-site rollout & Longitudinal Patient Analytics."
-              ],
-              highlight: "Time-to-Value: Under 90 Days"
-            }
-          ]
+          title: `${selectedCountry || 'Saudi Arabia'} — Go-To-Market Pitch Deck`,
+          subtitle: `M42 Digital Health Expansion & Monetisation Strategy for ${selectedCountry || 'Saudi Arabia'}`,
+          profile
         });
       } else {
         const sol = solutions.find(s => s.name === selectedSolution) || solutions[0];
+        const profile = getCountryProfile('Saudi Arabia', countries);
         setGeneratedDeck({
           targetType: 'solution',
           title: `${selectedSolution} — Solution Pitch Deck`,
           subtitle: `Commercialisation Strategy & Cross-Border Scaling for ${selectedSolution}`,
-          dealAnchor: '$4.5M',
-          tam: sol.revenue3Yr || '$21M',
-          targetDate: 'Q3 2026',
-          slides: [
-            {
-              slideNumber: 1,
-              title: "Executive Solution Overview",
-              category: "Product Overview",
-              keyPoints: [
-                `3-year cumulative addressable revenue estimated at ${sol.revenue3Yr}.`,
-                `High portfolio synergy across ${sol.compCount} modular reusable build components.`,
-                `Positioned as '${sol.positioning}' offering with distinctive competitive moat.`
-              ],
-              highlight: `3-Yr Revenue Target: ${sol.revenue3Yr}`
-            },
-            {
-              slideNumber: 2,
-              title: "Target Market Readiness & Economics",
-              category: "Market Expansion",
-              keyPoints: [
-                "Priority deployment across high-conviction markets with proven public & private reimbursement budgets.",
-                "Predictable subscription SaaS model paired with value-based transaction tiers.",
-                "Near-zero marginal cost of duplication across subsequent hospital network implementations."
-              ],
-              highlight: "Gross Margin Target: 82%"
-            },
-            {
-              slideNumber: 3,
-              title: "Technical Architecture & Security",
-              category: "Engineering",
-              keyPoints: [
-                "Microservices architecture with pre-integrated FHIR bridges and audit logs.",
-                "Enterprise-grade encryption and tenant isolation certified for hospital network SLA requirements.",
-                "Seamless continuous deployment pipelines with 99.99% uptime guarantees."
-              ],
-              highlight: "Deployment Velocity: 14 Days"
-            }
-          ]
+          profile,
+          solutionName: selectedSolution
         });
       }
 
@@ -405,206 +784,258 @@ export default function GtmInsights() {
           </div>
         )}
 
-        {/* GENERATED DECK PRESENTATION VIEW (Compact & Streamlined Header) */}
+        {/* GENERATED DECK PRESENTATION VIEW (Matching Reference Slides & Clean Header) */}
         {generatedDeck && (
           <div className="space-y-6">
-            {/* Streamlined Presentation Header Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/90 p-5 md:p-6 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
-                <div className="space-y-1 max-w-2xl">
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-orange-50 border border-orange-100 text-[#ED4D19] text-[0.6875rem] font-semibold">
-                    <Sparkles className="w-3 h-3" />
-                    <span>M42 GTM DECK READY</span>
-                  </div>
-                  <h2 className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
-                    {generatedDeck.title}
-                  </h2>
-                  <p className="text-xs text-gray-500 font-normal">
-                    {generatedDeck.subtitle}
-                  </p>
+            {/* Header: Title & Subtitle Only (No extra cards) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-orange-50 border border-orange-100 text-[#ED4D19] text-[0.6875rem] font-semibold">
+                  <Sparkles className="w-3 h-3" />
+                  <span>M42 GTM DECK READY</span>
                 </div>
+                <h2 className="text-xl sm:text-2xl font-bold text-[#0D212C] font-['Poppins']">
+                  {generatedDeck.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500 font-normal">
+                  {generatedDeck.subtitle}
+                </p>
               </div>
 
-              {/* Compact Key Metric Anchor Highlights */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-gray-50/70 rounded-xl p-3.5 space-y-0.5 border border-gray-100">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                    ESTIMATED DEAL ANCHOR
-                  </div>
-                  <div className="text-xl font-bold text-[#ED4D19] font-['Poppins']">
-                    {generatedDeck.dealAnchor}
-                  </div>
-                </div>
-
-                <div className="bg-gray-50/70 rounded-xl p-3.5 space-y-0.5 border border-gray-100">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                    MARKET TAM / REACH
-                  </div>
-                  <div className="text-xl font-bold text-[#0D212C] font-['Poppins']">
-                    {generatedDeck.tam}
-                  </div>
-                </div>
-
-                <div className="bg-gray-50/70 rounded-xl p-3.5 space-y-0.5 border border-gray-100">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                    TARGET TIMELINE
-                  </div>
-                  <div className="text-xl font-bold text-[#0D212C] font-['Poppins']">
-                    {generatedDeck.targetDate}
-                  </div>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  alert(`Downloading "${generatedDeck.title}.pptx" formatted for M42 executive presentations.`);
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-all cursor-pointer shrink-0"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download PPT</span>
+              </button>
             </div>
 
-            {/* Slide Previews (1 Slide in 1 Row with Rich Visuals) */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
-                  Templatized Slide Outlines ({generatedDeck.slides.length} Slides)
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert(`Downloading "${generatedDeck.title}.pptx" formatted for M42 executive presentations.`);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-all cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download PPT</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6">
-                {generatedDeck.slides.map((slide) => (
-                  <div
-                    key={slide.slideNumber}
-                    className="bg-white rounded-2xl border border-gray-200/90 p-6 sm:p-7 shadow-xs hover:border-gray-300 transition-all group"
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                      
-                      {/* Left: Narrative Content (7 Cols) */}
-                      <div className="lg:col-span-7 space-y-4">
-                        <div className="flex items-center gap-3">
-                          <span className="px-2.5 py-0.5 rounded-md text-[0.6875rem] font-semibold bg-gray-100 text-gray-700">
-                            SLIDE {slide.slideNumber}
-                          </span>
-                          <span className="text-xs font-medium text-gray-400">
-                            {slide.category}
-                          </span>
-                        </div>
-
-                        <h4 className="text-lg font-semibold text-[#0D212C] font-['Poppins'] group-hover:text-[#ED4D19] transition-colors">
-                          {slide.title}
-                        </h4>
-
-                        <ul className="space-y-2.5 pt-1">
-                          {slide.keyPoints.map((pt, i) => (
-                            <li key={i} className="text-xs sm:text-sm text-gray-600 font-normal flex items-start gap-2.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#ED4D19] mt-2 shrink-0" />
-                              <span className="leading-relaxed">{pt}</span>
-                            </li>
-                          ))}
-                        </ul>
-
-                        <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                          <span className="font-medium text-[#ED4D19]">
-                            {slide.highlight}
-                          </span>
-                          <span className="text-gray-400 text-[11px]">
-                            Included in PPT Deck
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right: Rich Visual Graphic Card (5 Cols) */}
-                      <div className="lg:col-span-5 bg-gradient-to-br from-gray-50 to-orange-50/30 rounded-xl p-5 border border-gray-100 space-y-3.5">
-                        <div className="flex items-center justify-between text-xs font-semibold text-gray-700 pb-2 border-b border-gray-200/60">
-                          <span>Slide {slide.slideNumber} Executive Visual</span>
-                          <span className="text-[#ED4D19] text-[11px]">Live Preview</span>
-                        </div>
-
-                        {/* Visual for Slide 1 (Strategic Positioning) */}
-                        {slide.slideNumber === 1 && (
-                          <div className="space-y-3">
-                            <div className="space-y-1.5">
-                              <div className="flex justify-between text-[11px] text-gray-500">
-                                <span>Healthcare Digital Readiness</span>
-                                <span className="font-semibold text-gray-800">88%</span>
-                              </div>
-                              <div className="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-                                <div className="h-full bg-[#ED4D19] rounded-full w-[88%]" />
-                              </div>
-                            </div>
-                            <div className="space-y-1.5">
-                              <div className="flex justify-between text-[11px] text-gray-500">
-                                <span>Regulatory & FHIR Alignment</span>
-                                <span className="font-semibold text-gray-800">94%</span>
-                              </div>
-                              <div className="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-                                <div className="h-full bg-[#36c0c9] rounded-full w-[94%]" />
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-100 text-[11px] text-gray-600">
-                              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                              <span>M42 Trusted Government Healthcare Partner</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Visual for Slide 2 (Commercial Architecture) */}
-                        {slide.slideNumber === 2 && (
-                          <div className="space-y-2.5">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="bg-white p-2.5 rounded-lg border border-gray-100 text-center">
-                                <div className="text-[10px] text-gray-400 uppercase">ARR Expansion</div>
-                                <div className="text-sm font-bold text-[#ED4D19] font-mono">+38% YoY</div>
-                              </div>
-                              <div className="bg-white p-2.5 rounded-lg border border-gray-100 text-center">
-                                <div className="text-[10px] text-gray-400 uppercase">Target Margin</div>
-                                <div className="text-sm font-bold text-gray-800 font-mono">82%</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 text-[11px]">
-                              <span className="text-gray-500">Payback Period</span>
-                              <span className="font-semibold text-[#0D212C]">6 Months</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Visual for Slide 3 (Technical Architecture) */}
-                        {slide.slideNumber === 3 && (
-                          <div className="space-y-2.5">
-                            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 text-[11px]">
-                              <div className="flex items-center gap-2">
-                                <Building2 className="w-3.5 h-3.5 text-[#36c0c9]" />
-                                <span className="font-medium text-gray-700">FHIR Bridge SLA</span>
-                              </div>
-                              <span className="font-semibold text-emerald-600 font-mono">99.99%</span>
-                            </div>
-                            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 text-[11px]">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-3.5 h-3.5 text-[#ED4D19]" />
-                                <span className="font-medium text-gray-700">Deployment Velocity</span>
-                              </div>
-                              <span className="font-semibold text-[#0D212C] font-mono">14 Days</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Visual for Slide 4+ */}
-                        {slide.slideNumber > 3 && (
-                          <div className="p-3 bg-white rounded-lg border border-gray-100 text-center space-y-1">
-                            <TrendingUp className="w-5 h-5 text-[#ED4D19] mx-auto" />
-                            <div className="text-xs font-semibold text-gray-800">Integrated Ecosystem Synergy</div>
-                            <div className="text-[11px] text-gray-400">Multi-solution catalog cross-sell ready</div>
-                          </div>
-                        )}
-                      </div>
-
+            {/* The 3 Branded Slides matching Reference Images in Part B Orange Branding */}
+            <div className="space-y-6 pt-2">
+              
+              {/* SLIDE 1: COUNTRY OVERVIEW */}
+              <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
+                {/* Part B Clean Header Banner */}
+                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                  <div>
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                      SLIDE 1 · COUNTRY OVERVIEW
+                    </div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                      {generatedDeck.profile.name}
                     </div>
                   </div>
-                ))}
+                  <div className="flex items-center">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                      M42
+                    </span>
+                  </div>
+                </div>
+
+                {/* Slide 1 Content Body */}
+                <div className="p-6 sm:p-7 space-y-5 bg-white">
+                  {/* 4 Metrics / Attribute Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Population</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.population}
+                      </div>
+                    </div>
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Income group</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.incomeGroup}
+                      </div>
+                    </div>
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Payer model</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.payerModel}
+                      </div>
+                    </div>
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-1.5 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Key driver</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.keyDriver}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Summary Sentence */}
+                  <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed">
+                    {generatedDeck.profile.summarySentence}
+                  </p>
+
+                  {/* Slide Confidential Footer */}
+                  <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                    <span>M42 · Go-To-Market · Strategy team · Confidential</span>
+                    <span>Illustrative estimate — figures to be validated</span>
+                  </div>
+                </div>
               </div>
+
+              {/* SLIDE 2: HEALTHCARE LANDSCAPE & MATURITY */}
+              <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
+                {/* Part B Clean Header Banner */}
+                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                  <div>
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                      SLIDE 2 · HEALTHCARE LANDSCAPE & MATURITY
+                    </div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                      {generatedDeck.profile.name} — market context
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                      M42
+                    </span>
+                  </div>
+                </div>
+
+                {/* Slide 2 Content Body */}
+                <div className="p-6 sm:p-7 space-y-5 bg-white">
+                  {/* 4 Cards with Badges Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Health spend / capita</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.spendCapita}
+                      </div>
+                      <div>
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold bg-[#E8F8F8] text-[#0E7C86] uppercase tracking-wider">
+                          {generatedDeck.profile.spendCapitaBadge}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Hospital beds / 1k</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.hospitalBeds}
+                      </div>
+                      <div>
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold bg-[#E8F8F8] text-[#0E7C86] uppercase tracking-wider">
+                          {generatedDeck.profile.hospitalBedsBadge}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Digital-health maturity</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.digitalMaturity}
+                      </div>
+                      <div>
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
+                          generatedDeck.profile.digitalMaturityBadge === 'HIGH' ? 'bg-[#E8F8F8] text-[#0E7C86]' : 'bg-[#FEF6E9] text-[#B56B12]'
+                        }`}>
+                          {generatedDeck.profile.digitalMaturityBadge}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#F8F9FA] rounded-xl p-4 space-y-2 border border-gray-100/90">
+                      <div className="text-xs text-gray-500 font-normal">Insured population</div>
+                      <div className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                        {generatedDeck.profile.insuredPopulation}
+                      </div>
+                      <div>
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
+                          generatedDeck.profile.insuredPopulationBadge === 'HIGH' ? 'bg-[#E8F8F8] text-[#0E7C86]' : 'bg-[#FEF6E9] text-[#B56B12]'
+                        }`}>
+                          {generatedDeck.profile.insuredPopulationBadge}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Context Note in Italics */}
+                  <p className="text-xs sm:text-sm text-gray-500 italic font-normal leading-relaxed">
+                    Health-system context that drives which solutions fit and what the market will pay.
+                  </p>
+
+                  {/* Slide Confidential Footer */}
+                  <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                    <span>M42 · Go-To-Market · Strategy team · Confidential</span>
+                    <span>Illustrative estimate — figures to be validated</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* SLIDE 3: RECOMMENDED SOLUTIONS & REVENUE */}
+              <div className="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
+                {/* Part B Clean Header Banner */}
+                <div className="bg-gradient-to-r from-orange-50/70 via-[#FFFBF9] to-white px-6 py-4 flex items-center justify-between border-b border-orange-100/70">
+                  <div>
+                    <div className="text-[0.6875rem] uppercase font-semibold text-[#ED4D19] tracking-wider">
+                      SLIDE 3 · RECOMMENDED SOLUTIONS & REVENUE
+                    </div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] font-['Poppins'] mt-0.5">
+                      {generatedDeck.profile.name} — where M42 wins
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-bold text-lg text-[#0D212C] font-['Poppins'] border-b-2 border-[#ED4D19] pb-0.5">
+                      M42
+                    </span>
+                  </div>
+                </div>
+
+                {/* Slide 3 Content Body */}
+                <div className="p-6 sm:p-7 space-y-5 bg-white">
+                  {/* Recommended Solutions List */}
+                  <div className="space-y-4">
+                    {generatedDeck.profile.solutions.map((sol, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+                              {sol.name}
+                            </span>
+                            <span className={`px-2.5 py-0.5 rounded-md text-[0.625rem] font-semibold uppercase tracking-wider ${
+                              sol.status === 'COMPLETED' || sol.status === 'IN PROGRESS'
+                                ? 'bg-[#E8F8F8] text-[#0E7C86]'
+                                : 'bg-[#FEF6E9] text-[#B56B12]'
+                            }`}>
+                              {sol.status}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 font-normal">
+                            Fit {sol.fit}/100 · score {sol.score}/100 · win ~{sol.win}% — {sol.description}
+                          </div>
+                        </div>
+
+                        <div className="text-left sm:text-right shrink-0">
+                          <div className="text-base sm:text-lg font-semibold text-[#ED4D19] font-['Poppins']">
+                            {sol.revenue3Yr}
+                          </div>
+                          <div className="text-[0.6875rem] text-gray-400 italic font-normal">
+                            3-yr · ~{sol.annualRev}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Formula Footnote */}
+                  <p className="text-[0.6875rem] text-gray-500 italic font-normal leading-relaxed pt-2">
+                    Revenue = {generatedDeck.profile.name} deal anchor {generatedDeck.profile.dealAnchor} × solution revenue-depth × win-likelihood. Only catalogue solutions carry a score and a $; research-only ideas would show as candidates to add.
+                  </p>
+
+                  {/* Slide Confidential Footer */}
+                  <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[0.6875rem] text-gray-400 font-normal">
+                    <span>M42 · Go-To-Market · Strategy team · Confidential</span>
+                    <span>Illustrative estimate — figures to be validated</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         )}
