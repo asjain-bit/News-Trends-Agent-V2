@@ -594,20 +594,20 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 </div>
 
                 {/* Filters Dropdown */}
-                <div className="relative w-[116px]" ref={statusFilterRef}>
+                <div className="relative min-w-[116px] shrink-0" ref={statusFilterRef}>
                   <button
                     type="button"
                     onClick={() => setIsStatusFilterOpen(!isStatusFilterOpen)}
-                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                    className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                   >
-                    <div className="flex items-center gap-[12px]">
+                    <div className="flex items-center gap-2">
                       <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span className="truncate">{statusFilter === 'All' ? 'Filters' : statusFilter}</span>
+                      <span>{statusFilter === 'All' ? 'Filters' : statusFilter}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isStatusFilterOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isStatusFilterOpen && (
-                    <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                    <div className="absolute top-full mt-1 right-0 min-w-full w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                       {(['All', 'Completed', 'In progress', 'Prioritised', 'New'] as const).map((st) => (
                         <button 
                           key={st}

@@ -955,24 +955,24 @@ export default function BuildRoadmap() {
                 </div>
 
                 {/* Filter by Status Button / Dropdown on Right Side of Search Bar */}
-                <div className="relative w-[130px]" ref={impactFilterRef}>
+                <div className="relative min-w-[116px] shrink-0" ref={impactFilterRef}>
                   <button
                     type="button"
                     onClick={() => setIsImpactFilterOpen(!isImpactFilterOpen)}
-                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                    className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                   >
-                    <div className="flex items-center gap-[12px]">
+                    <div className="flex items-center gap-2">
                       <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span className="truncate">
-                        {impactSort === 'all' ? 'All Status' : impactSort === 'in_progress' ? 'In progress' : 'Unlocked'}
+                      <span>
+                        {impactSort === 'all' ? 'Filters' : impactSort === 'in_progress' ? 'In progress' : 'Unlocked'}
                       </span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isImpactFilterOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isImpactFilterOpen && (
-                    <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                    <div className="absolute top-full mt-1 right-0 min-w-full w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                       {([
-                        { value: 'all', label: 'All Status' },
+                        { value: 'all', label: 'All statuses' },
                         { value: 'in_progress', label: 'In progress' },
                         { value: 'unlocked', label: 'Unlocked' },
                       ] as const).map((opt) => (

@@ -254,21 +254,21 @@ export default function Overview() {
           </div>
 
           {/* Custom Status Filter Dropdown */}
-          <div className="relative" ref={statusFilterRef}>
+          <div className="relative min-w-[116px] shrink-0" ref={statusFilterRef}>
             <button
               type="button"
               onClick={() => setIsStatusFilterOpen(!isStatusFilterOpen)}
-              className="flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2 text-xs text-[#0D212C] font-medium transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+              className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2 text-xs text-[#0D212C] font-normal transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
             >
               <div className="flex items-center gap-1.5">
                 <Filter className="w-3.5 h-3.5 text-gray-400" />
-                <span>{statusFilter === 'All' ? 'Status: All' : statusFilter}</span>
+                <span>{statusFilter === 'All' ? 'Filters' : statusFilter}</span>
               </div>
               <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isStatusFilterOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isStatusFilterOpen && (
-              <div className="absolute top-full mt-1.5 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+              <div className="absolute top-full mt-1.5 right-0 min-w-full w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                 {(['All', 'Completed', 'In progress', 'Prioritised', 'New'] as const).map((st) => (
                   <button
                     key={st}
@@ -280,7 +280,7 @@ export default function Overview() {
                     }}
                     className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
                       statusFilter === st
-                        ? 'bg-gray-100 text-gray-900 font-medium'
+                        ? 'bg-gray-100 text-gray-900 font-normal'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -357,7 +357,7 @@ export default function Overview() {
                       </td>
                       <td className="py-3.5 px-6">
                         <span
-                          className={`inline-block px-3 py-0.5 rounded-full text-[0.75rem] font-medium capitalize ${
+                          className={`inline-block px-3 py-0.5 rounded-full text-[0.75rem] font-normal capitalize ${
                             sol.status === 'Completed'
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : sol.status === 'In progress'

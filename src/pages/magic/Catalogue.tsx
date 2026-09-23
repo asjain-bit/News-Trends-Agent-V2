@@ -1482,19 +1482,19 @@ export default function Catalogue() {
                 </div>
 
                 {/* Custom Filter Dropdown */}
-                <div className="relative w-[116px]" ref={solutionsFilterRef}>
+                <div className="relative min-w-[116px] shrink-0" ref={solutionsFilterRef}>
                   <button
                     onClick={() => setIsSolutionsFilterOpen(!isSolutionsFilterOpen)}
-                    className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                    className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                   >
-                    <div className="flex items-center gap-[12px]">
+                    <div className="flex items-center gap-2">
                       <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span className="truncate">{solutionsUnifiedFilter === 'All' ? 'Filters' : solutionsUnifiedFilter}</span>
+                      <span>{solutionsUnifiedFilter === 'All' ? 'Filters' : solutionsUnifiedFilter}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isSolutionsFilterOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isSolutionsFilterOpen && (
-                    <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                    <div className="absolute top-full mt-1 right-0 min-w-full w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                       <button 
                         onClick={() => { setSolutionsUnifiedFilter('All'); setIsSolutionsFilterOpen(false); setSolutionsPage(1); }}
                         className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${solutionsUnifiedFilter === 'All' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
@@ -1775,19 +1775,19 @@ export default function Catalogue() {
               </div>
 
               {/* Custom Filter Dropdown */}
-              <div className="relative w-[116px]" ref={componentsFilterRef}>
+              <div className="relative min-w-[116px] shrink-0" ref={componentsFilterRef}>
                 <button
                   onClick={() => setIsComponentsFilterOpen(!isComponentsFilterOpen)}
-                  className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                  className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                 >
-                  <div className="flex items-center gap-[12px]">
+                  <div className="flex items-center gap-2">
                     <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                    <span className="truncate">{componentsUnifiedFilter === 'All' ? 'Filters' : componentsUnifiedFilter}</span>
+                    <span>{componentsUnifiedFilter === 'All' ? 'Filters' : componentsUnifiedFilter}</span>
                   </div>
                   <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isComponentsFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isComponentsFilterOpen && (
-                  <div className="absolute top-full mt-1 right-0 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                  <div className="absolute top-full mt-1 right-0 min-w-full w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                     <button 
                       onClick={() => { setComponentsUnifiedFilter('All'); setIsComponentsFilterOpen(false); setComponentsPage(1); }}
                       className={`w-full text-left px-4 py-1.5 text-[0.8125rem] flex items-center justify-between cursor-pointer transition-colors ${componentsUnifiedFilter === 'All' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
@@ -2015,20 +2015,20 @@ export default function Catalogue() {
               </div>
 
               {/* Single Unified Filter with High, Medium, Low - Custom Dropdown */}
-              <div className="relative w-[116px]" ref={countriesFilterRef}>
+              <div className="relative min-w-[116px] shrink-0" ref={countriesFilterRef}>
                 <button
                   type="button"
                   onClick={() => setIsCountriesFilterOpen(!isCountriesFilterOpen)}
-                  className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-lg pl-3 pr-2 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                  className="w-full flex items-center justify-between gap-2.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-[0.8125rem] text-gray-700 font-normal hover:bg-gray-50 focus:outline-none focus:border-gray-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                 >
-                  <div className="flex items-center gap-[12px]">
+                  <div className="flex items-center gap-2">
                     <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                    <span className="truncate">{countriesUnifiedFilter === 'All' ? 'Filters' : countriesUnifiedFilter}</span>
+                    <span>{countriesUnifiedFilter === 'All' ? 'Filters' : countriesUnifiedFilter}</span>
                   </div>
                   <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isCountriesFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isCountriesFilterOpen && (
-                  <div className="absolute top-full mt-1 right-0 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
+                  <div className="absolute top-full mt-1 right-0 min-w-full w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden">
                     <button 
                       type="button"
                       onClick={() => { setCountriesUnifiedFilter('All'); setIsCountriesFilterOpen(false); setCountriesPage(1); }}
