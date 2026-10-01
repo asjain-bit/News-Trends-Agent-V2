@@ -723,7 +723,7 @@ export default function GtmInsights() {
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <span>{kind === 'All' ? 'All kinds' : kind}</span>
+                          <span>{kind === 'All' ? 'All Type' : kind}</span>
                           {kindFilter === kind && <Check className="w-3.5 h-3.5 text-gray-700" />}
                         </button>
                       ))}
