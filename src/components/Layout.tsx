@@ -438,7 +438,7 @@ export default function Layout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F6F7FB]">
         {/* Topbar */}
-        <header className="h-16 flex items-center justify-between px-6 md:px-10 shrink-0 z-30 bg-white border-b border-gray-200">
+        <header className="h-16 flex items-center justify-between px-5 shrink-0 z-30 bg-white border-b border-gray-200">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}

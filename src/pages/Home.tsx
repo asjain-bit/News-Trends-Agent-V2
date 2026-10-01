@@ -100,7 +100,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-8 md:py-10">
+    <div className="w-full px-5 py-8 md:py-10">
       {/* Top Header Row with Title, Search, Sort By, and New Report Button */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
         <div>

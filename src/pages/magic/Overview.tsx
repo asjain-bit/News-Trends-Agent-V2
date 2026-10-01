@@ -139,7 +139,7 @@ export default function Overview() {
   }, [filteredList, currentPage, itemsPerPage]);
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 md:py-8 space-y-6">
+    <div className="w-full px-5 py-6 md:py-8 space-y-6">
       
       {/* 1. Top Navigation Action Buttons (Button Style, Minimal Space) */}
       <div className="flex flex-wrap items-center gap-3">

@@ -1630,7 +1630,7 @@ export default function Catalogue() {
   const activeMatrix = isEditingReuse ? tempReuseMatrix : reuseMatrix;
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 md:py-8 space-y-6">
+    <div className="w-full px-5 py-6 md:py-8 space-y-6">
       {/* Underline Tabs - Hidden when viewing solution details page */}
       {viewingSolution === null && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 gap-2">

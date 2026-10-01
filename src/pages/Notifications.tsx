@@ -9,7 +9,7 @@ export default function Notifications() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 md:p-10 w-full h-full flex flex-col">
+    <div className="px-5 py-6 md:py-10 w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-[1.375rem] font-semibold font-['Poppins'] text-[#0D212C]">Notifications</h1>

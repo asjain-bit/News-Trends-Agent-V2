@@ -20,7 +20,7 @@ export default function ChooseReportType() {
   };
 
   return (
-    <div className="w-full px-6 lg:px-12 py-8 md:py-10 flex flex-col">
+    <div className="w-full px-5 py-8 md:py-10 flex flex-col">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

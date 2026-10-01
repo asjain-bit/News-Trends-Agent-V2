@@ -37,7 +37,7 @@ export default function ReviewRequest() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="max-w-3xl mx-auto px-5 py-8 md:py-12">
       <button 
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors mb-6"

@@ -451,7 +451,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
   };
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 md:py-8 space-y-6">
+    <div className="w-full px-5 py-6 md:py-8 space-y-6">
       {/* Top Underline Tabs (Matching Catalogue Design Exactly) */}
       <div className="inline-block border-b border-gray-200">
         <nav className="flex space-x-1 sm:space-x-2 -mb-[1px]">
