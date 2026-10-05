@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Info, 
@@ -16,7 +17,8 @@ import {
   X,
   RotateCcw,
   Check,
-  Save
+  Save,
+  Ban
 } from 'lucide-react';
 
 // Factor Metadata
@@ -136,12 +138,37 @@ export const FACTORS: FactorInfo[] = [
   }
 ];
 
+export interface CountryMarketFitDetail {
+  rank: number;
+  country: string;
+  fitScore: number;
+  fitLabel: string;
+  winRate: string;
+  revenue: string;
+}
+
+export interface RestrictedCountryDetail {
+  country: string;
+  regulation: string;
+  authority: string;
+  oneLineReason: string;
+  sourceUrl?: string;
+}
+
+export interface MarketFitData {
+  score: number;
+  winRate: string;
+  topSellableCountries: CountryMarketFitDetail[];
+  restricted: RestrictedCountryDetail[];
+}
+
 export interface SolutionScoringItem {
   id: string;
   name: string;
   status: 'In progress' | 'Prioritised' | 'New' | 'Completed';
   revenue3Yr: string;
   revenueNum: number;
+  marketFit: MarketFitData;
   fScores: {
     F1: number; // 1 to 5
     F2: number;
@@ -160,6 +187,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'In progress',
     revenue3Yr: '$21M',
     revenueNum: 21,
+    marketFit: {
+      score: 4.1,
+      winRate: '61%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$24.8M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$21.0M' },
+        { rank: 3, country: 'Qatar', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$7.2M' },
+        { rank: 4, country: 'Kuwait', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$5.8M' },
+        { rank: 5, country: 'Bahrain', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.1M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Cross-border claims processing mandate (HIPAA/CMS) – requires localized tenancy',
+          sourceUrl: 'https://cms.gov'
+        }
+      ]
+    },
     fScores: { F1: 5, F2: 5, F3: 4, F4: 3, F5: 4, F6: 4 }
   },
   {
@@ -168,6 +215,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'Prioritised',
     revenue3Yr: '$25M',
     revenueNum: 25,
+    marketFit: {
+      score: 4.3,
+      winRate: '63%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$28.2M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$25.0M' },
+        { rank: 3, country: 'Qatar', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$8.0M' },
+        { rank: 4, country: 'Oman', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.5M' },
+        { rank: 5, country: 'Kuwait', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$4.2M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Remote telemetry export standard (FDA 21 CFR Part 820) – onshore hosting required',
+          sourceUrl: 'https://fda.gov'
+        }
+      ]
+    },
     fScores: { F1: 4, F2: 4, F3: 5, F4: 4, F5: 4, F6: 4 }
   },
   {
@@ -176,6 +243,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'In progress',
     revenue3Yr: '$27M',
     revenueNum: 27,
+    marketFit: {
+      score: 4.0,
+      winRate: '60%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$29.5M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$27.0M' },
+        { rank: 3, country: 'Kuwait', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$6.4M' },
+        { rank: 4, country: 'Egypt', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$5.2M' },
+        { rank: 5, country: 'Jordan', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.8M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Hospital workflow data routing compliance (Joint Commission) – non-US server block',
+          sourceUrl: 'https://jointcommission.org'
+        }
+      ]
+    },
     fScores: { F1: 4, F2: 4, F3: 3, F4: 3, F5: 5, F6: 4 }
   },
   {
@@ -184,6 +271,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'New',
     revenue3Yr: '$25M',
     revenueNum: 25,
+    marketFit: {
+      score: 3.9,
+      winRate: '59%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$25.9M' },
+        { rank: 2, country: 'UAE', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$25.4M' },
+        { rank: 3, country: 'Egypt', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$6.7M' },
+        { rank: 4, country: 'Qatar', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$5.4M' },
+        { rank: 5, country: 'Kuwait', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$5.0M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · <cited regulation> (<authority>) – one-line reason',
+          sourceUrl: 'https://hhs.gov'
+        }
+      ]
+    },
     fScores: { F1: 4, F2: 3, F3: 4, F4: 4, F5: 4, F6: 3 }
   },
   {
@@ -192,6 +299,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'New',
     revenue3Yr: '$19M',
     revenueNum: 19,
+    marketFit: {
+      score: 3.5,
+      winRate: '55%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$22.1M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$19.0M' },
+        { rank: 3, country: 'Jordan', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.8M' },
+        { rank: 4, country: 'Egypt', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.1M' },
+        { rank: 5, country: 'Qatar', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.9M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Clinical trial patient data localization mandate (FDA 21 CFR 312)',
+          sourceUrl: 'https://fda.gov'
+        }
+      ]
+    },
     fScores: { F1: 4, F2: 4, F3: 5, F4: 2, F5: 1, F6: 5 }
   },
   {
@@ -200,6 +327,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'Completed',
     revenue3Yr: '$24M',
     revenueNum: 24,
+    marketFit: {
+      score: 3.8,
+      winRate: '58%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$26.0M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$24.0M' },
+        { rank: 3, country: 'Qatar', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$6.0M' },
+        { rank: 4, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.5M' },
+        { rank: 5, country: 'Bahrain', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$2.8M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Interoperability node export restriction (ONC Cures Act)',
+          sourceUrl: 'https://healthit.gov'
+        }
+      ]
+    },
     fScores: { F1: 3, F2: 3, F3: 1, F4: 4, F5: 5, F6: 3 }
   },
   {
@@ -208,6 +355,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'Prioritised',
     revenue3Yr: '$11M',
     revenueNum: 11,
+    marketFit: {
+      score: 2.8,
+      winRate: '48%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$12.5M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$11.0M' },
+        { rank: 3, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.2M' },
+        { rank: 4, country: 'Qatar', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.4M' },
+        { rank: 5, country: 'Oman', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$1.8M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · DSCSA pharma supply chain serialization rule (FDA/DEA)',
+          sourceUrl: 'https://fda.gov'
+        }
+      ]
+    },
     fScores: { F1: 3, F2: 2, F3: 2, F4: 1, F5: 3, F6: 3 }
   },
   {
@@ -216,6 +383,26 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
     status: 'New',
     revenue3Yr: '$17M',
     revenueNum: 17,
+    marketFit: {
+      score: 2.2,
+      winRate: '42%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$17.0M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$12.4M' },
+        { rank: 3, country: 'Egypt', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$3.5M' },
+        { rank: 4, country: 'Jordan', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.1M' },
+        { rank: 5, country: 'Kuwait', fitScore: 1, fitLabel: '1 · Poor', winRate: '30%', revenue: '$1.2M' },
+      ],
+      restricted: [
+        {
+          country: 'USA',
+          regulation: '<cited regulation>',
+          authority: '<authority>',
+          oneLineReason: 'Restricted · Home health aide data privacy compliance mandate (CMS Conditions of Participation)',
+          sourceUrl: 'https://cms.gov'
+        }
+      ]
+    },
     fScores: { F1: 2, F2: 1, F3: 2, F4: 3, F5: 2, F6: 1 }
   }
 ];
@@ -230,6 +417,331 @@ const SCORE_CONFIG: Record<number, { stroke: string; track: string; text: string
   4: { stroke: '#3B82F6', track: '#DBEAFE', text: 'text-blue-600' },    // Blue
   5: { stroke: '#10B981', track: '#D1FAE5', text: 'text-emerald-600' }, // Green
 };
+
+// Custom Tooltip for Market Fit Column Header (Image 4)
+function MarketFitHeaderInfoTooltip() {
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearHideTimeout = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleMouseEnter = () => {
+    clearHideTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const tooltipWidth = 320;
+    const approxHeight = 220;
+
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+    left = Math.max(16, left);
+
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    let top: number;
+    if (spaceBelow >= approxHeight + 16) {
+      top = rect.bottom + 8;
+    } else if (spaceAbove >= approxHeight + 16) {
+      top = rect.top - approxHeight - 8;
+    } else {
+      top = Math.max(16, Math.min(rect.bottom + 8, window.innerHeight - approxHeight - 16));
+    }
+
+    setCoords({ top, left });
+  };
+
+  const handleMouseLeave = () => {
+    clearHideTimeout();
+    hideTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearHideTimeout();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScrollOrResize = () => {
+      clearHideTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="inline-flex items-center"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer focus:outline-none"
+        title="Market Fit information"
+      >
+        <Info className="w-3.5 h-3.5 shrink-0" />
+      </button>
+
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed z-[99999] w-[320px] max-h-[calc(100vh-32px)] overflow-y-auto bg-white border border-gray-200/90 rounded-2xl p-4 shadow-xl animate-in fade-in duration-150 text-left pointer-events-auto font-normal normal-case"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+          }}
+          onMouseEnter={clearHideTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-start justify-between gap-2 border-b border-gray-100 pb-2">
+            <h4 className="text-[0.875rem] font-bold text-[#0D212C]">Market Fit</h4>
+            <button
+              type="button"
+              onClick={() => {
+                clearHideTimeout();
+                setCoords(null);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer -mr-1 -mt-0.5"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="mt-2.5 space-y-2 text-[0.75rem] text-gray-700 leading-relaxed">
+            <p>
+              The AI rates how well the solution suits each catalogue country, 1 (Poor) to 5 (Excellent), with a reason.
+            </p>
+            <p>
+              <strong className="font-semibold text-gray-900">Shown here:</strong> deal-size weighted average across the countries the solution is sellable in (one decimal).
+            </p>
+            <p>
+              <strong className="font-semibold text-gray-900">Win rate:</strong> Market Fit sets the chance of winning a deal – 1 → 30%, 2 → 40%, 3 → 50%, 4 → 60%, 5 → 70% (win rate = 20% + 10% × fit). The win rate drives the revenue estimate.
+            </p>
+            <p className="text-gray-500 pt-0.5 text-[0.6875rem]">
+              Not part of Score / 100 or the weightage. Restricted and not-sellable countries are excluded.
+            </p>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+// Custom Tooltip for Market Fit Row Cells (Image 3)
+function MarketFitCellTooltip({
+  solution,
+  children
+}: {
+  solution: SolutionScoringItem;
+  children: React.ReactNode;
+}) {
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mf = solution.marketFit;
+
+  const clearHideTimeout = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleMouseEnter = () => {
+    clearHideTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const tooltipWidth = 330;
+    const approxHeight = 350;
+
+    // Horizontal centering clamped to viewport margins
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+    left = Math.max(16, left);
+
+    // Vertical placement with viewport edge awareness
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    let top: number;
+    if (spaceBelow >= approxHeight + 16) {
+      // Room below
+      top = rect.bottom + 8;
+    } else if (spaceAbove >= approxHeight + 16) {
+      // Room above
+      top = rect.top - approxHeight - 8;
+    } else {
+      // Clamp safely within viewport bounds
+      if (spaceBelow >= spaceAbove) {
+        top = Math.min(rect.bottom + 8, window.innerHeight - approxHeight - 16);
+        top = Math.max(16, top);
+      } else {
+        top = Math.max(16, rect.top - approxHeight - 8);
+        top = Math.min(top, window.innerHeight - approxHeight - 16);
+      }
+    }
+
+    setCoords({ top, left });
+  };
+
+  const handleMouseLeave = () => {
+    clearHideTimeout();
+    hideTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearHideTimeout();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScrollOrResize = () => {
+      clearHideTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="inline-flex items-center justify-center cursor-pointer py-1 select-none"
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed z-[99999] w-[330px] max-h-[calc(100vh-32px)] overflow-y-auto bg-white border border-gray-200/90 rounded-2xl p-4 shadow-xl animate-in fade-in duration-150 text-left pointer-events-auto font-normal normal-case"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+          }}
+          onMouseEnter={clearHideTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-start justify-between gap-2 border-b border-gray-100 pb-2.5">
+            <div>
+              <h4 className="text-[0.875rem] font-bold text-[#0D212C] leading-snug">
+                {solution.name} · Market Fit by country
+              </h4>
+              <p className="text-[0.75rem] text-gray-500 font-normal mt-0.5">
+                Top 5 Sellable Countries
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                clearHideTimeout();
+                setCoords(null);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer rounded -mr-1 -mt-0.5"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Table */}
+          <div className="mt-2.5">
+            <table className="w-full text-left border-collapse text-[0.75rem]">
+              <thead>
+                <tr className="text-[0.6875rem] text-gray-400 border-b border-gray-100">
+                  <th className="py-1 font-normal">Country</th>
+                  <th className="py-1 font-normal">Fit</th>
+                  <th className="py-1 font-normal">Win rate</th>
+                  <th className="py-1 font-normal text-right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {mf.topSellableCountries.map((c) => (
+                  <tr key={c.rank} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="py-1.5 text-[#0D212C] font-normal">{c.rank}. {c.country}</td>
+                    <td className="py-1.5 text-gray-700 font-normal">{c.fitLabel}</td>
+                    <td className="py-1.5 text-gray-700 font-normal">{c.winRate}</td>
+                    <td className="py-1.5 text-gray-900 font-bold text-right">{c.revenue}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Section Divider: RESTRICTED / NOT SELLABLE */}
+          <div className="mt-2.5 pt-2 border-t border-gray-100">
+            <div className="text-[0.625rem] font-semibold text-gray-400 tracking-wider uppercase mb-1.5">
+              RESTRICTED / NOT SELLABLE
+            </div>
+            <div className="space-y-1.5">
+              {mf.restricted.map((r, i) => (
+                <div key={i} className="flex items-start gap-1.5 text-[0.6875rem] text-red-700 bg-red-50/70 p-2 rounded-lg border border-red-100/80 leading-snug">
+                  <Ban className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <span className="font-semibold text-red-700">{r.country} </span>
+                    <span>{r.oneLineReason} · </span>
+                    <a
+                      href={r.sourceUrl || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-red-700 underline hover:text-red-900 font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      source
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="mt-3 pt-2.5 border-t border-gray-100 space-y-1 text-[0.75rem]">
+            <div className="flex items-center justify-between text-gray-700 font-medium">
+              <span>Weighted Market Fit</span>
+              <span className="text-[#0D212C] font-bold text-[0.875rem]">{mf.score.toFixed(1)}</span>
+            </div>
+            <div className="flex items-center justify-between text-gray-700 font-medium">
+              <span>Weighted win rate</span>
+              <span className="text-[#0D212C] font-bold text-[0.875rem]">{mf.winRate}</span>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
 
 export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'scoring' | 'weightage' }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -320,6 +832,20 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     setScoringPage(1);
   };
 
+  // Toggle Market Fit sort
+  const handleToggleMarketFitSort = () => {
+    setSortFactor((prev) => {
+      if (prev.factor !== 'marketFit') {
+        return { factor: 'marketFit', order: 'desc' };
+      }
+      if (prev.order === 'desc') {
+        return { factor: 'marketFit', order: 'asc' };
+      }
+      return { factor: 'none', order: 'none' };
+    });
+    setScoringPage(1);
+  };
+
   // Compute 0-100 Score for a solution
   const calculateScore = (fScores: SolutionScoringItem['fScores'], currentWeights: Record<string, number>): number => {
     let totalWeightedScore = 0;
@@ -375,12 +901,20 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     });
 
     if (sortFactor.factor !== 'none' && sortFactor.order !== 'none') {
-      const factorKey = sortFactor.factor as keyof SolutionScoringItem['fScores'];
-      list = [...list].sort((a, b) => {
-        const valA = a.fScores[factorKey] || 0;
-        const valB = b.fScores[factorKey] || 0;
-        return sortFactor.order === 'asc' ? valA - valB : valB - valA;
-      });
+      if (sortFactor.factor === 'marketFit') {
+        list = [...list].sort((a, b) => {
+          const valA = a.marketFit.score || 0;
+          const valB = b.marketFit.score || 0;
+          return sortFactor.order === 'asc' ? valA - valB : valB - valA;
+        });
+      } else {
+        const factorKey = sortFactor.factor as keyof SolutionScoringItem['fScores'];
+        list = [...list].sort((a, b) => {
+          const valA = a.fScores[factorKey] || 0;
+          const valB = b.fScores[factorKey] || 0;
+          return sortFactor.order === 'asc' ? valA - valB : valB - valA;
+        });
+      }
     }
 
     return list;
@@ -446,6 +980,50 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
             <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#0D212C]" />
           </div>
         )}
+      </div>
+    );
+  };
+
+  // Render Market Fit round progress bar
+  const renderMarketFitProgress = (score: number) => {
+    const roundedBand = Math.min(5, Math.max(1, Math.round(score)));
+    const config = SCORE_CONFIG[roundedBand] || SCORE_CONFIG[3];
+
+    const radius = 12;
+    const circumference = 2 * Math.PI * radius; // ~75.4
+    const strokeDashoffset = circumference - (Math.min(5, Math.max(0, score)) / 5) * circumference;
+
+    return (
+      <div className="relative inline-flex items-center justify-center cursor-pointer py-1 select-none">
+        <div className="relative w-8 h-8 flex items-center justify-center">
+          <svg className="w-8 h-8 -rotate-90">
+            {/* Background Track Ring */}
+            <circle
+              cx="16"
+              cy="16"
+              r={radius}
+              stroke={config.track}
+              strokeWidth="2.5"
+              fill="transparent"
+            />
+            {/* Colored Progress Ring */}
+            <circle
+              cx="16"
+              cy="16"
+              r={radius}
+              stroke={config.stroke}
+              strokeWidth="2.5"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              fill="transparent"
+            />
+          </svg>
+          {/* Centered Score Number */}
+          <span className={`absolute inset-0 flex items-center justify-center text-[0.625rem] font-bold ${config.text}`}>
+            {score.toFixed(1)}
+          </span>
+        </div>
       </div>
     );
   };
@@ -668,6 +1246,23 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                         </th>
                       ))}
 
+                      {/* Market Fit Column with 2-line header, sort, and (i) info popup */}
+                      <th 
+                        onClick={handleToggleMarketFitSort}
+                        className="py-2.5 px-3 font-normal text-center cursor-pointer select-none group min-w-[130px] outline-none focus:outline-none"
+                      >
+                        <div className="inline-flex flex-col items-center justify-center hover:text-gray-800 transition-colors select-none">
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold text-[#0D212C] text-[0.6875rem]">MARKET FIT</span>
+                            <ArrowUpDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" />
+                            <MarketFitHeaderInfoTooltip />
+                          </div>
+                          <span className="text-[0.625rem] text-gray-500 font-normal normal-case leading-tight mt-0.5 text-center whitespace-nowrap">
+                            (avg · sets win rate)
+                          </span>
+                        </div>
+                      </th>
+
                       {/* Revenue Column */}
                       <th className="py-3 px-4 font-normal text-left min-w-[120px]">
                         REVENUE (3-YR)
@@ -682,7 +1277,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                   <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                     {paginatedSolutions.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="py-12 text-center text-gray-400 text-sm">
+                        <td colSpan={11} className="py-12 text-center text-gray-400 text-sm">
                           No solutions found matching the search or filters.
                         </td>
                       </tr>
@@ -718,6 +1313,13 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                               </td>
                             );
                           })}
+
+                          {/* Market Fit Cell with custom tooltip */}
+                          <td className="py-4 px-3 text-center">
+                            <MarketFitCellTooltip solution={solution}>
+                              {renderMarketFitProgress(solution.marketFit.score)}
+                            </MarketFitCellTooltip>
+                          </td>
 
                           {/* Revenue Cell */}
                           <td className="py-4 px-4 text-left">

@@ -585,6 +585,449 @@ function InstantTooltip({
   );
 }
 
+// Country Field Sources Dictionary matching accurate sources with custom tooltips
+const COUNTRY_FIELD_SOURCES: Record<string, Record<string, { title: string; source: string; link: string }>> = {
+  'United Arab Emirates': {
+    spendCapita: {
+      title: 'Health spend per capita: $1,842',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 9.4M',
+      source: 'UAE Federal Competitiveness and Statistics Centre (2024)',
+      link: 'fcsc.gov.ae',
+    },
+    totalSpend: {
+      title: 'Total health spend: $17B',
+      source: 'WHO Global Health Expenditure Database (2023)',
+      link: 'apps.who.int/nha/database',
+    },
+    digitalShare: {
+      title: 'Digital share: 3%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 1%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $5M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: High',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'Saudi Arabia': {
+    spendCapita: {
+      title: 'Health spend per capita: $1,485',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 36.9M',
+      source: 'Saudi General Authority for Statistics (GASTAT, 2024)',
+      link: 'stats.gov.sa',
+    },
+    totalSpend: {
+      title: 'Total health spend: $55B',
+      source: 'Saudi Ministry of Health & WHO GHED (2023)',
+      link: 'moh.gov.sa',
+    },
+    digitalShare: {
+      title: 'Digital share: 3%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 0.37%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $6M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: High',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'Jordan': {
+    spendCapita: {
+      title: 'Health spend per capita: $304',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 11.3M',
+      source: 'Jordan Department of Statistics (DOS, 2024)',
+      link: 'dos.gov.jo',
+    },
+    totalSpend: {
+      title: 'Total health spend: $3B',
+      source: 'WHO Global Health Expenditure Database (2023)',
+      link: 'apps.who.int/nha/database',
+    },
+    digitalShare: {
+      title: 'Digital share: 2.5%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 1.5%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $1.3M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: Medium',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'Estonia': {
+    spendCapita: {
+      title: 'Health spend per capita: $1,733',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 1.3M',
+      source: 'Statistics Estonia (Statistikaamet, 2024)',
+      link: 'stat.ee',
+    },
+    totalSpend: {
+      title: 'Total health spend: $2B',
+      source: 'Eurostat Healthcare Statistics & WHO GHED (2023)',
+      link: 'ec.europa.eu/eurostat',
+    },
+    digitalShare: {
+      title: 'Digital share: 6%',
+      source: 'e-Estonia & Statista Digital Health Outlook (2024)',
+      link: 'e-estonia.com',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 1.5%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $2M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: High',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'South Korea': {
+    spendCapita: {
+      title: 'Health spend per capita: $2,600',
+      source: 'World Bank & OECD Health Statistics (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 51.7M',
+      source: 'Statistics Korea (KOSTAT, 2024)',
+      link: 'kostat.go.kr',
+    },
+    totalSpend: {
+      title: 'Total health spend: $134B',
+      source: 'OECD Health Statistics (2023)',
+      link: 'oecd.org/health',
+    },
+    digitalShare: {
+      title: 'Digital share: 3%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 0.2%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $8M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: Medium',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'United States': {
+    spendCapita: {
+      title: 'Health spend per capita: $12,555',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 333M',
+      source: 'U.S. Census Bureau (2024)',
+      link: 'census.gov',
+    },
+    totalSpend: {
+      title: 'Total health spend: $4.2T',
+      source: 'Centers for Medicare & Medicaid Services (CMS, 2023)',
+      link: 'cms.gov/data-research',
+    },
+    digitalShare: {
+      title: 'Digital share: 3%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 0.013%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $16M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: Low',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+  'Azerbaijan': {
+    spendCapita: {
+      title: 'Health spend per capita: $230',
+      source: 'World Bank, World Development Indicators (2023)',
+      link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+    },
+    population: {
+      title: 'Population: 10.1M',
+      source: 'State Statistical Committee of Azerbaijan (2024)',
+      link: 'stat.gov.az',
+    },
+    totalSpend: {
+      title: 'Total health spend: $2B',
+      source: 'WHO Global Health Expenditure Database (2023)',
+      link: 'apps.who.int/nha/database',
+    },
+    digitalShare: {
+      title: 'Digital share: 2%',
+      source: 'Statista & McKinsey Digital Health Outlook (2024)',
+      link: 'statista.com/outlook/dmo/digital-health',
+    },
+    obtainableSlice: {
+      title: 'Obtainable slice: 2.2%',
+      source: 'M42 Regional Market Penetration Benchmark (2024)',
+      link: 'm42.ae/gtm/analytics',
+    },
+    dealAnchor: {
+      title: 'Deal anchor (per-country): $1M',
+      source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+      link: 'm42.ae/pricing-model',
+    },
+    confidence: {
+      title: 'Confidence: Low',
+      source: 'M42 Verified National Data Index (2024)',
+      link: 'm42.ae/methodology',
+    },
+  },
+};
+
+function getCountryFieldSource(country: CountryItem, field: string) {
+  const custom = COUNTRY_FIELD_SOURCES[country.name]?.[field];
+  if (custom) return custom;
+
+  switch (field) {
+    case 'spendCapita':
+      return {
+        title: `Health spend per capita: ${country.spendCapita}`,
+        source: 'World Bank, World Development Indicators (2023)',
+        link: 'data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
+      };
+    case 'population':
+      return {
+        title: `Population: ${country.population}`,
+        source: `${country.name} National Statistical Authority (2024)`,
+        link: 'un.org/development/desa',
+      };
+    case 'totalSpend':
+      return {
+        title: `Total health spend: ${country.totalSpend}`,
+        source: 'WHO Global Health Expenditure Database (2023)',
+        link: 'apps.who.int/nha/database',
+      };
+    case 'digitalShare':
+      return {
+        title: `Digital share: ${country.digitalShare}`,
+        source: 'Statista & McKinsey Digital Health Outlook (2024)',
+        link: 'statista.com/outlook/dmo/digital-health',
+      };
+    case 'obtainableSlice':
+      return {
+        title: `Obtainable slice: ${country.obtainableSlice}`,
+        source: 'M42 Regional Market Penetration Benchmark (2024)',
+        link: 'm42.ae/gtm/analytics',
+      };
+    case 'dealAnchor':
+      return {
+        title: `Deal anchor (per-country): ${country.dealAnchor}`,
+        source: 'M42 Health Tech Enterprise Pricing Model (2024)',
+        link: 'm42.ae/pricing-model',
+      };
+    case 'confidence':
+      return {
+        title: `Confidence: ${country.confidence}`,
+        source: 'M42 Verified National Data Index (2024)',
+        link: 'm42.ae/methodology',
+      };
+    default:
+      return {
+        title: `${country.name} Data`,
+        source: 'M42 Country Profile Research (2024)',
+        link: 'm42.ae',
+      };
+  }
+}
+
+function CountrySourceCell({
+  country,
+  field,
+  children,
+  className = '',
+}: {
+  country: CountryItem;
+  field: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [coords, setCoords] = useState<{ x: number; y: number; placeAbove: boolean } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const info = getCountryFieldSource(country, field);
+
+  const clearHideTimeout = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleMouseEnter = () => {
+    clearHideTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const placeAbove = rect.top > 130;
+    const tooltipWidth = 290;
+    let x = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (x + tooltipWidth > window.innerWidth - 16) {
+      x = window.innerWidth - tooltipWidth - 16;
+    }
+    x = Math.max(16, x);
+
+    setCoords({
+      x,
+      y: placeAbove ? window.innerHeight - rect.top + 8 : rect.bottom + 8,
+      placeAbove,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    clearHideTimeout();
+    hideTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearHideTimeout();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScrollOrResize = () => {
+      clearHideTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`group/source relative inline-block w-full cursor-pointer ${className}`}
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed z-[99999] w-[290px] bg-white border border-gray-200/90 rounded-2xl p-3.5 shadow-xl animate-in fade-in duration-150 text-left pointer-events-auto"
+          style={{
+            left: `${coords.x}px`,
+            ...(coords.placeAbove
+              ? { bottom: `${coords.y}px` }
+              : { top: `${coords.y}px` }),
+          }}
+          onMouseEnter={clearHideTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <h4 className="text-[0.8125rem] font-bold text-[#0D212C] leading-snug">
+              {info.title}
+            </h4>
+            <button
+              type="button"
+              onClick={() => {
+                clearHideTimeout();
+                setCoords(null);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer rounded -mr-1 -mt-0.5"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-[0.75rem] text-gray-600 mt-1.5 leading-snug font-normal">
+            Source: {info.source}
+          </p>
+          <a
+            href={`https://${info.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-[0.75rem] text-blue-600 hover:text-blue-700 underline mt-1 truncate font-normal cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {info.link}
+          </a>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 // Merged Description & Attachments Cell Component for Tables
 function DescriptionCell({
   title,
@@ -1129,6 +1572,7 @@ export default function Catalogue() {
   const [isAnalyzingCountry, setIsAnalyzingCountry] = useState(false);
   const [analysisStep, setAnalysisStep] = useState('');
   const [showSyncNotice, setShowSyncNotice] = useState(true);
+  const [isCountryTitleTooltipHovered, setIsCountryTitleTooltipHovered] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'countries') {
@@ -1262,8 +1706,8 @@ export default function Catalogue() {
           valA = parseRevenueValue(a.revenue3Yr);
           valB = parseRevenueValue(b.revenue3Yr);
         } else if (solutionsSort.column === 'score') {
-          valA = parseFloat(a.score);
-          valB = parseFloat(b.score);
+          valA = Number(a.score) || 0;
+          valB = Number(b.score) || 0;
         } else if (solutionsSort.column === 'components') {
           valA = a.compCount;
           valB = b.compCount;
@@ -1665,20 +2109,6 @@ export default function Catalogue() {
 
             <button
               onClick={() => {
-                setActiveTab('countries');
-                setViewingSolution(null);
-              }}
-              className={`pb-2.5 px-3 sm:px-4 text-[0.875rem] font-medium cursor-pointer transition-colors border-b-2 rounded-t-lg ${
-                activeTab === 'countries'
-                  ? 'border-gray-800 text-gray-900 bg-gray-100/80 font-semibold'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Countries
-            </button>
-
-            <button
-              onClick={() => {
                 setActiveTab('reuse');
                 setViewingSolution(null);
               }}
@@ -1689,6 +2119,20 @@ export default function Catalogue() {
               }`}
             >
               Reuse grid
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('countries');
+                setViewingSolution(null);
+              }}
+              className={`pb-2.5 px-3 sm:px-4 text-[0.875rem] font-medium cursor-pointer transition-colors border-b-2 rounded-t-lg ${
+                activeTab === 'countries'
+                  ? 'border-gray-800 text-gray-900 bg-gray-100/80 font-semibold'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Countries
             </button>
           </nav>
 
@@ -2504,10 +2948,25 @@ export default function Catalogue() {
       {activeTab === 'countries' && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins']">
-                Countries
+            <div 
+              className="relative inline-flex items-center gap-2 select-none"
+              onMouseEnter={() => setIsCountryTitleTooltipHovered(true)}
+              onMouseLeave={() => setIsCountryTitleTooltipHovered(false)}
+            >
+              <h2 className="text-[1.125rem] font-medium text-[#0D212C] font-['Poppins'] flex items-center gap-1.5">
+                <span>Countries</span>
+                <button type="button" className="inline-flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none cursor-pointer">
+                  <Info className="w-4 h-4 shrink-0" />
+                </button>
               </h2>
+
+              {/* Hover Tooltip on (i) button */}
+              {isCountryTitleTooltipHovered && (
+                <div className="absolute left-0 top-full mt-2 px-3 py-1.5 bg-[#0D212C] text-white text-xs font-normal rounded-lg shadow-xl z-50 whitespace-nowrap animate-in fade-in duration-150">
+                  Hover over any data field to see the sources from where this information has been extracted.
+                  <div className="absolute bottom-full left-6 -translate-x-1/2 border-4 border-transparent border-b-[#0D212C]" />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -2624,34 +3083,48 @@ export default function Catalogue() {
                         </div>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        {country.spendCapita}
+                        <CountrySourceCell country={country} field="spendCapita">
+                          <span>{country.spendCapita}</span>
+                        </CountrySourceCell>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        {country.population}
+                        <CountrySourceCell country={country} field="population">
+                          <span>{country.population}</span>
+                        </CountrySourceCell>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        {country.totalSpend}
+                        <CountrySourceCell country={country} field="totalSpend">
+                          <span>{country.totalSpend}</span>
+                        </CountrySourceCell>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        {country.digitalShare}
+                        <CountrySourceCell country={country} field="digitalShare">
+                          <span>{country.digitalShare}</span>
+                        </CountrySourceCell>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        {country.obtainableSlice}
+                        <CountrySourceCell country={country} field="obtainableSlice">
+                          <span>{country.obtainableSlice}</span>
+                        </CountrySourceCell>
                       </td>
                       {/* Deal Anchor in primary color (#ED4D19) */}
                       <td className="py-4 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
-                        {country.dealAnchor}
+                        <CountrySourceCell country={country} field="dealAnchor">
+                          <span>{country.dealAnchor}</span>
+                        </CountrySourceCell>
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
-                          country.confidence === 'High'
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                            : country.confidence === 'Medium'
-                            ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                            : 'bg-red-50 text-red-600 border border-red-200'
-                        }`}>
-                          {country.confidence}
-                        </span>
+                        <CountrySourceCell country={country} field="confidence">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
+                            country.confidence === 'High'
+                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                              : country.confidence === 'Medium'
+                              ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                              : 'bg-red-50 text-red-600 border border-red-200'
+                          }`}>
+                            {country.confidence}
+                          </span>
+                        </CountrySourceCell>
                       </td>
                     </tr>
                   ))}
@@ -3079,7 +3552,7 @@ export default function Catalogue() {
                 <input
                   type="number"
                   value={editingSolution.score}
-                  onChange={(e) => setEditingSolution({ ...editingSolution, score: e.target.value })}
+                  onChange={(e) => setEditingSolution({ ...editingSolution, score: Number(e.target.value) || 0 })}
                   className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs font-normal focus:outline-none focus:border-gray-300"
                 />
               </div>

@@ -65,7 +65,7 @@ export default function BuildRequest() {
     reportType: 'Health Tech Landscape Report',
     geography: [] as string[],
     domains: [] as string[],
-    depth: 'Deep Dive',
+    depth: 'Quick Overview',
     focusLens: [] as string[],
     additionalInstructions: '',
     files: [] as File[]
@@ -211,7 +211,7 @@ export default function BuildRequest() {
   };
 
   const handleBack = () => {
-    const hasChanges = inputs.geography.length > 0 || inputs.domains.length > 0 || inputs.depth !== 'Deep Dive' || inputs.focusLens.length > 0 || inputs.additionalInstructions || inputs.files.length > 0;
+    const hasChanges = inputs.geography.length > 0 || inputs.domains.length > 0 || inputs.depth !== 'Quick Overview' || inputs.focusLens.length > 0 || inputs.additionalInstructions || inputs.files.length > 0;
     if (hasChanges) {
       setShowCancelModal(true);
     } else {
@@ -568,7 +568,7 @@ export default function BuildRequest() {
               )}
             </div>
 
-            {/* Report Depth (Deep Dive selected by default, softer text and dark grey titles) */}
+            {/* Report Depth (Quick Overview selected by default, softer text and dark grey titles) */}
             <div>
               <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
                 <span>Report Depth</span>
@@ -577,9 +577,9 @@ export default function BuildRequest() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { title: 'Deep Dive', time: '30 – 45 mins', pages: '~60 pages' },
+                  { title: 'Quick Overview', time: '10 – 15 mins', pages: '~20 pages' },
                   { title: 'Standard Analysis', time: '20 – 30 mins', pages: '~40 pages' },
-                  { title: 'Quick Overview', time: '10 – 15 mins', pages: '~20 pages' }
+                  { title: 'Deep Dive', time: '30 – 45 mins', pages: '~60 pages' }
                 ].map(option => (
                   <div 
                     key={option.title}
