@@ -76,7 +76,7 @@ function NumericStepperInput({
 
   return (
     <div className="flex items-center gap-1.5 shrink-0">
-      <div className="h-[26px] flex items-center bg-white border border-gray-200 hover:border-gray-300 focus-within:border-gray-400 rounded-lg px-2 transition-colors">
+      <div className="h-[26px] flex items-center bg-white border border-gray-200 rounded-lg px-2">
         {prefix && (
           <span className="text-[11px] text-gray-400 font-normal mr-1 select-none">
             {prefix}
@@ -157,7 +157,7 @@ export default function UsageInsights() {
       setAppliedAvgTokens(formAvgTokens);
       setAppliedReportsPerWeek(formReportsPerWeek);
       setIsRecalculating(false);
-    }, 350);
+    }, 800);
   };
 
   // Live Calculated metrics derived from APPLIED state
@@ -279,9 +279,9 @@ export default function UsageInsights() {
           Value/ROI
         </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-          {/* Left Column: Assumptions Table Card (5 cols on lg) */}
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-gray-200/90 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between space-y-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+          {/* Left Column: Assumptions Table Card (50% width on lg) */}
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between space-y-2">
             <div className="divide-y divide-gray-100">
               {/* Row 1: Hours spent on manual research */}
               <div className="py-1 flex items-center justify-between gap-3 first:pt-0">
@@ -380,17 +380,16 @@ export default function UsageInsights() {
             </div>
           </div>
 
-          {/* Right Column: Unified Financial Impact & ROI Section with Middle Line Separator */}
-          <div
-            className={`lg:col-span-7 bg-white rounded-2xl border border-gray-200/90 shadow-xs p-3.5 sm:p-4.5 grid grid-rows-2 divide-y divide-gray-100 transition-all duration-300 relative overflow-hidden ${
-              isRecalculating
-                ? 'opacity-50 scale-[0.99] ring-2 ring-[#00C3CB]/40'
-                : 'opacity-100 scale-100 ring-0'
-            }`}
-          >
-            {/* Subtle pulse/wave effect when recalculating */}
+          {/* Right Column: Unified Financial Impact & ROI Section (50% width on lg) */}
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-xs p-3.5 sm:p-4.5 grid grid-rows-2 divide-y divide-gray-100 transition-all duration-300 relative overflow-hidden">
+            {/* Loading Animation & Text during Recalculate */}
             {isRecalculating && (
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00C3CB]/15 to-transparent animate-pulse pointer-events-none" />
+              <div className="absolute inset-0 bg-white/95 backdrop-blur-2xs rounded-2xl flex flex-col items-center justify-center z-20 space-y-2.5 transition-all">
+                <div className="w-6 h-6 border-2 border-gray-200 border-t-[#ED4D19] rounded-full animate-spin" />
+                <span className="text-xs font-medium text-gray-600 font-['Poppins']">
+                  Recalculating value/roi...
+                </span>
+              </div>
             )}
 
             {/* Top Row: Manual cost vs AI cost separated by vertical line (Exact 50% height) */}
