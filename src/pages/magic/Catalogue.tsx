@@ -585,6 +585,112 @@ function InstantTooltip({
   );
 }
 
+// Explanation helper for Solution AI Score
+export const getSolutionScoreExplanation = (s: { name: string; score?: number }) => {
+
+  switch (s.name) {
+    case 'InsurTech & Reimbursement':
+      return 'High automation potential in payer-provider claims reconciliation with low technical friction and strong integration APIs.';
+    case 'Remote Patient Monitoring':
+      return 'High clinical telemetry demand and established RPM reimbursement codes across GCC public health networks.';
+    case 'Hospital Ops & Clinical Workflow':
+      return 'Exceptional operational ROI and rapid bed turnaround efficiency with high readiness for ambient intelligence.';
+    case 'Population Health & Analytics':
+      return 'Strong public health mandate for epidemiological surveillance, risk stratification, and preventive intervention.';
+    case 'Drug Discovery':
+      return 'High innovation multiplier with genomic biomarker matching, balanced by extended regulatory trial phases.';
+    case 'EMR & Interoperability':
+      return 'Core infrastructure layer with high switching cost, standard FHIR/HL7 connectivity, and enterprise maturity.';
+    case 'Pharmacy & Medication':
+      return 'High transactional volume with automated prescription verification, subject to national drug formulary compliance.';
+    case 'Home & Community Care':
+      return 'Decentralized care expansion with mobile offline logging, balancing patient engagement with connectivity limits.';
+    default:
+      return 'Weighted AI assessment across clinical depth, interoperability, market adoption, execution risk, and compliance maturity.';
+  }
+};
+
+// Rich Tooltip for Solution Score and Revenue with Explanation and Source
+function SolutionMetricTooltip({
+  title,
+  explanation,
+  source,
+  children,
+  className = "",
+}: {
+  title: string;
+  explanation: string;
+  source: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [coords, setCoords] = useState<{ x: number; y: number; placeAbove: boolean } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const placeAbove = rect.top > 120;
+    const tooltipWidth = 280;
+    let x = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (x + tooltipWidth > window.innerWidth - 16) {
+      x = Math.max(16, window.innerWidth - tooltipWidth - 16);
+    }
+    setCoords({
+      x: Math.max(16, x),
+      y: placeAbove ? window.innerHeight - rect.top + 6 : rect.bottom + 6,
+      placeAbove,
+    });
+  };
+
+  const handleMouseLeave = () => setCoords(null);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScroll = () => setCoords(null);
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`inline-block ${className}`}
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed pointer-events-none z-[99999] w-[280px] p-3 bg-white text-[#0D212C] text-left rounded-xl shadow-xl border border-gray-200/90 animate-in fade-in duration-150 normal-case select-none"
+          style={{
+            left: `${coords.x}px`,
+            ...(coords.placeAbove
+              ? { bottom: `${coords.y}px` }
+              : { top: `${coords.y}px` }),
+          }}
+        >
+          <div className="text-xs font-semibold text-[#0D212C] mb-1 leading-snug">
+            {title}
+          </div>
+          <p className="text-[11px] text-gray-600 leading-relaxed mb-2 font-normal">
+            {explanation}
+          </p>
+          <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px]">
+            <span className="text-gray-400 font-medium">Source</span>
+            <span className="text-blue-600 font-normal truncate max-w-[190px]">{source}</span>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 // Country Field Sources Dictionary matching accurate sources with custom tooltips
 const COUNTRY_FIELD_SOURCES: Record<string, Record<string, { title: string; source: string; link: string }>> = {
   'United Arab Emirates': {
@@ -2601,14 +2707,13 @@ export default function Catalogue() {
                           <ArrowUpDown className={`w-3.5 h-3.5 ${solutionsSort.column === 'components' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors shrink-0`} />
                         </div>
                       </th>
-                      <th className="py-3 px-3.5 font-normal w-[10%]">CONSTRAINTS</th>
                       <th className="py-3 px-3.5 font-normal text-right w-[4%]">ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                     {paginatedSolutions.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-12 text-center text-gray-400 text-sm">
+                        <td colSpan={8} className="py-12 text-center text-gray-400 text-sm">
                           No solutions found matching the search or filters.
                         </td>
                       </tr>
@@ -2668,33 +2773,40 @@ export default function Catalogue() {
                             </span>
                           </td>
 
-                          {/* Score */}
-                          <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-gray-700 whitespace-nowrap">
-                            {solution.score}
+                          {/* Score with Explanation & Source Tooltip */}
+                          <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-gray-700 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <SolutionMetricTooltip
+                              title={`AI Feasibility Score · ${solution.score} / 100`}
+                              explanation={getSolutionScoreExplanation(solution)}
+                              source="M42 AI Multi-Factor Evaluation Model 2025"
+                            >
+                              <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                                {solution.score}
+                              </span>
+                            </SolutionMetricTooltip>
                           </td>
 
-                          {/* Revenue */}
-                          <td className="py-3.5 px-3.5 whitespace-nowrap min-w-0">
-                            <div className="flex flex-col leading-tight">
-                              <span className="text-[0.8125rem] font-normal text-[#0D212C]">{solution.revenue3Yr}</span>
-                              <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
-                                ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M / yr
-                              </span>
-                            </div>
+                          {/* Revenue with Explanation & Source Tooltip */}
+                          <td className="py-3.5 px-3.5 whitespace-nowrap min-w-0" onClick={(e) => e.stopPropagation()}>
+                            <SolutionMetricTooltip
+                              title={`3-Year Revenue · ${solution.revenue3Yr}`}
+                              explanation="Expected cumulative 3-year revenue across sellable catalogue countries based on deal anchors, win rates, and depth multipliers."
+                              source="M42 Commercial GTM Pipeline & Deal Database 2025"
+                            >
+                              <div className="flex flex-col leading-tight cursor-help group/rev">
+                                <span className="text-[0.8125rem] font-normal text-[#0D212C] group-hover/rev:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                                  {solution.revenue3Yr}
+                                </span>
+                                <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
+                                  ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M / yr
+                                </span>
+                              </div>
+                            </SolutionMetricTooltip>
                           </td>
 
                           {/* Comp Count */}
                           <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-[#0D212C] whitespace-nowrap">
                             {solution.compCount}
-                          </td>
-
-                          {/* Constraints (1 line with instant tooltip) */}
-                          <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0">
-                            <InstantTooltip content={getSolutionConstraints(solution)} className="w-full min-w-0">
-                              <span className="truncate block leading-relaxed">
-                                {getSolutionConstraints(solution)}
-                              </span>
-                            </InstantTooltip>
                           </td>
 
                           {/* Action Column - 3-dot menu */}

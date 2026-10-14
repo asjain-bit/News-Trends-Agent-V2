@@ -579,8 +579,44 @@ export default function GtmInsights() {
   const [hoveredCellBasis, setHoveredCellBasis] = useState<CellBasisDetails | null>(null);
   const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null);
 
+  // Separate overlay for Market Fit explainer (Matching Image 2)
+  const [marketFitModalOpen, setMarketFitModalOpen] = useState(false);
+  const [marketFitPopoverPos, setMarketFitPopoverPos] = useState<{ top: number; left: number } | null>(null);
+  const marketFitHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const filtersOverlayRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMarketFitMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
+    if (marketFitHideTimeoutRef.current) {
+      clearTimeout(marketFitHideTimeoutRef.current);
+      marketFitHideTimeoutRef.current = null;
+    }
+    setHoveredCellBasis(null);
+    setPopoverPos(null);
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const popoverWidth = 340;
+    let left = rect.left + rect.width / 2 - popoverWidth / 2;
+    if (left < 16) left = 16;
+    if (left + popoverWidth > window.innerWidth - 16) {
+      left = window.innerWidth - popoverWidth - 16;
+    }
+
+    const approxHeight = 310;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const isAbove = spaceBelow < approxHeight + 16 && rect.top > approxHeight + 16;
+    const top = isAbove ? rect.top - approxHeight - 8 : rect.bottom + 8;
+
+    setMarketFitPopoverPos({ top, left });
+  };
+
+  const handleMarketFitMouseLeave = () => {
+    if (marketFitHideTimeoutRef.current) clearTimeout(marketFitHideTimeoutRef.current);
+    marketFitHideTimeoutRef.current = setTimeout(() => {
+      setMarketFitPopoverPos(null);
+    }, 200);
+  };
 
   const handleCellMouseEnter = (e: React.MouseEvent<HTMLButtonElement>, basis: CellBasisDetails) => {
     if (hideTimeoutRef.current) {
@@ -1303,6 +1339,8 @@ export default function GtmInsights() {
                           {/* Country Cells with Plain Box Colors */}
                           {MATRIX_COUNTRIES.map((cnt) => {
                             const cell = row.cells[cnt] || {};
+                            const fitNum = cell.fit ? parseInt(cell.fit.match(/\d+/)?.[0] || '3', 10) : 3;
+                            const winRate = 20 + 10 * fitNum;
 
                             return (
                               <td key={cnt} className="py-2 px-1.5 text-center">
@@ -1322,13 +1360,32 @@ export default function GtmInsights() {
                                     onClick={() =>
                                       setSelectedCellBasis(getMatrixCellBasis(row.name, cnt, cell))
                                     }
-                                    className="w-full bg-white hover:bg-gray-50/90 border border-gray-200/90 rounded-lg py-1.5 px-1.5 flex flex-col items-center justify-center cursor-pointer shadow-2xs transition-all group/btn"
+                                    className="w-full bg-[#B2E9ED]/55 hover:bg-[#B2E9ED]/85 border border-[#96D9DE] rounded-xl py-2 px-1.5 flex flex-col items-center justify-center cursor-pointer shadow-2xs transition-all group/btn"
                                   >
-                                    <span className="text-xs font-semibold text-[#0D212C] group-hover/btn:text-[#ED4D19] transition-colors">
+                                    <span className="text-[13px] font-bold text-[#0D212C] leading-tight">
                                       {cell.rev}
                                     </span>
-                                    <span className="text-[9.5px] text-gray-400 font-normal mt-0.5">
-                                      {cell.fit}
+                                    <span className="text-[10px] text-[#0D212C]/90 font-normal mt-0.5 whitespace-nowrap flex items-center justify-center gap-1">
+                                      <span
+                                        className="underline decoration-dotted decoration-gray-600 hover:text-black cursor-pointer font-medium"
+                                        onMouseEnter={(e) => {
+                                          e.stopPropagation();
+                                          handleMarketFitMouseEnter(e);
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.stopPropagation();
+                                          handleMarketFitMouseLeave();
+                                        }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setMarketFitModalOpen(true);
+                                        }}
+                                        title="Click or hover to learn more about Market Fit"
+                                      >
+                                        Market Fit {fitNum}
+                                      </span>
+                                      <span>·</span>
+                                      <span>Win rate {winRate}%</span>
                                     </span>
                                   </button>
                                 ) : (
@@ -1510,6 +1567,74 @@ export default function GtmInsights() {
                       Solution deck
                     </button>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Market Fit Explainer Overlay (Matching Image 2 Exactly) */}
+            {(marketFitModalOpen || marketFitPopoverPos) && (
+              <div 
+                className={
+                  marketFitModalOpen
+                    ? "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/15 backdrop-blur-2xs"
+                    : "fixed z-[100] pointer-events-auto"
+                }
+                style={
+                  marketFitModalOpen 
+                    ? undefined 
+                    : {
+                        top: `${marketFitPopoverPos?.top ?? 100}px`,
+                        left: `${marketFitPopoverPos?.left ?? 100}px`,
+                      }
+                }
+                onClick={() => {
+                  setMarketFitModalOpen(false);
+                  setMarketFitPopoverPos(null);
+                }}
+              >
+                <div 
+                  className="bg-white rounded-2xl border border-gray-200/90 shadow-2xl max-w-sm w-full p-5 space-y-3.5 text-left font-sans select-none animate-in fade-in zoom-in-95 duration-150"
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseEnter={() => {
+                    if (marketFitHideTimeoutRef.current) {
+                      clearTimeout(marketFitHideTimeoutRef.current);
+                      marketFitHideTimeoutRef.current = null;
+                    }
+                  }}
+                  onMouseLeave={handleMarketFitMouseLeave}
+                >
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-base font-bold text-[#0D212C] leading-snug">
+                      Market Fit
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMarketFitModalOpen(false);
+                        setMarketFitPopoverPos(null);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer -mr-1 -mt-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="h-px bg-gray-100 w-full" />
+
+                  <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                    The AI rates how well the solution suits each catalogue country, 1 (Poor) to 5 (Excellent), with a reason.
+                  </p>
+
+                  <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                    <strong className="text-gray-900 font-semibold">Shown here:</strong> Market Fit for this solution in this country, with the win rate it sets.
+                  </p>
+
+                  <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                    <strong className="text-gray-900 font-semibold">Win rate:</strong> Market Fit sets the chance of winning a deal – 1 → 30%, 2 → 40%, 3 → 50%, 4 → 60%, 5 → 70% (win rate = 20% + 10% × fit). The win rate drives the revenue estimate.
+                  </p>
+
+                  <p className="text-xs text-gray-500 leading-relaxed font-normal pt-1">
+                    Not part of Score / 100 or the weightage. Restricted and not-sellable countries are excluded.
+                  </p>
                 </div>
               </div>
             )}

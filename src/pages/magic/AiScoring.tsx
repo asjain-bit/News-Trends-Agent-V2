@@ -794,6 +794,313 @@ function MarketFitHeaderInfoTooltip() {
   );
 }
 
+// Explanation helper for Solution AI Score
+export const getSolutionScoreExplanation = (s: { name: string; score?: number }) => {
+
+  switch (s.name) {
+    case 'InsurTech & Reimbursement':
+      return 'High automation potential in payer-provider claims reconciliation with low technical friction and strong integration APIs.';
+    case 'Remote Patient Monitoring':
+      return 'High clinical telemetry demand and established RPM reimbursement codes across GCC public health networks.';
+    case 'Hospital Ops & Clinical Workflow':
+      return 'Exceptional operational ROI and rapid bed turnaround efficiency with high readiness for ambient intelligence.';
+    case 'Population Health & Analytics':
+      return 'Strong public health mandate for epidemiological surveillance, risk stratification, and preventive intervention.';
+    case 'Drug Discovery':
+      return 'High innovation multiplier with genomic biomarker matching, balanced by extended regulatory trial phases.';
+    case 'EMR & Interoperability':
+      return 'Core infrastructure layer with high switching cost, standard FHIR/HL7 connectivity, and enterprise maturity.';
+    case 'Pharmacy & Medication':
+      return 'High transactional volume with automated prescription verification, subject to national drug formulary compliance.';
+    case 'Home & Community Care':
+      return 'Decentralized care expansion with mobile offline logging, balancing patient engagement with connectivity limits.';
+    default:
+      return 'Weighted AI assessment across clinical depth, interoperability, market adoption, execution risk, and compliance maturity.';
+  }
+};
+
+// Nested Tooltip for Country Fit Score inside Market Fit Tooltip (Requirement 5)
+function CountryFitScoreTooltip({
+  country,
+  fitLabel,
+  solutionName,
+  children
+}: {
+  country: string;
+  fitLabel: string;
+  solutionName: string;
+  children: React.ReactNode;
+}) {
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const getFitExplanation = (country: string, label: string) => {
+    if (label.startsWith('5')) {
+      return `Exceptional health system fit in ${country}. Direct alignment with national health digitisation mandates, high payer acceptance, and favorable clinical adoption economics.`;
+    }
+    if (label.startsWith('4')) {
+      return `Strong market fit in ${country}. Well-defined clinical pathways and private/public payer support, with standard 3-6 month integration onboarding.`;
+    }
+    if (label.startsWith('3')) {
+      return `Moderate market fit in ${country}. Addressable opportunity in specialized care networks; regulatory accreditation required before enterprise rollout.`;
+    }
+    return `Baseline market fit in ${country} with conditional pilot eligibility.`;
+  };
+
+  const getFitSource = (country: string) => {
+    switch (country) {
+      case 'Saudi Arabia':
+        return 'Saudi MoH & Vision 2030 Health Sector Transformation Program';
+      case 'UAE':
+        return 'DoH Abu Dhabi / DHA Dubai Health Regulation Guidelines 2025';
+      case 'Qatar':
+        return 'Qatar Ministry of Public Health (MoPH) E-Health Strategy';
+      case 'Kuwait':
+        return 'Kuwait Ministry of Health Digital Transformation Advisory';
+      case 'Bahrain':
+        return 'Bahrain Supreme Council of Health Regulatory Framework';
+      case 'Oman':
+        return 'Oman Vision 2040 Healthcare Modernisation Protocol';
+      default:
+        return 'GCC Health Council Market Readiness Index 2025';
+    }
+  };
+
+  const getFitSourceUrl = (country: string) => {
+    switch (country) {
+      case 'Saudi Arabia':
+        return 'https://www.moh.gov.sa/en/Vision2030';
+      case 'UAE':
+        return 'https://www.doh.gov.ae';
+      case 'Qatar':
+        return 'https://www.moph.gov.qa';
+      case 'Kuwait':
+        return 'https://www.moh.gov.kw';
+      case 'Bahrain':
+        return 'https://www.moh.gov.bh';
+      case 'Oman':
+        return 'https://www.moh.gov.om';
+      default:
+        return 'https://ghc.sa/en';
+    }
+  };
+
+  const handleMouseEnter = () => {
+    clearCloseTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const tooltipWidth = 260;
+    let left = rect.right + 6;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = rect.left - tooltipWidth - 6;
+    }
+    setCoords({
+      top: Math.max(16, rect.top - 10),
+      left: Math.max(16, left),
+    });
+  };
+
+  const handleMouseLeave = () => {
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearCloseTimeout();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScroll = () => {
+      clearCloseTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      clearCloseTimeout();
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="inline-block"
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          onMouseEnter={clearCloseTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed pointer-events-auto z-[100000] w-[260px] p-2.5 bg-white text-[#0D212C] text-left rounded-xl shadow-2xl border border-gray-200 animate-in fade-in duration-100 normal-case select-none"
+          style={{ top: `${coords.top}px`, left: `${coords.left}px` }}
+        >
+          <div className="text-[11px] font-semibold text-[#0D212C] mb-1 leading-snug">
+            {country} · Fit {fitLabel}
+          </div>
+          <p className="text-[10px] text-gray-600 leading-relaxed mb-2 font-normal">
+            {getFitExplanation(country, fitLabel)}
+          </p>
+          <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[9px]">
+            <span className="text-gray-400 font-medium">Source</span>
+            <a
+              href={getFitSourceUrl(country)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline font-normal truncate max-w-[185px] cursor-pointer"
+            >
+              <span className="truncate">{getFitSource(country)}</span>
+              <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
+            </a>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+// Rich Tooltip for Solution Score and Revenue with Explanation and Source (Requirement 6)
+function SolutionMetricTooltip({
+  title,
+  explanation,
+  source,
+  children,
+  className = "",
+}: {
+  title: string;
+  explanation: string;
+  source: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [coords, setCoords] = useState<{ x: number; y: number; placeAbove: boolean } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const getMetricSourceUrl = (src: string) => {
+    if (src.includes('Prioritisation')) return 'https://m42.ae';
+    if (src.includes('GTM') || src.includes('TAM')) return 'https://www.who.int/data/gho';
+    return 'https://m42.ae';
+  };
+
+  const handleMouseEnter = () => {
+    clearCloseTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const placeAbove = rect.top > 120;
+    const tooltipWidth = 280;
+    let x = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (x + tooltipWidth > window.innerWidth - 16) {
+      x = Math.max(16, window.innerWidth - tooltipWidth - 16);
+    }
+    setCoords({
+      x: Math.max(16, x),
+      y: placeAbove ? window.innerHeight - rect.top + 6 : rect.bottom + 6,
+      placeAbove,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearCloseTimeout();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScroll = () => {
+      clearCloseTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      clearCloseTimeout();
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [coords]);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`inline-block ${className}`}
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          onMouseEnter={clearCloseTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed pointer-events-auto z-[99999] w-[280px] p-3 bg-white text-[#0D212C] text-left rounded-xl shadow-xl border border-gray-200/90 animate-in fade-in duration-150 normal-case select-none"
+          style={{
+            left: `${coords.x}px`,
+            ...(coords.placeAbove
+              ? { bottom: `${coords.y}px` }
+              : { top: `${coords.y}px` }),
+          }}
+        >
+          <div className="text-xs font-semibold text-[#0D212C] mb-1 leading-snug">
+            {title}
+          </div>
+          <p className="text-[11px] text-gray-600 leading-relaxed mb-2 font-normal">
+            {explanation}
+          </p>
+          <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px]">
+            <span className="text-gray-400 font-medium">Source</span>
+            <a
+              href={getMetricSourceUrl(source)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline font-normal truncate max-w-[190px] cursor-pointer"
+            >
+              <span className="truncate">{source}</span>
+              <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
+            </a>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 // Custom Tooltip for Market Fit Row Cells (Image 3)
 function MarketFitCellTooltip({
   solution,
@@ -857,7 +1164,7 @@ function MarketFitCellTooltip({
     clearHideTimeout();
     hideTimeoutRef.current = setTimeout(() => {
       setCoords(null);
-    }, 200);
+    }, 450);
   };
 
   useEffect(() => {
@@ -936,7 +1243,13 @@ function MarketFitCellTooltip({
                 {mf.topSellableCountries.map((c) => (
                   <tr key={c.rank} className="hover:bg-gray-50/50 transition-colors">
                     <td className="py-1.5 text-[#0D212C] font-normal">{c.rank}. {c.country}</td>
-                    <td className="py-1.5 text-gray-700 font-normal">{c.fitLabel}</td>
+                    <td className="py-1.5 text-gray-700 font-normal">
+                      <CountryFitScoreTooltip country={c.country} fitLabel={c.fitLabel} solutionName={solution.name}>
+                        <span className="cursor-help underline decoration-dotted decoration-gray-400 hover:text-cyan-700 transition-colors">
+                          {c.fitLabel}
+                        </span>
+                      </CountryFitScoreTooltip>
+                    </td>
                     <td className="py-1.5 text-gray-700 font-normal">{c.winRate}</td>
                     <td className="py-1.5 text-gray-900 font-bold text-right">{c.revenue}</td>
                   </tr>
@@ -1695,19 +2008,33 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
 
                           {/* Revenue Cell */}
                           <td className="py-4 px-4 text-left">
-                            <div className="flex flex-col leading-tight">
-                              <span className="font-normal text-[0.8125rem] text-[#0D212C]">
-                                {solution.revenue3Yr}
-                              </span>
-                              <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
-                                ${(solution.revenueNum / 3).toFixed(1)}M per year
-                              </span>
-                            </div>
+                            <SolutionMetricTooltip
+                              title={`${solution.name} · 3-Year Addressable Revenue`}
+                              explanation={`Projected cumulative revenue across top sellable markets based on weighted win rate (${solution.marketFit.winRate}) and catalog TAM model.`}
+                              source="GTM Revenue Pipeline Model 2026 & Addressable Market TAM"
+                            >
+                              <div className="flex flex-col leading-tight cursor-help underline decoration-dotted decoration-gray-300">
+                                <span className="font-normal text-[0.8125rem] text-[#0D212C]">
+                                  {solution.revenue3Yr}
+                                </span>
+                                <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 whitespace-nowrap">
+                                  ${(solution.revenueNum / 3).toFixed(1)}M per year
+                                </span>
+                              </div>
+                            </SolutionMetricTooltip>
                           </td>
 
                           {/* Score / 100 */}
                           <td className="py-4 px-6 text-right font-semibold text-[0.875rem] text-[#ED4D19]">
-                            {solution.score}
+                            <SolutionMetricTooltip
+                              title={`${solution.name} · Solution Score (${solution.score}/100)`}
+                              explanation={getSolutionScoreExplanation({ name: solution.name, score: solution.score })}
+                              source="M42 AI Prioritisation Engine (Clinical, Interop, Feasibility)"
+                            >
+                              <span className="cursor-help underline decoration-dotted decoration-[#ED4D19]/40 hover:opacity-80">
+                                {solution.score}
+                              </span>
+                            </SolutionMetricTooltip>
                           </td>
                         </tr>
                       ))

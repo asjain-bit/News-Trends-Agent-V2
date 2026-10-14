@@ -1,12 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   DollarSign, 
   FileText, 
   BarChart3,
   ChevronUp,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
+  Calendar,
+  ChevronDown as ChevronDownSmall
 } from 'lucide-react';
+
+const OCTOBER_WEEKS = [
+  { label: 'Week 1: Oct 4 – Oct 10, 2026', short: 'Oct 4 – Oct 10, 2026' },
+  { label: 'Week 2: Oct 11 – Oct 17, 2026 (Current)', short: 'Oct 11 – Oct 17, 2026' },
+  { label: 'Week 3: Oct 18 – Oct 24, 2026', short: 'Oct 18 – Oct 24, 2026' },
+  { label: 'Week 4: Oct 25 – Oct 31, 2026', short: 'Oct 25 – Oct 31, 2026' },
+];
+
 
 interface NumericStepperInputProps {
   value: number;
@@ -118,6 +128,22 @@ function NumericStepperInput({
 }
 
 export default function UsageInsights() {
+  // Week selector state (October 2026 only, Sunday–Saturday)
+  const [selectedWeekIdx, setSelectedWeekIdx] = useState<number>(1); // Default: Week 2 (Current)
+  const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
+  const weekDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!weekDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (weekDropdownRef.current && !weekDropdownRef.current.contains(e.target as Node)) {
+        setWeekDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [weekDropdownOpen]);
+
   // Input assumptions state (Form inputs)
   const [formHours, setFormHours] = useState<number>(4);
   const [formCostPerHour, setFormCostPerHour] = useState<number>(30);
@@ -210,6 +236,49 @@ export default function UsageInsights() {
 
   return (
     <div className="w-full px-5 py-6 md:py-8 space-y-6">
+      {/* 1. Overview Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+            Overview
+          </h2>
+
+          {/* Week Selector — top right, October 2026 only */}
+          <div className="relative" ref={weekDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setWeekDropdownOpen((o) => !o)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span>{OCTOBER_WEEKS[selectedWeekIdx].short}</span>
+              <ChevronDownSmall className={`w-3.5 h-3.5 text-gray-400 transition-transform ${weekDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {weekDropdownOpen && (
+              <div className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 animate-in fade-in slide-in-from-top-1 duration-100">
+                {OCTOBER_WEEKS.map((week, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setSelectedWeekIdx(idx);
+                      setWeekDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-xs transition-colors cursor-pointer ${
+                      selectedWeekIdx === idx
+                        ? 'text-[#ED4D19] font-semibold bg-orange-50'
+                        : 'text-gray-700 font-normal hover:bg-gray-50'
+                    }`}
+                  >
+                    {week.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
       {/* 1. Top KPI Cards (Matching Overview Page Card Design Exactly, Without Consumption Heading) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Card 1: Outputs Generated */}
@@ -272,6 +341,7 @@ export default function UsageInsights() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* 2. Value/ROI Section */}
       <div className="space-y-3">

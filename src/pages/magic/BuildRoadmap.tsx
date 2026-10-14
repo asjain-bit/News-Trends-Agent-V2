@@ -1156,27 +1156,27 @@ export default function BuildRoadmap() {
                               </span>
                             </div>
 
-                            {/* Interactive Tooltip on hover */}
+                            {/* Interactive Tooltip on hover (Light Theme) */}
                             {hoveredBubble?.id === comp.id && (
-                              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-56 bg-[#0D212C] text-white p-3 rounded-xl shadow-xl text-left z-50 pointer-events-none">
-                                <div className="text-xs font-semibold">{comp.name}</div>
-                                <div className="text-[10px] text-gray-300 mb-2">{comp.subtitle}</div>
-                                <div className="grid grid-cols-2 gap-1.5 text-[11px] pt-1 border-t border-gray-700/60">
+                              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-56 bg-white border border-gray-200/90 text-[#0D212C] p-3 rounded-xl shadow-xl text-left z-50 pointer-events-none animate-in fade-in duration-150">
+                                <div className="text-xs font-semibold text-[#0D212C]">{comp.name}</div>
+                                <div className="text-[10px] text-gray-500 mb-2">{comp.subtitle}</div>
+                                <div className="grid grid-cols-2 gap-1.5 text-[11px] pt-1.5 border-t border-gray-100">
                                   <div>
-                                    <span className="text-gray-400 block text-[9px] uppercase">Revenue</span>
-                                    <span className="font-semibold text-emerald-400">{formatRevenue(allocatedRev)}</span>
+                                    <span className="text-gray-400 block text-[9px] uppercase font-medium">Revenue</span>
+                                    <span className="font-semibold text-emerald-600">{formatRevenue(allocatedRev)}</span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-400 block text-[9px] uppercase">Priority</span>
-                                    <span className="font-medium text-amber-300">{formatPriority(comp)}</span>
+                                    <span className="text-gray-400 block text-[9px] uppercase font-medium">Priority</span>
+                                    <span className="font-medium text-amber-600">{formatPriority(comp)}</span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-400 block text-[9px] uppercase">Reuse</span>
-                                    <span>{actualReuse} solutions</span>
+                                    <span className="text-gray-400 block text-[9px] uppercase font-medium">Reuse</span>
+                                    <span className="text-gray-700 font-medium">{actualReuse} solutions</span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-400 block text-[9px] uppercase">Quadrant</span>
-                                    <span className="font-medium text-blue-300">{quad}</span>
+                                    <span className="text-gray-400 block text-[9px] uppercase font-medium">Quadrant</span>
+                                    <span className="font-medium text-blue-600">{quad}</span>
                                   </div>
                                 </div>
                               </div>
