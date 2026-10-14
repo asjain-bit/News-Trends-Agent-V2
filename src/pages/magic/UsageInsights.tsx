@@ -175,14 +175,19 @@ function NumericStepperInput({
   );
 }
 
+const CURRENT_MONTH = 9; // October (0-indexed: 9 = October)
+const CURRENT_YEAR = 2026;
+
 export default function UsageInsights() {
-  // Selected date state (defaults to October 14, 2026)
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(2026, 9, 14));
-  const [viewMonth, setViewMonth] = useState<number>(9); // 0-indexed: 9 = October
-  const [viewYear, setViewYear] = useState<number>(2026);
+  // Selected date state (defaults to October 14, 2026, restricted to current month only)
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(CURRENT_YEAR, CURRENT_MONTH, 14));
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Month and Year are strictly locked to current month (October 2026)
+  const viewMonth = CURRENT_MONTH;
+  const viewYear = CURRENT_YEAR;
 
   // Derive Monday-to-Sunday week
   const selectedWeek = useMemo(() => getMondayToSundayWeek(selectedDate), [selectedDate]);
@@ -199,22 +204,13 @@ export default function UsageInsights() {
     return () => document.removeEventListener('mousedown', handler);
   }, [calendarOpen]);
 
-  const handlePrevMonth = () => {
-    if (viewMonth === 0) {
-      setViewMonth(11);
-      setViewYear((y) => y - 1);
-    } else {
-      setViewMonth((m) => m - 1);
+  const handleSelectDate = (date: Date) => {
+    // Strictly restrict selection to current month only
+    if (date.getMonth() !== CURRENT_MONTH || date.getFullYear() !== CURRENT_YEAR) {
+      return;
     }
-  };
-
-  const handleNextMonth = () => {
-    if (viewMonth === 11) {
-      setViewMonth(0);
-      setViewYear((y) => y + 1);
-    } else {
-      setViewMonth((m) => m + 1);
-    }
+    setSelectedDate(date);
+    setCalendarOpen(false);
   };
 
   const calendarDays = useMemo(() => {
@@ -361,11 +357,7 @@ export default function UsageInsights() {
           <div className="relative" ref={calendarRef}>
             <button
               type="button"
-              onClick={() => {
-                setViewMonth(selectedDate.getMonth());
-                setViewYear(selectedDate.getFullYear());
-                setCalendarOpen((o) => !o);
-              }}
+              onClick={() => setCalendarOpen((o) => !o)}
               className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5 text-[#ED4D19] shrink-0" />
@@ -377,24 +369,29 @@ export default function UsageInsights() {
 
             {calendarOpen && (
               <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-3.5 animate-in fade-in zoom-in-95 duration-100 select-none">
-                {/* Header: Month / Year with Navigation */}
+                {/* Header: Locked to Current Month Only (October 2026) */}
                 <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-100">
                   <button
                     type="button"
-                    onClick={handlePrevMonth}
-                    className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                    aria-label="Previous month"
+                    disabled
+                    className="p-1 rounded-lg text-gray-300 opacity-25 cursor-not-allowed"
+                    title="Selection limited to current month only"
+                    aria-label="Previous month unavailable"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <div className="text-xs font-semibold text-[#0D212C] font-['Poppins']">
-                    {MONTH_NAMES[viewMonth]} {viewYear}
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0D212C] font-['Poppins']">
+                    <span>{MONTH_NAMES[viewMonth]} {viewYear}</span>
+                    <span className="text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                      Current
+                    </span>
                   </div>
                   <button
                     type="button"
-                    onClick={handleNextMonth}
-                    className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                    aria-label="Next month"
+                    disabled
+                    className="p-1 rounded-lg text-gray-300 opacity-25 cursor-not-allowed"
+                    title="Selection limited to current month only"
+                    aria-label="Next month unavailable"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -420,11 +417,11 @@ export default function UsageInsights() {
                     const isSunday = dayOfWeek === 0;
 
                     let bgClass = '';
-                    if (isInSelected) {
+                    if (cell.isCurrentMonth && isInSelected) {
                       bgClass = 'bg-orange-50';
                       if (isMonday) bgClass += ' rounded-l-full';
                       if (isSunday) bgClass += ' rounded-r-full';
-                    } else if (isInHovered) {
+                    } else if (cell.isCurrentMonth && isInHovered) {
                       bgClass = 'bg-orange-50/50';
                       if (isMonday) bgClass += ' rounded-l-full';
                       if (isSunday) bgClass += ' rounded-r-full';
@@ -434,26 +431,25 @@ export default function UsageInsights() {
                       <div
                         key={idx}
                         className={`h-8 flex items-center justify-center relative transition-colors ${bgClass}`}
-                        onMouseEnter={() => setHoveredDate(cell.date)}
+                        onMouseEnter={() => {
+                          if (cell.isCurrentMonth) setHoveredDate(cell.date);
+                        }}
                         onMouseLeave={() => setHoveredDate(null)}
                       >
                         <button
                           type="button"
-                          onClick={() => {
-                            setSelectedDate(cell.date);
-                            setCalendarOpen(false);
-                          }}
-                          className={`w-7 h-7 flex items-center justify-center text-xs transition-all cursor-pointer rounded-full ${
-                            isSelected
-                              ? 'bg-[#ED4D19] text-white font-semibold shadow-xs ring-2 ring-orange-200'
+                          disabled={!cell.isCurrentMonth}
+                          onClick={() => handleSelectDate(cell.date)}
+                          className={`w-7 h-7 flex items-center justify-center text-xs transition-all rounded-full ${
+                            !cell.isCurrentMonth
+                              ? 'text-gray-200 cursor-not-allowed pointer-events-none select-none opacity-30'
+                              : isSelected
+                              ? 'bg-[#ED4D19] text-white font-semibold shadow-xs ring-2 ring-orange-200 cursor-pointer'
                               : isInSelected
-                              ? cell.isCurrentMonth
-                                ? 'text-orange-950 font-medium hover:bg-orange-100/70'
-                                : 'text-orange-400 font-normal hover:bg-orange-100/70'
-                              : cell.isCurrentMonth
-                              ? 'text-gray-700 font-normal hover:bg-gray-100'
-                              : 'text-gray-300 font-normal hover:bg-gray-100'
+                              ? 'text-orange-950 font-medium hover:bg-orange-100/70 cursor-pointer'
+                              : 'text-gray-700 font-normal hover:bg-gray-100 cursor-pointer'
                           }`}
+                          title={!cell.isCurrentMonth ? 'Only current month dates are available' : undefined}
                         >
                           {cell.dayNum}
                         </button>
@@ -473,11 +469,8 @@ export default function UsageInsights() {
                   <button
                     type="button"
                     onClick={() => {
-                      const today = new Date(2026, 9, 14);
-                      setSelectedDate(today);
-                      setViewMonth(today.getMonth());
-                      setViewYear(today.getFullYear());
-                      setCalendarOpen(false);
+                      const today = new Date(CURRENT_YEAR, CURRENT_MONTH, 14);
+                      handleSelectDate(today);
                     }}
                     className="text-[#ED4D19] hover:underline font-medium text-[11px] shrink-0 ml-2 cursor-pointer"
                   >
