@@ -1237,6 +1237,111 @@ function DescriptionCell({
   );
 }
 
+// AI Positioning Explanations Map
+export const POSITIONING_EXPLANATIONS: Record<
+  string,
+  {
+    type: 'Common' | 'Mixed' | 'Distinctive';
+    summary: string;
+    aiRationale: string;
+    factorBasis: string;
+  }
+> = {
+  'EMR & Interoperability': {
+    type: 'Common',
+    summary: 'Commodity Baseline Infrastructure',
+    aiRationale: 'Standard electronic health record adapters and FHIR interfaces widely commoditized across major EHR market vendors with low technological differentiation.',
+    factorBasis: 'Assigned Common based on F3 Competitiveness (Score: 1/5 - high vendor substitutability) and standard interoperability open APIs.'
+  },
+  'Hospital Ops & Clinical Workflow': {
+    type: 'Mixed',
+    summary: 'Hybrid Core & Workflow Orchestration',
+    aiRationale: 'Pairs commercial market shift-scheduling and HL7 messaging modules with proprietary localized bed-allocation heuristics and multi-ward patient transfer orchestration.',
+    factorBasis: 'Assigned Mixed based on balanced F3 Competitiveness (Score: 3/5) and high cross-functional clinical applicability.'
+  },
+  'Home & Community Care': {
+    type: 'Mixed',
+    summary: 'Hybrid Remote Dispatch & Protocols',
+    aiRationale: 'Combines standard mobile field check-in mechanisms with specialized multilingual nurse triage protocols and custom home-visit risk routing.',
+    factorBasis: 'Assigned Mixed reflecting moderate F3 Competitiveness (Score: 3/5) with localized workflow customization.'
+  },
+  'Remote Patient Monitoring': {
+    type: 'Distinctive',
+    summary: 'Proprietary AI Triage & Telemetry Moat',
+    aiRationale: 'Proprietary edge-biometric continuous streaming algorithms, automated Arabic conversational triage, and validated clinical anomaly detection create high technological defensibility.',
+    factorBasis: 'Assigned Distinctive based on F3 Competitiveness (Score: 5/5) and defensible Class II clinical sensor pipeline.'
+  },
+  'InsurTech & Reimbursement': {
+    type: 'Distinctive',
+    summary: 'Proprietary Regional Rule Engine',
+    aiRationale: 'Encapsulates >1,400 localized GCC health payer billing regulations, real-time pre-authorization ML scoring, and automated denial recovery models difficult for generic competitors to replicate.',
+    factorBasis: 'Assigned Distinctive based on F3 Competitiveness (Score: 4/5) and high barriers to entry in regional multi-payer compliance.'
+  },
+  'Drug Discovery': {
+    type: 'Distinctive',
+    summary: 'Advanced AI Molecular Target Modeling',
+    aiRationale: 'Deep neural graph models for virtual screening and binding affinity prediction yielding defensible preclinical IP and proprietary target discovery pipelines.',
+    factorBasis: 'Assigned Distinctive based on F3 Competitiveness (Score: 5/5) and unique molecular computational biology architecture.'
+  },
+  'Pharmacy & Medication': {
+    type: 'Mixed',
+    summary: 'Integrated Fulfillment & Interaction Logic',
+    aiRationale: 'Standard commercial e-prescribing and medication fulfillment protocols integrated with specialized adverse drug event alerts and regional formulary cross-checks.',
+    factorBasis: 'Assigned Mixed based on standard fulfillment baseline with custom clinical alert overlays.'
+  },
+  'Population Health & Analytics': {
+    type: 'Distinctive',
+    summary: 'Longitudinal Cohort Risk AI Models',
+    aiRationale: 'Localized predictive risk stratification indexes trained on regional demographic registries to predict multi-year disease trajectory and prevent hospitalizations.',
+    factorBasis: 'Assigned Distinctive based on proprietary cohort models and unique regional longitudinal dataset integration.'
+  }
+};
+
+// Interactive AI Positioning Tooltip Component
+export function PositioningCellTooltip({
+  solutionName,
+  positioning,
+  alignUpward = false,
+}: {
+  solutionName: string;
+  positioning: 'Common' | 'Mixed' | 'Distinctive';
+  alignUpward?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(containerRef, () => setIsOpen(false));
+
+  const info = POSITIONING_EXPLANATIONS[solutionName] || {
+    type: positioning,
+    summary: positioning === 'Distinctive' ? 'Proprietary AI Models & Defensible IP' : positioning === 'Mixed' ? 'Hybrid Architecture & Customized Workflows' : 'Commodity Baseline Healthcare Infrastructure',
+    aiRationale: positioning === 'Distinctive' ? 'Evaluated by AI as having high technological defensibility, proprietary algorithms, or regulatory moats.' : positioning === 'Mixed' ? 'Combines standardized market vendor modules with proprietary workflow orchestration.' : 'Standardized commodity capability widely available across healthcare vendors.',
+    factorBasis: `Assigned ${positioning} based on AI scoring across F3 Competitiveness & F4 Reusability.`
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative inline-block select-none"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <span className="inline-flex items-center bg-gray-100 hover:bg-gray-200/80 text-gray-700 px-2.5 py-0.5 rounded-full text-[0.72rem] font-normal border border-gray-200/70 cursor-help transition-colors">
+        <span>{positioning}</span>
+      </span>
+
+      {isOpen && (
+        <div 
+          className={`absolute left-0 w-64 p-2.5 bg-gray-900 text-white text-[11px] leading-relaxed rounded-lg shadow-xl z-50 text-left pointer-events-none animate-in fade-in zoom-in-95 duration-150 font-sans ${
+            alignUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+          }`}
+        >
+          {info.aiRationale}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const COUNTRY_FLAG_MAP: Record<string, string> = {
   'United Arab Emirates': 'ae',
   'UAE': 'ae',
@@ -2183,11 +2288,13 @@ export default function Catalogue() {
                   </span>
                 </div>
 
-                {/* Positioning chip below title (without positioning text) */}
+                {/* Positioning chip below title with AI tooltip */}
                 <div>
-                  <span className="inline-block px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-normal border border-gray-200/70">
-                    {viewingSolution.positioning}
-                  </span>
+                  <PositioningCellTooltip
+                    solutionName={viewingSolution.name}
+                    positioning={viewingSolution.positioning}
+                    alignUpward={false}
+                  />
                 </div>
 
                 {/* Summary text with font weight reduced by 1 unit and font size reduced by 2 units */}
@@ -2537,11 +2644,13 @@ export default function Catalogue() {
                             />
                           </td>
 
-                          {/* Positioning */}
-                          <td className="py-3.5 px-3.5 min-w-0">
-                            <span className="inline-block bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-[0.72rem] font-normal border border-gray-200/70 truncate max-w-full">
-                              {solution.positioning}
-                            </span>
+                          {/* Positioning with AI Assessment Tooltip */}
+                          <td className="py-3.5 px-3.5 min-w-0" onClick={(e) => e.stopPropagation()}>
+                            <PositioningCellTooltip
+                              solutionName={solution.name}
+                              positioning={solution.positioning}
+                              alignUpward={idx >= 4}
+                            />
                           </td>
 
                           {/* Status */}

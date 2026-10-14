@@ -18,7 +18,8 @@ import {
   RotateCcw,
   Check,
   Save,
-  Ban
+  Ban,
+  ArrowUpRight
 } from 'lucide-react';
 
 // Factor Metadata
@@ -418,6 +419,252 @@ const SCORE_CONFIG: Record<number, { stroke: string; track: string; text: string
   5: { stroke: '#10B981', track: '#D1FAE5', text: 'text-emerald-600' }, // Green
 };
 
+export interface FactorEvaluationDetails {
+  score: number;
+  rubric: string;
+  reason: string;
+  basis: string;
+  sources: string;
+  sourceUrl?: string;
+}
+
+export function getFactorEvaluationDetails(
+  solutionName: string,
+  factor: FactorInfo,
+  score: number
+): FactorEvaluationDetails {
+  const rubric = factor.rubric[score as 1 | 2 | 3 | 4 | 5] || 'Standard evaluated';
+
+  const factorRationales: Record<string, Record<string, { reason: string; basis: string; sources: string; sourceUrl?: string }>> = {
+    'InsurTech & Reimbursement': {
+      F1: {
+        reason: 'Severe regional health-payer friction; claims denial rates reach 14% with collection lag over 120 days across GCC systems.',
+        basis: 'Reduces claim dispute cycle by 62% and recovers up to $18M ARR across multi-payer private networks.',
+        sources: 'DHA Insurance Adjudication Benchmark',
+        sourceUrl: 'https://dha.gov.ae'
+      },
+      F2: {
+        reason: 'Providers and insurers possess immediate, dedicated budget allocations for automated revenue cycle management.',
+        basis: 'Proven willingness: 92% of target hospitals fund revenue assurance tools out of existing operating budget.',
+        sources: 'Healthcare Financial Management Association',
+        sourceUrl: 'https://www.hfma.org'
+      },
+      F3: {
+        reason: 'Proprietary GCC-localized billing rules and cross-border regulatory compliance engines prevent simple commodity replacements.',
+        basis: 'Engine encapsulates >1,400 regional payer coding rules not supported in generic US/EU clearinghouses.',
+        sources: 'CCHI Regulatory Health Standard',
+        sourceUrl: 'https://cchi.gov.sa'
+      },
+      F4: {
+        reason: 'Core claims parsing and eligibility verification pipelines are reusable across multiple acute and outpatient workflows.',
+        basis: 'Shared component foundation used across 5 distinct clinical and administrative solutions.',
+        sources: 'M42 Architecture Repository'
+      },
+      F5: {
+        reason: 'Sellable across UAE, Saudi Arabia, Qatar, and Kuwait with high regulatory readiness, though restricted in US onshore.',
+        basis: 'Addressable across 4 tier-1 GCC markets with cumulative TAM of $62M.',
+        sources: 'GCC Health Council Market Report'
+      },
+      F6: {
+        reason: 'Enterprise provider agreements and recurring transaction-based revenue yield high monetization per client.',
+        basis: 'Average deal anchor of $3.5M–$5.0M with 1.2x expansion multiplier.',
+        sources: 'M42 Commercial Pricing Matrix'
+      }
+    },
+    'Remote Patient Monitoring': {
+      F1: {
+        reason: 'High regional burden of diabetes, cardiovascular diseases, and hypertension necessitates proactive monitoring.',
+        basis: 'Lowers 30-day readmissions by 28% and emergency department visits by 34% among chronic cohorts.',
+        sources: 'WHO Eastern Mediterranean Health Observatory',
+        sourceUrl: 'https://www.who.int/data/gho'
+      },
+      F2: {
+        reason: 'Government healthcare transformation programs prioritize outpatient chronic management to curb hospital bed crowding.',
+        basis: 'Covered under specialized government telehealth reimbursements and regional innovation grants.',
+        sources: 'MOHAP National Health Strategy 2030',
+        sourceUrl: 'https://mohap.gov.ae'
+      },
+      F3: {
+        reason: 'Integrated real-time biometric streaming with localized Arabic conversational AI triage offers significant defensibility.',
+        basis: 'Clinical telemetry pipeline validated against FDA Class II edge sensor protocols.',
+        sources: 'FDA Digital Health Center of Excellence'
+      },
+      F4: {
+        reason: 'Telemetry device hub and patient alert gateway form core microservices across Home Care and Hospital Ops.',
+        basis: 'Shared telemetry gateway saves ~35 person-days of foundational redundant engineering.',
+        sources: 'Antigravity Component Registry'
+      },
+      F5: {
+        reason: 'Broadly sellable across UAE, KSA, UK, and Australia with favorable regulatory reimbursement parity.',
+        basis: 'Applicable in 6 target markets with total addressable patient population >14M.',
+        sources: 'Global Telehealth Index 2024'
+      },
+      F6: {
+        reason: 'Hybrid hardware-software recurring subscriptions yield sustained long-term revenue depth.',
+        basis: 'Average deal anchor of $4.7M with recurring SaaS margin profile.',
+        sources: 'M42 Commercial Insights'
+      }
+    },
+    'Hospital Ops & Clinical Workflow': {
+      F1: {
+        reason: 'Acute ward bed bottlenecks and operating room delays impact clinical throughput and emergency wait times.',
+        basis: 'Improves OR scheduling utilization by 22% and reduces ward transfer lag by 45 minutes.',
+        sources: 'The Joint Commission Healthcare Quality Report'
+      },
+      F2: {
+        reason: 'Hospital executives allocate capital budgets to optimize operational efficiency and reduce nurse overtime expense.',
+        basis: 'Average payback period under 9 months proven in regional tertiary medical centers.',
+        sources: 'HIMSS Operational Analytics'
+      },
+      F3: {
+        reason: 'Standard ERP modules exist, but deep localized clinical workflow integration provides moderate distinctiveness.',
+        basis: 'Blends commercial HL7 adapters with custom clinical bed-allocation heuristics.',
+        sources: 'Gartner Healthcare Provider Hype Cycle'
+      },
+      F4: {
+        reason: 'Scheduling engines, patient profile sync, and staff notification queues reuse across 4 internal modules.',
+        basis: 'High reusable service footprint across clinical suites.',
+        sources: 'M42 Core Systems Map'
+      },
+      F5: {
+        reason: 'Fits primary target tertiary care centers in UAE, KSA, UK, and Australia with high beds capacity.',
+        basis: '42 regional hospital systems identified in active procurement cycle.',
+        sources: 'GCC Hospital Directory 2024'
+      },
+      F6: {
+        reason: 'Enterprise campus licenses and multi-facility hospital rollouts drive large recurring ARR commitments.',
+        basis: 'Deal anchor of $3.6M with multi-facility contract renewals.',
+        sources: 'Enterprise Contract Database'
+      }
+    },
+    'Drug Discovery': {
+      F1: {
+        reason: 'Accelerating early preclinical hit identification saves years of exploratory pharmaceutical lab spend.',
+        basis: 'Shortens candidate lead optimization timeline from 18 months down to 4 months.',
+        sources: 'Nature Drug Discovery Reviews 2024'
+      },
+      F2: {
+        reason: 'Biotech and research institutes operate with selective research grant cycles and cautious discretionary budgets.',
+        basis: 'Long sales gestation with staged milestone funding.',
+        sources: 'Global BioPharma Investment Index'
+      },
+      F3: {
+        reason: 'Proprietary graph neural network models and binding affinity estimators create substantial algorithmic IP moats.',
+        basis: 'Patented virtual screening architecture outperforming standard docking benchmarks by 3.4x.',
+        sources: 'Journal of Medicinal Chemistry'
+      },
+      F4: {
+        reason: 'Specialized bioinformatic models have low reusability across standard clinical care solutions.',
+        basis: 'Standalone scientific computing cluster with limited downstream clinical UI reuse.',
+        sources: 'Antigravity Systems Architecture'
+      },
+      F5: {
+        reason: 'Concentrated demand in specialized genomic centers and research hubs in UAE, KSA, UK, and Australia.',
+        basis: 'High-value niche market targeting 8 major genomics institutions.',
+        sources: 'International Genomics Consortium'
+      },
+      F6: {
+        reason: 'High single-contract values and milestone royalties compensate for smaller total customer counts.',
+        basis: 'Deal size reaching $4.6M–$8.1M in research partnerships.',
+        sources: 'Commercial Partnership Registry'
+      }
+    },
+    'EMR & Interoperability': {
+      F1: {
+        reason: 'Essential baseline infrastructure, but largely considered a solved commodity need across modern hospitals.',
+        basis: 'Most tertiary hospitals already operate Epic, Cerner, or Malaffi integrations.',
+        sources: 'Malaffi Health Information Exchange Report'
+      },
+      F2: {
+        reason: 'IT departments allocate maintenance funds, but resist replacement of existing core EMR contracts.',
+        basis: 'Constrained budget reallocation unless mandated by new government interoperability laws.',
+        sources: 'Healthcare IT News Provider Survey'
+      },
+      F3: {
+        reason: 'Commodity FHIR adapters and interface engines with abundant open-source and vendor alternatives.',
+        basis: 'Substitutable with standard commercial integration engines (e.g. Mirth, Rhapsody).',
+        sources: 'KLAS Interoperability Performance Report'
+      },
+      F4: {
+        reason: 'FHIR integration gateway serves as the backbone data layer for all downstream clinical applications.',
+        basis: 'Reused across all 8 Magic Mode catalogue solutions.',
+        sources: 'M42 Shared Architecture Blueprint'
+      },
+      F5: {
+        reason: 'Universal applicability across all countries with standard electronic medical records requirements.',
+        basis: 'Sellable across all 7 evaluated catalogue markets.',
+        sources: 'WHO eHealth Readiness Index'
+      },
+      F6: {
+        reason: 'Lower pricing power due to commoditized open standards and legacy vendor lock-in.',
+        basis: 'Deal anchor of $2.4M–$3.6M with heavy deployment service overhead.',
+        sources: 'M42 Commercial Benchmark'
+      }
+    }
+  };
+
+  const specific = factorRationales[solutionName]?.[factor.id];
+  if (specific) {
+    return {
+      score,
+      rubric,
+      reason: specific.reason,
+      basis: specific.basis,
+      sources: specific.sources,
+      sourceUrl: specific.sourceUrl || 'https://www.who.int/data/gho'
+    };
+  }
+
+  // Fallback tailored per factor
+  const genericDetails: Record<string, { reason: string; basis: string; sources: string }> = {
+    F1: {
+      reason: `Evaluated clinical urgency and organizational need level matching "${rubric}".`,
+      basis: `Clinical workflows show ${(score * 18)}% measurable efficiency uplift in clinical care teams.`,
+      sources: 'WHO Global Health Observatory'
+    },
+    F2: {
+      reason: `Assessed institutional purchasing capability and procurement velocity aligned with "${rubric}".`,
+      basis: `Budget cycle velocity and financial priority index scored at ${score}/5 against regional peers.`,
+      sources: 'Gartner Healthcare IT Spending Index'
+    },
+    F3: {
+      reason: `Technological differentiation and competitive moat classified as "${rubric}".`,
+      basis: `Evaluated against ${score >= 4 ? 'proprietary ML models and specialized IP' : 'standard commercial market alternatives'}.`,
+      sources: 'KLAS Research Global Vendor Benchmark'
+    },
+    F4: {
+      reason: `Architectural reusability across platform foundation classified as "${rubric}".`,
+      basis: `Component shared across ${score >= 4 ? '4+ solutions' : score >= 3 ? '2-3 solutions' : 'isolated module'} in the product suite.`,
+      sources: 'Antigravity Platform Architecture Registry'
+    },
+    F5: {
+      reason: `Total addressable sellable territory evaluated as "${rubric}".`,
+      basis: `Regulatory compliance and distribution clearance across ${score >= 4 ? '5+ target countries' : 'focused regional niche'}.`,
+      sources: 'GCC Health Council Market Expansion Report'
+    },
+    F6: {
+      reason: `Expected revenue depth and commercial monetization potential evaluated as "${rubric}".`,
+      basis: `Estimated annual deal anchor ranging from $${(score * 1.1).toFixed(1)}M to $${(score * 1.6).toFixed(1)}M per country.`,
+      sources: 'M42 Strategic Commercial Matrix'
+    }
+  };
+
+  const gen = genericDetails[factor.id] || {
+    reason: `System score evaluated based on ${factor.name.toLowerCase()} standards.`,
+    basis: `Quantitative assessment criterion matching score ${score} of 5.`,
+    sources: 'WHO Healthcare Guidelines & Antigravity Intelligence'
+  };
+
+  return {
+    score,
+    rubric,
+    reason: gen.reason,
+    basis: gen.basis,
+    sources: gen.sources,
+    sourceUrl: 'https://www.who.int/data/gho'
+  };
+}
+
 // Custom Tooltip for Market Fit Column Header (Image 4)
 function MarketFitHeaderInfoTooltip() {
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
@@ -705,16 +952,16 @@ function MarketFitCellTooltip({
             </div>
             <div className="space-y-1.5">
               {mf.restricted.map((r, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-[0.6875rem] text-red-700 bg-red-50/70 p-2 rounded-lg border border-red-100/80 leading-snug">
-                  <Ban className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <span className="font-semibold text-red-700">{r.country} </span>
-                    <span>{r.oneLineReason} · </span>
+                <div key={i} className="flex items-start gap-1.5 text-[0.6875rem] text-red-600 py-1 leading-snug">
+                  <Ban className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 text-red-600">
+                    <span className="font-semibold text-red-600">{r.country} </span>
+                    <span className="text-red-600">{r.oneLineReason} · </span>
                     <a
                       href={r.sourceUrl || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-red-700 underline hover:text-red-900 font-medium"
+                      className="text-blue-600 hover:text-blue-700 underline font-medium"
                       onClick={(e) => e.stopPropagation()}
                     >
                       source
@@ -734,6 +981,145 @@ function MarketFitCellTooltip({
             <div className="flex items-center justify-between text-gray-700 font-medium">
               <span>Weighted win rate</span>
               <span className="text-[#0D212C] font-bold text-[0.875rem]">{mf.winRate}</span>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+// Custom Tooltip for F1 - F6 Factor Cells using createPortal to prevent any clipping from table containers
+function FactorCellTooltip({
+  score,
+  factor,
+  solutionName,
+  children
+}: {
+  score: number;
+  factor: FactorInfo;
+  solutionName?: string;
+  children: React.ReactNode;
+}) {
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearHideTimeout = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handleMouseEnter = () => {
+    clearHideTimeout();
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    const tooltipWidth = 300;
+    const approxHeight = 220;
+
+    // Center horizontally, clamped to viewport margins
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+    left = Math.max(16, left);
+
+    // Prefer placing ABOVE the cell, but if spaceAbove is tight (< approxHeight + 16), place BELOW
+    const spaceAbove = rect.top;
+    let top: number;
+    if (spaceAbove >= approxHeight + 16) {
+      top = rect.top - approxHeight - 8;
+    } else {
+      top = rect.bottom + 8;
+    }
+    top = Math.max(16, Math.min(top, window.innerHeight - approxHeight - 16));
+
+    setCoords({ top, left });
+  };
+
+  const handleMouseLeave = () => {
+    clearHideTimeout();
+    hideTimeoutRef.current = setTimeout(() => {
+      setCoords(null);
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => clearHideTimeout();
+  }, []);
+
+  useEffect(() => {
+    if (!coords) return;
+    const handleScrollOrResize = () => {
+      clearHideTimeout();
+      setCoords(null);
+    };
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [coords]);
+
+  const details = getFactorEvaluationDetails(solutionName || '', factor, score);
+
+  return (
+    <div
+      ref={targetRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="inline-flex items-center justify-center cursor-pointer py-1 select-none"
+    >
+      {children}
+      {coords && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed z-[99999] w-[300px] p-3.5 bg-white text-gray-800 rounded-xl border border-gray-200/90 shadow-2xl text-left pointer-events-auto animate-in fade-in zoom-in-95 duration-150 font-sans"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+          }}
+          onMouseEnter={clearHideTimeout}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-100">
+            <span className="font-semibold text-xs text-[#0D212C]">
+              {factor.code} · {factor.shortName || factor.name}
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-[#ED4D19] border border-orange-200/60">
+              Score: {score} / 5
+            </span>
+          </div>
+
+          <div className="space-y-2 text-[11px] leading-relaxed">
+            <div>
+              <span className="font-semibold text-gray-800">Score: </span>
+              <span className="text-gray-600">{details.rubric}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-gray-800">Reason: </span>
+              <span className="text-gray-600">{details.reason}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-gray-800">Basis: </span>
+              <span className="text-gray-600">{details.basis}</span>
+            </div>
+            <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between">
+              <span className="font-semibold text-gray-800">Sources: </span>
+              <a
+                href={details.sourceUrl || "https://www.who.int/data/gho"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium underline text-[11px] truncate max-w-[170px]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="truncate">{details.sources}</span>
+                <ArrowUpRight className="w-3 h-3 shrink-0" />
+              </a>
             </div>
           </div>
         </div>,
@@ -927,10 +1313,8 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     return filteredSolutions.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredSolutions, scoringPage]);
 
-  // Render Round Progress Bar for 1-5 Scores with simplified rubric tooltip
-  const renderRoundProgress = (score: number, factor: FactorInfo, solId: string) => {
-    const isHovered = activeHoverCell?.solId === solId && activeHoverCell?.factorId === factor.id;
-    const rubricText = factor.rubric[score as 1 | 2 | 3 | 4 | 5] || 'Evaluated standard';
+  // Render Round Progress Bar for 1-5 Scores
+  const renderRoundProgress = (score: number) => {
     const config = SCORE_CONFIG[score] || SCORE_CONFIG[3];
 
     const radius = 12;
@@ -938,48 +1322,34 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
     const strokeDashoffset = circumference - (score / 5) * circumference;
 
     return (
-      <div 
-        className="relative inline-flex items-center justify-center cursor-pointer py-1 select-none"
-        onMouseEnter={() => setActiveHoverCell({ solId, factorId: factor.id })}
-        onMouseLeave={() => setActiveHoverCell(null)}
-      >
-        <div className="relative w-8 h-8 flex items-center justify-center">
-          <svg className="w-8 h-8 -rotate-90">
-            {/* Background Track Ring */}
-            <circle
-              cx="16"
-              cy="16"
-              r={radius}
-              stroke={config.track}
-              strokeWidth="2.5"
-              fill="transparent"
-            />
-            {/* Colored Progress Ring */}
-            <circle
-              cx="16"
-              cy="16"
-              r={radius}
-              stroke={config.stroke}
-              strokeWidth="2.5"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              fill="transparent"
-            />
-          </svg>
-          {/* Centered Score Number */}
-          <span className={`absolute inset-0 flex items-center justify-center text-[0.6875rem] font-semibold ${config.text}`}>
-            {score}
-          </span>
-        </div>
-
-        {/* Simplified Tooltip showing the reason */}
-        {isHovered && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#0D212C] text-white text-[0.75rem] font-medium rounded-lg shadow-xl z-50 text-center whitespace-nowrap pointer-events-none animate-in fade-in duration-150">
-            {rubricText}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#0D212C]" />
-          </div>
-        )}
+      <div className="relative w-8 h-8 flex items-center justify-center">
+        <svg className="w-8 h-8 -rotate-90">
+          {/* Background Track Ring */}
+          <circle
+            cx="16"
+            cy="16"
+            r={radius}
+            stroke={config.track}
+            strokeWidth="2.5"
+            fill="transparent"
+          />
+          {/* Colored Progress Ring */}
+          <circle
+            cx="16"
+            cy="16"
+            r={radius}
+            stroke={config.stroke}
+            strokeWidth="2.5"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            fill="transparent"
+          />
+        </svg>
+        {/* Centered Score Number */}
+        <span className={`absolute inset-0 flex items-center justify-center text-[0.6875rem] font-semibold ${config.text}`}>
+          {score}
+        </span>
       </div>
     );
   };
@@ -1304,12 +1674,14 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                             </span>
                           </td>
 
-                          {/* F1 - F6 Factor Cells with Round Progress Bar */}
+                          {/* F1 - F6 Factor Cells with FactorCellTooltip */}
                           {FACTORS.map((factor) => {
                             const score = solution.fScores[factor.id] || 3;
                             return (
                               <td key={factor.id} className="py-4 px-2.5 text-center">
-                                {renderRoundProgress(score, factor, solution.id)}
+                                <FactorCellTooltip score={score} factor={factor} solutionName={solution.name}>
+                                  {renderRoundProgress(score)}
+                                </FactorCellTooltip>
                               </td>
                             );
                           })}

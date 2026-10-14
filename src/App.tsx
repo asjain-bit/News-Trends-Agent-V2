@@ -19,6 +19,7 @@ import AiScoring from './pages/magic/AiScoring';
 import Weightage from './pages/magic/Weightage';
 import BuildRoadmap from './pages/magic/BuildRoadmap';
 import GtmInsights from './pages/magic/GtmInsights';
+import UsageInsights from './pages/magic/UsageInsights';
 
 export default function App() {
   const { loadThreads, user } = useAppStore();
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="weightage" element={<Weightage />} />
         <Route path="build-roadmap" element={<BuildRoadmap />} />
         <Route path="gtm-insights" element={<GtmInsights />} />
+        <Route path="usage-insights" element={<UsageInsights />} />
 
         {/* Support prefixed /magic/* routes as well */}
         <Route path="magic/overview" element={<Overview />} />
@@ -57,6 +59,7 @@ export default function App() {
         <Route path="magic/weightage" element={<Weightage />} />
         <Route path="magic/roadmap" element={<BuildRoadmap />} />
         <Route path="magic/gtm-insights" element={<GtmInsights />} />
+        <Route path="magic/usage-insights" element={<UsageInsights />} />
       </Route>
     </Routes>
   );

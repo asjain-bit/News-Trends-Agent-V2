@@ -22,6 +22,7 @@ import {
   Star,
   Layers,
   BarChart2,
+  BarChart3,
   SlidersHorizontal,
   Map,
   Globe,
@@ -147,6 +148,7 @@ export default function Layout() {
     { id: 'ai-scoring', label: 'AI Scoring & Weightage', path: '/ai-scoring', icon: BarChart2 },
     { id: 'roadmap', label: 'Build Roadmap', path: '/build-roadmap', icon: Map },
     { id: 'gtm', label: 'GTM Insights', path: '/gtm-insights', icon: Globe },
+    { id: 'usage', label: 'Usage Insights', path: '/usage-insights', icon: BarChart3 },
   ];
 
   // Determine title based on route
@@ -156,6 +158,7 @@ export default function Layout() {
     if (location.pathname.includes('/ai-scoring')) return 'AI Scoring & Weightage';
     if (location.pathname.includes('/build-roadmap')) return 'Build Roadmap';
     if (location.pathname.includes('/gtm-insights')) return 'GTM Insights';
+    if (location.pathname.includes('/usage-insights')) return 'Usage Insights';
     if (location.pathname === '/new/tech') return 'Generate New Report';
     if (location.pathname.includes('/new')) return 'New Report';
     if (location.pathname.includes('/reports')) return 'All Reports';
@@ -483,7 +486,7 @@ export default function Layout() {
           </div>
           
           <div className="flex items-center gap-6">
-            {!location.pathname.startsWith('/new') && location.pathname !== '/' && !location.pathname.includes('/notifications') && !location.pathname.includes('/reports') && !location.pathname.includes('/catalogue') && !location.pathname.includes('/overview') && !location.pathname.includes('/ai-scoring') && !location.pathname.includes('/weightage') && !location.pathname.includes('/build-roadmap') && !location.pathname.includes('/gtm-insights') && (
+            {!location.pathname.startsWith('/new') && location.pathname !== '/' && !location.pathname.includes('/notifications') && !location.pathname.includes('/reports') && !location.pathname.includes('/catalogue') && !location.pathname.includes('/overview') && !location.pathname.includes('/ai-scoring') && !location.pathname.includes('/weightage') && !location.pathname.includes('/build-roadmap') && !location.pathname.includes('/gtm-insights') && !location.pathname.includes('/usage-insights') && (
               <div className="relative hidden md:block w-80">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 

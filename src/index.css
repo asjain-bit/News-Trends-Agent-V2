@@ -43,6 +43,10 @@
   --font-sans: 'Poppins', 'Calibri', 'Inter', system-ui, sans-serif;
 }
 
+:root {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);

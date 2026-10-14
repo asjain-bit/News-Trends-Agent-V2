@@ -21,7 +21,11 @@ import {
   Building2,
   Calendar,
   DollarSign,
-  Info
+  Info,
+  SlidersHorizontal,
+  ArrowUpRight,
+  X,
+  Ban
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMagicStore } from '../../store/magicStore';
@@ -287,8 +291,272 @@ const INITIAL_HISTORY: GtmHistoryItem[] = [
   },
 ];
 
+export interface MatrixCellData {
+  rev?: string;
+  revNum?: number;
+  fit?: string;
+  restricted?: boolean;
+}
+
+export interface MarketMatrixRow {
+  id: string;
+  name: string;
+  status: 'Completed' | 'In progress' | 'Prioritised' | 'New';
+  positioning: 'Distinctive' | 'Mixed' | 'Common';
+  total3Yr: string;
+  totalNum: number;
+  cells: Record<string, MatrixCellData>;
+}
+
+export const MATRIX_COUNTRIES = [
+  'United Arab Emirates',
+  'Saudi Arabia',
+  'United Kingdom',
+  'Australia',
+  'Qatar',
+  'Bahrain',
+  'Chad',
+];
+
+export interface CellBasisDetails {
+  solutionName: string;
+  countryName: string;
+  marketFit: string;
+  winRate: string;
+  dealAnchor: string;
+  depthMultiplier: string;
+  expectedRevenue: string;
+  formula: string;
+  rationale: string;
+}
+
+export const getMatrixCellBasis = (
+  solutionName: string,
+  countryName: string,
+  cell: MatrixCellData
+): CellBasisDetails => {
+  const rev = cell.rev || '$3.9M';
+  const fit = cell.fit || 'Fit 4 · Strong';
+
+  if (solutionName === 'Remote Patient Monitoring' && countryName === 'United Arab Emirates') {
+    return {
+      solutionName,
+      countryName,
+      marketFit: '5 · Excellent',
+      winRate: '70%',
+      dealAnchor: '$4.7M',
+      depthMultiplier: '1.2×',
+      expectedRevenue: '$3.9M',
+      formula: '$4.7M × 1.2 × 70%',
+      rationale: 'High chronic-disease burden and strong home-care programmes create direct demand.',
+    };
+  }
+
+  const anchorMap: Record<string, string> = {
+    'United Arab Emirates': '$4.7M',
+    'Saudi Arabia': '$5.0M',
+    'United Kingdom': '$5.5M',
+    'Australia': '$9.7M',
+    'Qatar': '$2.1M',
+    'Bahrain': '$360K',
+    'Chad': '$80K',
+  };
+
+  const anchor = anchorMap[countryName] || '$4.5M';
+  const fitText = fit.includes('5')
+    ? '5 · Excellent'
+    : fit.includes('4')
+    ? '4 · Strong'
+    : fit.includes('3')
+    ? '3 · Moderate'
+    : '2 · Weak';
+  const winRate = fit.includes('5')
+    ? '70%'
+    : fit.includes('4')
+    ? '60%'
+    : fit.includes('3')
+    ? '50%'
+    : '35%';
+  const formula = `${anchor} × 1.2 × ${winRate}`;
+
+  const rationaleMap: Record<string, string> = {
+    'Remote Patient Monitoring': 'High chronic-disease burden and strong home-care programmes create direct demand.',
+    'Population Health & Analytics': 'National health transformation initiative prioritizes population-level analytics and epidemiological surveillance.',
+    'Drug Discovery': 'Government-backed life sciences hub and clinical genomics trial investments driving enterprise adoption.',
+    'InsurTech & Reimbursement': 'Mandatory private health insurance and stringent claims adjudication mandates require automated pre-auth.',
+    'EMR & Interoperability': 'National interoperability mandate accelerating unified longitudinal health record integration across hospital networks.',
+    'Hospital Ops & Clinical Workflow': 'Tertiary healthcare capacity pressures driving demand for AI bed forecasting and ambient clinician triage.',
+    'Home & Community Care': 'Expanding community-first care models and aging population require decentralized caregiver workflow solutions.',
+    'Pharmacy & Medication': 'Centralized e-prescription compliance and counterfeit drug prevention driving unified formulary adoption.',
+  };
+
+  const rationale = rationaleMap[solutionName] || 'Market scale and addressable digital transformation budget support high-confidence monetization.';
+
+  return {
+    solutionName,
+    countryName,
+    marketFit: fitText,
+    winRate,
+    dealAnchor: anchor,
+    depthMultiplier: '1.2×',
+    expectedRevenue: rev,
+    formula,
+    rationale,
+  };
+};
+
+export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
+  {
+    id: 's4',
+    name: 'Remote Patient Monitoring',
+    status: 'Prioritised',
+    positioning: 'Distinctive',
+    total3Yr: '$26.7M',
+    totalNum: 26.7,
+    cells: {
+      'United Arab Emirates': { rev: '$3.9M', revNum: 3.9, fit: 'Fit 5 · Excellent' },
+      'Saudi Arabia': { rev: '$5.0M', revNum: 5.0, fit: 'Fit 5 · Excellent' },
+      'United Kingdom': { rev: '$5.5M', revNum: 5.5, fit: 'Fit 4 · Strong' },
+      'Australia': { rev: '$9.7M', revNum: 9.7, fit: 'Fit 4 · Strong' },
+      'Qatar': { rev: '$2.1M', revNum: 2.1, fit: 'Fit 4 · Strong' },
+      'Bahrain': { rev: '$360K', revNum: 0.36, fit: 'Fit 3 · Moderate' },
+      'Chad': {},
+    },
+  },
+  {
+    id: 's8',
+    name: 'Population Health & Analytics',
+    status: 'New',
+    positioning: 'Distinctive',
+    total3Yr: '$21.7M',
+    totalNum: 21.7,
+    cells: {
+      'United Arab Emirates': { rev: '$3.3M', revNum: 3.3, fit: 'Fit 5 · Excellent' },
+      'Saudi Arabia': { rev: '$3.6M', revNum: 3.6, fit: 'Fit 4 · Strong' },
+      'United Kingdom': { rev: '$4.6M', revNum: 4.6, fit: 'Fit 4 · Strong' },
+      'Australia': { rev: '$8.1M', revNum: 8.1, fit: 'Fit 4 · Strong' },
+      'Qatar': { rev: '$1.7M', revNum: 1.7, fit: 'Fit 4 · Strong' },
+      'Bahrain': { rev: '$300K', revNum: 0.3, fit: 'Fit 3 · Moderate' },
+      'Chad': { restricted: true },
+    },
+  },
+  {
+    id: 's6',
+    name: 'Drug Discovery',
+    status: 'New',
+    positioning: 'Distinctive',
+    total3Yr: '$20.3M',
+    totalNum: 20.3,
+    cells: {
+      'United Arab Emirates': { rev: '$2.8M', revNum: 2.8, fit: 'Fit 4 · Strong' },
+      'Saudi Arabia': { rev: '$3.6M', revNum: 3.6, fit: 'Fit 4 · Strong' },
+      'United Kingdom': { rev: '$4.6M', revNum: 4.6, fit: 'Fit 4 · Strong' },
+      'Australia': { rev: '$8.1M', revNum: 8.1, fit: 'Fit 4 · Strong' },
+      'Qatar': { rev: '$1.2M', revNum: 1.2, fit: 'Fit 2 · Weak' },
+      'Bahrain': {},
+      'Chad': {},
+    },
+  },
+  {
+    id: 's5',
+    name: 'InsurTech & Reimbursement',
+    status: 'In progress',
+    positioning: 'Distinctive',
+    total3Yr: '$20.1M',
+    totalNum: 20.1,
+    cells: {
+      'United Arab Emirates': { rev: '$2.6M', revNum: 2.6, fit: 'Fit 3 · Moderate' },
+      'Saudi Arabia': { rev: '$4.0M', revNum: 4.0, fit: 'Fit 4 · Strong' },
+      'United Kingdom': { rev: '$4.2M', revNum: 4.2, fit: 'Fit 3 · Moderate' },
+      'Australia': { rev: '$7.4M', revNum: 7.4, fit: 'Fit 3 · Moderate' },
+      'Qatar': { rev: '$1.6M', revNum: 1.6, fit: 'Fit 3 · Moderate' },
+      'Bahrain': { rev: '$330K', revNum: 0.33, fit: 'Fit 3 · Moderate' },
+      'Chad': {},
+    },
+  },
+  {
+    id: 's1',
+    name: 'EMR & Interoperability',
+    status: 'Completed',
+    positioning: 'Common',
+    total3Yr: '$19.1M',
+    totalNum: 19.1,
+    cells: {
+      'United Arab Emirates': { rev: '$2.4M', revNum: 2.4, fit: 'Fit 3 · Moderate' },
+      'Saudi Arabia': { rev: '$3.6M', revNum: 3.6, fit: 'Fit 4 · Strong' },
+      'United Kingdom': { rev: '$4.6M', revNum: 4.6, fit: 'Fit 4 · Strong' },
+      'Australia': { rev: '$6.8M', revNum: 6.8, fit: 'Fit 3 · Moderate' },
+      'Qatar': { rev: '$1.4M', revNum: 1.4, fit: 'Fit 3 · Moderate' },
+      'Bahrain': { rev: '$300K', revNum: 0.3, fit: 'Fit 3 · Moderate' },
+      'Chad': { rev: '$80K', revNum: 0.08, fit: 'Fit 2 · Weak' },
+    },
+  },
+  {
+    id: 's2',
+    name: 'Hospital Ops & Clinical Workflow',
+    status: 'In progress',
+    positioning: 'Mixed',
+    total3Yr: '$18.5M',
+    totalNum: 18.5,
+    cells: {
+      'United Arab Emirates': { rev: '$2.8M', revNum: 2.8, fit: 'Fit 4 · Strong' },
+      'Saudi Arabia': { rev: '$3.6M', revNum: 3.6, fit: 'Fit 4 · Strong' },
+      'United Kingdom': { rev: '$3.9M', revNum: 3.9, fit: 'Fit 3 · Moderate' },
+      'Australia': { rev: '$6.8M', revNum: 6.8, fit: 'Fit 3 · Moderate' },
+      'Qatar': { rev: '$1.4M', revNum: 1.4, fit: 'Fit 3 · Moderate' },
+      'Bahrain': {},
+      'Chad': {},
+    },
+  },
+  {
+    id: 's3',
+    name: 'Home & Community Care',
+    status: 'New',
+    positioning: 'Mixed',
+    total3Yr: '$15.5M',
+    totalNum: 15.5,
+    cells: {
+      'United Arab Emirates': { rev: '$2.5M', revNum: 2.5, fit: 'Fit 4 · Strong' },
+      'Saudi Arabia': { rev: '$2.7M', revNum: 2.7, fit: 'Fit 3 · Moderate' },
+      'United Kingdom': { rev: '$4.2M', revNum: 4.2, fit: 'Fit 4 · Strong' },
+      'Australia': { rev: '$6.1M', revNum: 6.1, fit: 'Fit 3 · Moderate' },
+      'Qatar': {},
+      'Bahrain': {},
+      'Chad': {},
+    },
+  },
+  {
+    id: 's7',
+    name: 'Pharmacy & Medication',
+    status: 'Prioritised',
+    positioning: 'Mixed',
+    total3Yr: '$11.3M',
+    totalNum: 11.3,
+    cells: {
+      'United Arab Emirates': { rev: '$2.1M', revNum: 2.1, fit: 'Fit 3 · Moderate' },
+      'Saudi Arabia': { rev: '$2.7M', revNum: 2.7, fit: 'Fit 3 · Moderate' },
+      'United Kingdom': { restricted: true },
+      'Australia': { rev: '$4.9M', revNum: 4.9, fit: 'Fit 2 · Weak' },
+      'Qatar': { rev: '$1.3M', revNum: 1.3, fit: 'Fit 3 · Moderate' },
+      'Bahrain': { rev: '$270K', revNum: 0.27, fit: 'Fit 3 · Moderate' },
+      'Chad': {},
+    },
+  },
+];
+
+export const MATRIX_TOTALS: Record<string, string> = {
+  'United Arab Emirates': '$22.5M',
+  'Saudi Arabia': '$28.8M',
+  'United Kingdom': '$31.6M',
+  'Australia': '$57.8M',
+  'Qatar': '$10.8M',
+  'Bahrain': '$1.6M',
+  'Chad': '$80K',
+  'Total': '$153.1M',
+};
+
 export default function GtmInsights() {
-  const [activeTab, setActiveTab] = useState<'country' | 'solution' | 'history'>('country');
+  const [activeTab, setActiveTab] = useState<'country' | 'solution' | 'matrix' | 'history'>('country');
   
   const { countries, solutions } = useMagicStore();
 
@@ -297,6 +565,66 @@ export default function GtmInsights() {
   const [selectedSolution, setSelectedSolution] = useState('');
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [isSolutionDropdownOpen, setIsSolutionDropdownOpen] = useState(false);
+
+  // Market Matrix State
+  const [matrixSearch, setMatrixSearch] = useState('');
+  const [matrixStatusFilters, setMatrixStatusFilters] = useState<string[]>([]);
+  const [matrixPositioningFilters, setMatrixPositioningFilters] = useState<string[]>([]);
+  const [draftStatusFilters, setDraftStatusFilters] = useState<string[]>([]);
+  const [draftPositioningFilters, setDraftPositioningFilters] = useState<string[]>([]);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [matrixSortCol, setMatrixSortCol] = useState<string>('default');
+  const [matrixSortDir, setMatrixSortDir] = useState<'asc' | 'desc'>('desc');
+  const [selectedCellBasis, setSelectedCellBasis] = useState<CellBasisDetails | null>(null);
+  const [hoveredCellBasis, setHoveredCellBasis] = useState<CellBasisDetails | null>(null);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null);
+
+  const filtersOverlayRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleCellMouseEnter = (e: React.MouseEvent<HTMLButtonElement>, basis: CellBasisDetails) => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const popoverWidth = 350;
+    let left = rect.left + rect.width / 2 - popoverWidth / 2;
+    if (left < 16) left = 16;
+    if (left + popoverWidth > window.innerWidth - 16) {
+      left = window.innerWidth - popoverWidth - 16;
+    }
+
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const isAbove = spaceBelow < 400 && rect.top > 400;
+    const top = isAbove ? rect.top - 400 : rect.bottom + 8;
+
+    setPopoverPos({ top, left });
+    setHoveredCellBasis(basis);
+  };
+
+  const handleCellMouseLeave = () => {
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    hideTimeoutRef.current = setTimeout(() => {
+      setHoveredCellBasis(null);
+      setPopoverPos(null);
+    }, 220);
+  };
+
+  const handlePopoverMouseEnter = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handlePopoverMouseLeave = () => {
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    hideTimeoutRef.current = setTimeout(() => {
+      setHoveredCellBasis(null);
+      setPopoverPos(null);
+    }, 150);
+  };
 
   // History State
   const [historyList, setHistoryList] = useState<GtmHistoryItem[]>(INITIAL_HISTORY);
@@ -336,6 +664,9 @@ export default function GtmInsights() {
       if (kindFilterRef.current && !kindFilterRef.current.contains(event.target as Node)) {
         setIsKindFilterOpen(false);
       }
+      if (filtersOverlayRef.current && !filtersOverlayRef.current.contains(event.target as Node)) {
+        setIsFiltersOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -361,6 +692,39 @@ export default function GtmInsights() {
     const start = (historyCurrentPage - 1) * historyItemsPerPage;
     return filteredHistoryList.slice(start, start + historyItemsPerPage);
   }, [filteredHistoryList, historyCurrentPage, historyItemsPerPage]);
+
+  // Filtered and Sorted Market Matrix Data
+  const filteredMatrixData = useMemo(() => {
+    let list = MARKET_MATRIX_DATA.filter((item) => {
+      const q = matrixSearch.toLowerCase();
+      const matchesSearch =
+        item.name.toLowerCase().includes(q) ||
+        Object.keys(item.cells).some((c) => c.toLowerCase().includes(q));
+      const matchesStatus =
+        matrixStatusFilters.length === 0 || matrixStatusFilters.includes(item.status);
+      const matchesPositioning =
+        matrixPositioningFilters.length === 0 || matrixPositioningFilters.includes(item.positioning);
+      return matchesSearch && matchesStatus && matchesPositioning;
+    });
+
+    if (matrixSortCol === 'solution') {
+      list = [...list].sort((a, b) =>
+        matrixSortDir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+      );
+    } else if (matrixSortCol === 'total') {
+      list = [...list].sort((a, b) =>
+        matrixSortDir === 'asc' ? a.totalNum - b.totalNum : b.totalNum - a.totalNum
+      );
+    } else if (matrixSortCol !== 'default') {
+      list = [...list].sort((a, b) => {
+        const valA = a.cells[matrixSortCol]?.revNum ?? 0;
+        const valB = b.cells[matrixSortCol]?.revNum ?? 0;
+        return matrixSortDir === 'asc' ? valA - valB : valB - valA;
+      });
+    }
+
+    return list;
+  }, [matrixSearch, matrixStatusFilters, matrixPositioningFilters, matrixSortCol, matrixSortDir]);
 
   // Open deck from history row click
   const handleOpenHistoryDeck = (item: GtmHistoryItem) => {
@@ -507,6 +871,19 @@ export default function GtmInsights() {
           </button>
           <button
             onClick={() => {
+              setActiveTab('matrix');
+              setGeneratedDeck(null);
+            }}
+            className={`pb-2.5 px-3 sm:px-4 text-[0.875rem] font-medium cursor-pointer transition-colors border-b-2 rounded-t-lg ${
+              activeTab === 'matrix'
+                ? 'border-gray-800 text-gray-900 bg-gray-100/80 font-semibold'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Market matrix
+          </button>
+          <button
+            onClick={() => {
               setActiveTab('history');
               setGeneratedDeck(null);
             }}
@@ -523,7 +900,7 @@ export default function GtmInsights() {
 
 
       {/* Input Selection Bar & Generate CTA (Only in By Country & By Solution Tabs) */}
-      {activeTab !== 'history' && (
+      {(activeTab === 'country' || activeTab === 'solution') && (
         <div className="space-y-2">
           <label className="block text-xs font-medium text-gray-700">
             {activeTab === 'country' 
@@ -654,7 +1031,7 @@ export default function GtmInsights() {
       {/* Main Content Area */}
       <div>
         {/* State 1: Initial Empty State for Country / Solution tabs */}
-        {activeTab !== 'history' && !generatedDeck && !isGenerating && (
+        {(activeTab === 'country' || activeTab === 'solution') && !generatedDeck && !isGenerating && (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center flex flex-col items-center justify-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#ED4D19] flex items-center justify-center border border-orange-100 shadow-2xs">
               <FileText className="w-6 h-6" />
@@ -665,7 +1042,481 @@ export default function GtmInsights() {
           </div>
         )}
 
-        {/* State 2: GTM Insights History Tab Table View */}
+        {/* State 2: Market Matrix Tab View */}
+        {activeTab === 'matrix' && (
+          <div className="space-y-4">
+            {/* Header: Title, Description, and Filter Controls */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+              <div className="space-y-1">
+                <h2 className="text-base sm:text-lg font-semibold text-[#0D212C] font-['Poppins']">
+                  Market matrix
+                </h2>
+                <p className="text-xs text-gray-500 font-normal">
+                  Expected 3-year revenue per solution and catalogue country. Only countries in the catalogue appear. Click a cell for the basis and source.
+                </p>
+              </div>
+
+              {/* Filters on Right: Search & Unified Filters Overlay */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Search Bar */}
+                <div className="relative w-full sm:w-56">
+                  <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={matrixSearch}
+                    onChange={(e) => setMatrixSearch(e.target.value)}
+                    placeholder="Search solutions or countries..."
+                    className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-[0.8125rem] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors shadow-2xs"
+                  />
+                </div>
+
+                {/* Unified Filters Overlay Button */}
+                <div className="relative" ref={filtersOverlayRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isFiltersOpen) {
+                        setDraftStatusFilters([...matrixStatusFilters]);
+                        setDraftPositioningFilters([...matrixPositioningFilters]);
+                      }
+                      setIsFiltersOpen(!isFiltersOpen);
+                    }}
+                    className={`flex items-center justify-between gap-2 bg-white border rounded-xl px-3.5 py-1.5 text-[0.8125rem] transition-colors cursor-pointer shadow-2xs whitespace-nowrap ${
+                      (matrixStatusFilters.length > 0 || matrixPositioningFilters.length > 0)
+                        ? 'border-[#ED4D19] text-[#ED4D19] font-medium'
+                        : 'border-gray-200 hover:border-gray-300 text-gray-700 font-normal'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <SlidersHorizontal className="w-3.5 h-3.5" />
+                      <span>Filters</span>
+                      {(matrixStatusFilters.length > 0 || matrixPositioningFilters.length > 0) && (
+                        <span className="w-2 h-2 rounded-full bg-[#ED4D19]" />
+                      )}
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isFiltersOpen && (
+                    <div className="absolute top-full mt-1.5 right-0 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 select-none">
+                      <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                        <span className="text-xs font-semibold text-gray-800">Filters</span>
+                        {(draftStatusFilters.length > 0 || draftPositioningFilters.length > 0) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDraftStatusFilters([]);
+                              setDraftPositioningFilters([]);
+                            }}
+                            className="text-[11px] font-medium text-[#ED4D19] hover:underline cursor-pointer"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Status Checkbox List */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block">
+                          Status
+                        </label>
+                        <div className="space-y-1">
+                          {['Completed', 'In progress', 'Prioritised', 'New'].map((st) => {
+                            const isChecked = draftStatusFilters.includes(st);
+                            return (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() => {
+                                  setDraftStatusFilters((prev) =>
+                                    prev.includes(st) ? prev.filter((s) => s !== st) : [...prev, st]
+                                  );
+                                }}
+                                className="w-full flex items-center gap-2.5 py-1 px-1.5 rounded-lg hover:bg-gray-50 text-xs text-gray-700 transition-colors cursor-pointer text-left"
+                              >
+                                <div
+                                  className={`w-4 h-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
+                                    isChecked
+                                      ? 'bg-[#ED4D19] border border-[#ED4D19] text-white shadow-2xs'
+                                      : 'border border-gray-300 bg-white hover:border-gray-400'
+                                  }`}
+                                >
+                                  {isChecked && (
+                                    <Check className="w-3 h-3 text-white stroke-[3]" />
+                                  )}
+                                </div>
+                                <span>{st}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Positioning Checkbox List */}
+                      <div className="space-y-1.5 pt-2 border-t border-gray-100">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block">
+                          Positioning
+                        </label>
+                        <div className="space-y-1">
+                          {['Distinctive', 'Mixed', 'Common'].map((pos) => {
+                            const isChecked = draftPositioningFilters.includes(pos);
+                            return (
+                              <button
+                                key={pos}
+                                type="button"
+                                onClick={() => {
+                                  setDraftPositioningFilters((prev) =>
+                                    prev.includes(pos) ? prev.filter((p) => p !== pos) : [...prev, pos]
+                                  );
+                                }}
+                                className="w-full flex items-center gap-2.5 py-1 px-1.5 rounded-lg hover:bg-gray-50 text-xs text-gray-700 transition-colors cursor-pointer text-left"
+                              >
+                                <div
+                                  className={`w-4 h-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
+                                    isChecked
+                                      ? 'bg-[#ED4D19] border border-[#ED4D19] text-white shadow-2xs'
+                                      : 'border border-gray-300 bg-white hover:border-gray-400'
+                                  }`}
+                                >
+                                  {isChecked && (
+                                    <Check className="w-3 h-3 text-white stroke-[3]" />
+                                  )}
+                                </div>
+                                <span>{pos}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Apply & Cancel Buttons */}
+                      <div className="flex items-center justify-between pt-2.5 border-t border-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDraftStatusFilters([]);
+                            setDraftPositioningFilters([]);
+                          }}
+                          className="text-[11px] text-gray-400 hover:text-gray-600 cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setIsFiltersOpen(false)}
+                            className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMatrixStatusFilters([...draftStatusFilters]);
+                              setMatrixPositioningFilters([...draftPositioningFilters]);
+                              setIsFiltersOpen(false);
+                            }}
+                            className="px-3.5 py-1.5 text-xs font-medium text-white bg-[#ED4D19] hover:bg-[#c93b0e] rounded-lg shadow-2xs transition-colors cursor-pointer"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Market Matrix Table */}
+            <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[980px]" onMouseLeave={() => { if (!selectedCellBasis) handleCellMouseLeave(); }}>
+                  <thead>
+                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
+                      <th 
+                        className="py-3 px-5 font-normal cursor-pointer hover:text-gray-800 transition-colors w-[22%]"
+                        onClick={() => {
+                          setMatrixSortCol('solution');
+                          setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                        }}
+                      >
+                        <div className="flex items-center gap-1">
+                          <span>SOLUTION</span>
+                          <span className="text-[10px] text-gray-400">⇅</span>
+                        </div>
+                      </th>
+                      {MATRIX_COUNTRIES.map((cnt) => (
+                        <th 
+                          key={cnt}
+                          className="py-3 px-2 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors"
+                          onClick={() => {
+                            setMatrixSortCol(cnt);
+                            setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                          }}
+                        >
+                          <div className="inline-flex items-center justify-center gap-1">
+                            <span>{cnt.toUpperCase()}</span>
+                            <span className="text-[10px] text-gray-400">⇅</span>
+                          </div>
+                        </th>
+                      ))}
+                      <th 
+                        className="py-3 px-4 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors bg-gray-50/80 border-l border-gray-200 text-gray-700 w-[11%]"
+                        onClick={() => {
+                          setMatrixSortCol('total');
+                          setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                        }}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1">
+                          <span>TOTAL (3-YR)</span>
+                          <span className="text-[10px] text-gray-400">⇅</span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                    {filteredMatrixData.length === 0 ? (
+                      <tr>
+                        <td colSpan={9} className="py-10 text-center text-xs text-gray-400">
+                          No solutions found matching "{matrixSearch}".
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredMatrixData.map((row) => (
+                        <tr 
+                          key={row.id} 
+                          className="hover:bg-gray-50/70 transition-colors"
+                        >
+                          {/* Solution Name & Subtitle */}
+                          <td className="py-3.5 px-5">
+                            <div className="flex flex-col">
+                              <span className="font-medium text-[#0D212C] text-[0.8125rem]">
+                                {row.name}
+                              </span>
+                              <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5">
+                                {row.status} · {row.positioning}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Country Cells with Plain Box Colors */}
+                          {MATRIX_COUNTRIES.map((cnt) => {
+                            const cell = row.cells[cnt] || {};
+
+                            return (
+                              <td key={cnt} className="py-2 px-1.5 text-center">
+                                {cell.restricted ? (
+                                  <div className="inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-400 text-[11px] font-normal w-full select-none">
+                                    <Ban className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                    <span>Restricted</span>
+                                  </div>
+                                ) : cell.rev ? (
+                                  <button
+                                    type="button"
+                                    onMouseEnter={(e) => {
+                                      e.stopPropagation();
+                                      handleCellMouseEnter(e, getMatrixCellBasis(row.name, cnt, cell));
+                                    }}
+                                    onMouseLeave={handleCellMouseLeave}
+                                    onClick={() =>
+                                      setSelectedCellBasis(getMatrixCellBasis(row.name, cnt, cell))
+                                    }
+                                    className="w-full bg-white hover:bg-gray-50/90 border border-gray-200/90 rounded-lg py-1.5 px-1.5 flex flex-col items-center justify-center cursor-pointer shadow-2xs transition-all group/btn"
+                                  >
+                                    <span className="text-xs font-semibold text-[#0D212C] group-hover/btn:text-[#ED4D19] transition-colors">
+                                      {cell.rev}
+                                    </span>
+                                    <span className="text-[9.5px] text-gray-400 font-normal mt-0.5">
+                                      {cell.fit}
+                                    </span>
+                                  </button>
+                                ) : (
+                                  <span className="text-gray-300 text-xs font-normal select-none">
+                                    —
+                                  </span>
+                                )}
+                              </td>
+                            );
+                          })}
+
+                          {/* Row Total with Subtle Grey Background */}
+                          <td className="py-3.5 px-4 text-center font-semibold text-[#0D212C] text-[0.8125rem] bg-gray-50/40 border-l border-gray-200">
+                            {row.total3Yr}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+
+                  {/* Summary Footer Row with Subtle Grey Background */}
+                  <tfoot>
+                    <tr className="bg-gray-50/90 border-t border-gray-200 font-semibold text-[0.8125rem] text-[#0D212C]">
+                      <td className="py-3 px-5 text-gray-900">
+                        Total (3-yr)
+                      </td>
+                      {MATRIX_COUNTRIES.map((cnt) => (
+                        <td key={cnt} className="py-3 px-2 text-center font-semibold text-[#0D212C]">
+                          {MATRIX_TOTALS[cnt] || '—'}
+                        </td>
+                      ))}
+                      <td className="py-3 px-4 text-center font-bold text-gray-900 bg-gray-100/70 border-l border-gray-200">
+                        {MATRIX_TOTALS['Total'] || '$153.1M'}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            {/* Hover / Click Overlay Matching Attached Image */}
+            {(selectedCellBasis || (hoveredCellBasis && popoverPos)) && (
+              <div 
+                className={
+                  selectedCellBasis 
+                    ? "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/10 backdrop-blur-2xs"
+                    : "fixed z-50 pointer-events-auto"
+                }
+                style={
+                  selectedCellBasis 
+                    ? undefined
+                    : {
+                        top: `${popoverPos?.top ?? 100}px`,
+                        left: `${popoverPos?.left ?? 100}px`,
+                      }
+                }
+                onClick={() => {
+                  if (selectedCellBasis) {
+                    setSelectedCellBasis(null);
+                    setHoveredCellBasis(null);
+                    setPopoverPos(null);
+                  }
+                }}
+              >
+                <div 
+                  className="bg-white rounded-2xl border border-gray-200/90 shadow-2xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 font-sans select-none"
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseEnter={handlePopoverMouseEnter}
+                  onMouseLeave={handlePopoverMouseLeave}
+                >
+                  {/* Header with Title & Close Icon */}
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-base font-bold text-[#0D212C] leading-snug">
+                      {(selectedCellBasis || hoveredCellBasis)?.solutionName} · {(selectedCellBasis || hoveredCellBasis)?.countryName}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCellBasis(null);
+                        setHoveredCellBasis(null);
+                        setPopoverPos(null);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Metric Breakdown Table */}
+                  <div className="divide-y divide-gray-100 text-xs">
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 font-normal">Market Fit</span>
+                      <span className="font-bold text-[#0D212C]">{(selectedCellBasis || hoveredCellBasis)?.marketFit}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 font-normal">Win rate</span>
+                      <span className="font-bold text-[#0D212C]">{(selectedCellBasis || hoveredCellBasis)?.winRate}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 font-normal">Deal anchor (country)</span>
+                      <span className="font-bold text-[#0D212C]">{(selectedCellBasis || hoveredCellBasis)?.dealAnchor}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 font-normal">Depth multiplier (F6)</span>
+                      <span className="font-bold text-[#0D212C]">{(selectedCellBasis || hoveredCellBasis)?.depthMultiplier}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 font-normal">Expected revenue (3-yr)</span>
+                      <span className="font-bold text-[#0D212C]">{(selectedCellBasis || hoveredCellBasis)?.expectedRevenue}</span>
+                    </div>
+                  </div>
+
+                  {/* Formula & Calculation */}
+                  <div className="pt-0.5">
+                    <span className="text-xs font-mono text-gray-500 font-normal">
+                      {(selectedCellBasis || hoveredCellBasis)?.formula}
+                    </span>
+                  </div>
+
+                  {/* Rationale text */}
+                  <p className="text-xs text-gray-600 font-normal leading-relaxed">
+                    {(selectedCellBasis || hoveredCellBasis)?.rationale}
+                  </p>
+
+                  {/* Source link */}
+                  <div>
+                    <a
+                      href="https://www.who.int/data/gho"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 underline font-medium cursor-pointer py-1 px-1.5 -ml-1.5 rounded-md hover:bg-blue-50 transition-colors"
+                    >
+                      <span>source</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  {/* Two Action Buttons: Country deck & Solution deck */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const basis = selectedCellBasis || hoveredCellBasis;
+                        if (basis) {
+                          handleOpenHistoryDeck({
+                            id: 'deck-cnt',
+                            name: basis.countryName,
+                            kind: 'Country',
+                            generatedAt: 'Just now',
+                          });
+                          setSelectedCellBasis(null);
+                          setHoveredCellBasis(null);
+                          setPopoverPos(null);
+                        }
+                      }}
+                      className="w-full py-2 px-3 bg-white hover:bg-gray-50 text-gray-800 text-xs font-semibold rounded-xl border border-gray-200 transition-colors shadow-2xs cursor-pointer text-center"
+                    >
+                      Country deck
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const basis = selectedCellBasis || hoveredCellBasis;
+                        if (basis) {
+                          handleOpenHistoryDeck({
+                            id: 'deck-sol',
+                            name: basis.solutionName,
+                            kind: 'Solution',
+                            generatedAt: 'Just now',
+                          });
+                          setSelectedCellBasis(null);
+                          setHoveredCellBasis(null);
+                          setPopoverPos(null);
+                        }
+                      }}
+                      className="w-full py-2 px-3 bg-[#ED4D19] hover:bg-[#d64111] text-white text-xs font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer text-center"
+                    >
+                      Solution deck
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* State 3: GTM Insights History Tab Table View */}
         {activeTab === 'history' && !generatedDeck && (
           <div className="space-y-4">
             {/* Section Title & Controls (Search + Custom Filter) on the Right */}

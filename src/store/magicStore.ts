@@ -9,6 +9,10 @@ export interface ComponentItem {
   reuseCount: number;
   complexity?: 'Low' | 'Medium' | 'High';
   effort?: string;
+  allocatedRevenue?: number;
+  buildPriority?: string;
+  buildPriorityNum?: number;
+  quadrant?: 'Build first' | 'High Value' | 'Cheap enablers' | 'Defer';
   dependencies?: string[] | string;
   keyCapabilities?: string[] | string;
   description?: string;
@@ -49,16 +53,18 @@ export interface CountryItem {
 }
 
 export const DEFAULT_COMPONENTS: ComponentItem[] = [
-  { id: 'c1', name: 'AI Chatbot · CRAG', subtitle: 'GenAI clinical assistant', category: 'AI / GenAI', status: 'In progress', reuseCount: 7, complexity: 'High', effort: '~50 pd', keyCapabilities: 'Clinical query RAG, Citations grounding, Multi-lingual patient triage', description: 'GenAI clinical assistant powered by Corrective Retrieval-Augmented Generation.', dependencies: 'Patient Profile (c3), Analytics (c5)', attachments: ['CRAG_Model_Card.pdf', 'Prompt_Templates.docx', 'Eval_Benchmark.xlsx'] },
-  { id: 'c2', name: 'Payment Module', subtitle: 'Billing & checkout core', category: 'Payments', status: 'Completed', reuseCount: 6, complexity: 'Medium', effort: '~15 pd', keyCapabilities: 'Multi-currency checkout, Split settlement, Insurance co-pay routing', description: 'Billing & checkout core supporting clinical transactions and claims co-pay.', dependencies: 'Insurance Directory (c10)', attachments: ['Payment_Gateway_Spec.pdf', 'Settlement_Rules.xlsx'] },
-  { id: 'c3', name: 'Patient Profile', subtitle: 'Master patient record', category: 'Core data', status: 'Completed', reuseCount: 5, complexity: 'Low', effort: '~12 pd', keyCapabilities: 'Longitudinal health history, Consent management, Biometric identity', description: 'Master patient record unifying demographic, insurance, and medical timeline data.', dependencies: 'None (Core foundation)', attachments: ['Master_Patient_Schema.pdf', 'Consent_Spec.pdf', 'HL7_MPI_Guide.pdf'] },
-  { id: 'c4', name: 'Clinical Notes · NLP', subtitle: 'Ambient documentation', category: 'AI / GenAI', status: 'New', reuseCount: 4, complexity: 'Medium', effort: '~28 pd', keyCapabilities: 'Ambient conversation capture, SOAP note structuring, ICD-10 tagging', description: 'Ambient documentation engine converting physician-patient dialogue into EHR notes.', dependencies: 'AI Chatbot (c1), Patient Profile (c3)', attachments: ['NLP_Benchmark.pdf', 'SOAP_Template.docx'] },
-  { id: 'c5', name: 'Analytics & Dashboards', subtitle: 'Operational BI & Metrics', category: 'Data / BI', status: 'Prioritised', reuseCount: 4, complexity: 'Medium', effort: '~20 pd', keyCapabilities: 'Real-time KPI aggregation, Custom visual builders, Scheduled export', description: 'Operational BI and clinical analytics dashboard engine.', dependencies: 'Patient Profile (c3)', attachments: ['Dashboard_Metrics.xlsx', 'BI_Widgets_Guide.pdf'] },
-  { id: 'c6', name: 'Fraud-Claim Detection', subtitle: 'Claims anomaly engine', category: 'InsurTech / AI', status: 'In progress', reuseCount: 1, complexity: 'High', effort: '~35 pd', keyCapabilities: 'Anomaly detection, Payer pattern clustering, Flagging workflow', description: 'Claims anomaly engine identifying irregular billing patterns before submission.', dependencies: 'Payment Module (c2), Insurance Directory (c10)', attachments: ['Fraud_Heuristics.pdf'] },
-  { id: 'c7', name: 'Appointment Booking', subtitle: 'Scheduling module', category: 'Workflow', status: 'Completed', reuseCount: 3, complexity: 'Low', effort: '~18 pd', keyCapabilities: 'Multi-provider slot calendar, Automated SMS/WhatsApp, Waitlist queuing', description: 'Scheduling module coordinating provider availability and patient visits.', dependencies: 'Patient Profile (c3)', attachments: ['Booking_API.pdf', 'Calendar_Sync_Doc.docx'] },
-  { id: 'c8', name: 'e-Prescription', subtitle: 'Prescribing & pharmacy', category: 'Workflow', status: 'Prioritised', reuseCount: 3, complexity: 'Low', effort: '~14 pd', keyCapabilities: 'Rx digital signature, Drug contraindication check, Pharmacy dispatch', description: 'Prescribing and medication fulfillment workflow component.', dependencies: 'Patient Profile (c3), Appointment Booking (c7)', attachments: ['eRx_Validation.pdf', 'Signature_Crypto.pdf', 'Pharmacy_Rules.pdf'] },
-  { id: 'c9', name: 'LIS · Lab Information', subtitle: 'Diagnostic lab bridge', category: 'Diagnostics', status: 'Completed', reuseCount: 3, complexity: 'Medium', effort: '~22 pd', keyCapabilities: 'HL7 instrument bridge, Specimen barcode tracking, Auto-validation', description: 'Diagnostic lab bridge connecting pathology equipment directly to patient records.', dependencies: 'Patient Profile (c3)', attachments: ['LIS_Interface_Spec.pdf', 'Instrument_Bridge.xlsx'] },
-  { id: 'c10', name: 'Insurance Directory', subtitle: 'Payer rules engine', category: 'InsurTech', status: 'In progress', reuseCount: 1, complexity: 'Medium', effort: '~16 pd', keyCapabilities: 'Payer rules engine, Real-time benefit check, Policy versioning', description: 'Payer directory managing reimbursement rules and coverage criteria.', dependencies: 'None (Core rules)', attachments: ['Payer_Directory_v3.xlsx'] },
+  { id: 'c3', name: 'Patient Profile', subtitle: 'Master patient record', category: 'Core data', status: 'Completed', reuseCount: 5, complexity: 'Low', effort: '~12 pd', allocatedRevenue: 13.2, buildPriorityNum: 1100, buildPriority: '$1.10M / pd', keyCapabilities: 'Longitudinal health history, Consent management, Biometric identity', description: 'Master patient record unifying demographic, insurance, and medical timeline data.', dependencies: 'None (Core foundation)', attachments: ['Master_Patient_Schema.pdf', 'Consent_Spec.pdf', 'HL7_MPI_Guide.pdf'] },
+  { id: 'c5', name: 'Analytics & Dashboards', subtitle: 'Operational BI & Metrics', category: 'Data / BI', status: 'Prioritised', reuseCount: 4, complexity: 'Medium', effort: '~20 pd', allocatedRevenue: 20.1, buildPriorityNum: 1010, buildPriority: '$1.01M / pd', keyCapabilities: 'Real-time KPI aggregation, Custom visual builders, Scheduled export', description: 'Operational BI and clinical analytics dashboard engine.', dependencies: 'Patient Profile (c3)', attachments: ['Dashboard_Metrics.xlsx', 'BI_Widgets_Guide.pdf'] },
+  { id: 'c4', name: 'Clinical Notes · NLP', subtitle: 'Ambient documentation', category: 'AI / GenAI', status: 'New', reuseCount: 3, complexity: 'Medium', effort: '~22 pd', allocatedRevenue: 19.5, buildPriorityNum: 885, buildPriority: '$885K / pd', keyCapabilities: 'Ambient conversation capture, SOAP note structuring, ICD-10 tagging', description: 'Ambient documentation engine converting physician-patient dialogue into EHR notes.', dependencies: 'AI Chatbot (c1), Patient Profile (c3)', attachments: ['NLP_Benchmark.pdf', 'SOAP_Template.docx'] },
+  { id: 'c1', name: 'AI Chatbot · CRAG', subtitle: 'GenAI clinical assistant', category: 'AI / GenAI', status: 'In progress', reuseCount: 5, complexity: 'High', effort: '~50 pd', allocatedRevenue: 39.2, buildPriorityNum: 783, buildPriority: '$783K / pd', keyCapabilities: 'Clinical query RAG, Citations grounding, Multi-lingual patient triage', description: 'GenAI clinical assistant powered by Corrective Retrieval-Augmented Generation.', dependencies: 'Patient Profile (c3), Analytics (c5)', attachments: ['CRAG_Model_Card.pdf', 'Prompt_Templates.docx', 'Eval_Benchmark.xlsx'] },
+  { id: 'c11', name: 'Notification Service', subtitle: 'Omnichannel alert dispatcher', category: 'Workflow', status: 'Prioritised', reuseCount: 5, complexity: 'Low', effort: '~6 pd', allocatedRevenue: 4.7, buildPriorityNum: 783, buildPriority: '$783K / pd', keyCapabilities: 'Urgent broadcast alerts, Multi-carrier SMS & WhatsApp, Delivery audit tracking', description: 'High-throughput omnichannel notification service handling critical clinical and patient alerts.', dependencies: 'Patient Profile (c3)', attachments: ['Notification_Specs.pdf'] },
+  { id: 'c2', name: 'Payment Module', subtitle: 'Billing & checkout core', category: 'Payments', status: 'Completed', reuseCount: 4, complexity: 'Medium', effort: '~15 pd', allocatedRevenue: 10.4, buildPriorityNum: 694, buildPriority: '$694K / pd', keyCapabilities: 'Multi-currency checkout, Split settlement, Insurance co-pay routing', description: 'Billing & checkout core supporting clinical transactions and claims co-pay.', dependencies: 'Insurance Directory (c10)', attachments: ['Payment_Gateway_Spec.pdf', 'Settlement_Rules.xlsx'] },
+  { id: 'c12', name: 'FHIR Integration Gateway', subtitle: 'Standardized clinical bridge', category: 'Core data', status: 'In progress', reuseCount: 3, complexity: 'High', effort: '~35 pd', allocatedRevenue: 24.1, buildPriorityNum: 688, buildPriority: '$688K / pd', keyCapabilities: 'HL7 to FHIR R4 schema translation, Sub-second query caching, Enterprise audit log', description: 'Central integration highway normalizing heterogeneous electronic medical records across systems.', dependencies: 'Patient Profile (c3)', attachments: ['FHIR_Integration_Guide.pdf'] },
+  { id: 'c9', name: 'Device Telemetry Hub', subtitle: 'IoT vitals ingestion engine', category: 'Diagnostics', status: 'Completed', reuseCount: 2, complexity: 'Medium', effort: '~26 pd', allocatedRevenue: 8.3, buildPriorityNum: 317, buildPriority: '$317K / pd', keyCapabilities: 'HL7 instrument bridge, Specimen barcode tracking, Auto-validation', description: 'Diagnostic lab and device bridge connecting monitoring hardware directly to patient records.', dependencies: 'Patient Profile (c3)', attachments: ['LIS_Interface_Spec.pdf', 'Instrument_Bridge.xlsx'] },
+  { id: 'c7', name: 'Appointment Booking', subtitle: 'Scheduling module', category: 'Workflow', status: 'Completed', reuseCount: 2, complexity: 'Low', effort: '~18 pd', allocatedRevenue: 5.5, buildPriorityNum: 308, buildPriority: '$308K / pd', keyCapabilities: 'Multi-provider slot calendar, Automated SMS/WhatsApp, Waitlist queuing', description: 'Scheduling module coordinating provider availability and patient visits.', dependencies: 'Patient Profile (c3)', attachments: ['Booking_API.pdf', 'Calendar_Sync_Doc.docx'] },
+  { id: 'c6', name: 'Fraud-Claim Detection', subtitle: 'Claims anomaly engine', category: 'InsurTech / AI', status: 'In progress', reuseCount: 1, complexity: 'High', effort: '~30 pd', allocatedRevenue: 5.3, buildPriorityNum: 178, buildPriority: '$178K / pd', keyCapabilities: 'Anomaly detection, Payer pattern clustering, Flagging workflow', description: 'Claims anomaly engine identifying irregular billing patterns before submission.', dependencies: 'Payment Module (c2), Insurance Directory (c10)', attachments: ['Fraud_Heuristics.pdf'] },
+  { id: 'c8', name: 'Prescription Engine', subtitle: 'Prescribing & pharmacy core', category: 'Workflow', status: 'Prioritised', reuseCount: 1, complexity: 'Low', effort: '~24 pd', allocatedRevenue: 2.8, buildPriorityNum: 118, buildPriority: '$118K / pd', keyCapabilities: 'Rx digital signature, Drug contraindication check, Pharmacy dispatch', description: 'Prescribing and medication fulfillment workflow component.', dependencies: 'Patient Profile (c3), Appointment Booking (c7)', attachments: ['eRx_Validation.pdf', 'Signature_Crypto.pdf', 'Pharmacy_Rules.pdf'] },
+  { id: 'c10', name: 'Insurance Directory · Unmapped', subtitle: 'Payer rules engine', category: 'InsurTech', status: 'In progress', reuseCount: 0, complexity: 'Medium', effort: '~16 pd', allocatedRevenue: 0.0, buildPriorityNum: 0, buildPriority: '$0K / pd', keyCapabilities: 'Payer rules engine, Real-time benefit check, Policy versioning', description: 'Payer directory managing reimbursement rules and coverage criteria.', dependencies: 'None (Core rules)', attachments: ['Payer_Directory_v3.xlsx'] },
 ];
 
 export const DEFAULT_SOLUTIONS: SolutionItem[] = [
@@ -83,16 +89,18 @@ export const DEFAULT_COUNTRIES: CountryItem[] = [
 ];
 
 export const DEFAULT_REUSE_MATRIX: Record<string, string[]> = {
-  c1: ['s1', 's2', 's3', 's4', 's5', 's7', 's8'], // 7
-  c2: ['s1', 's2', 's3', 's4', 's5', 's7'],     // 6
-  c3: ['s1', 's2', 's3', 's4', 's6'],          // 5
-  c4: ['s1', 's2', 's5', 's8'],                // 4
-  c5: ['s1', 's2', 's3', 's8'],                // 4
-  c6: ['s5'],                                  // 1
-  c7: ['s1', 's2', 's3'],                      // 3
-  c8: ['s1', 's2', 's7'],                      // 3
-  c9: ['s1', 's2', 's8'],                      // 3
-  c10: ['s5'],                                 // 1
+  c1: ['s1', 's2', 's3', 's4', 's5'],           // 5
+  c2: ['s1', 's2', 's3', 's5'],                 // 4
+  c3: ['s1', 's2', 's3', 's4', 's6'],           // 5
+  c4: ['s1', 's2', 's5'],                       // 3
+  c5: ['s1', 's2', 's3', 's8'],                 // 4
+  c6: ['s5'],                                   // 1
+  c7: ['s1', 's2'],                             // 2
+  c8: ['s7'],                                   // 1
+  c9: ['s4', 's8'],                             // 2
+  c10: [],                                      // 0
+  c11: ['s1', 's2', 's3', 's4', 's7'],          // 5
+  c12: ['s1', 's2', 's4'],                      // 3
 };
 
 interface MagicState {
@@ -120,8 +128,42 @@ const loadStored = <T>(key: string, fallback: T): T => {
   return fallback;
 };
 
+const loadStoredComponents = (): ComponentItem[] => {
+  try {
+    const saved = localStorage.getItem('m42_magic_components');
+    if (saved) {
+      const parsed: ComponentItem[] = JSON.parse(saved);
+      const defaultMap = new Map(DEFAULT_COMPONENTS.map(c => [c.id, c]));
+      const enriched = parsed.map(c => {
+        const def = defaultMap.get(c.id);
+        if (!def) return c;
+        return {
+          ...def,
+          ...c,
+          name: def.name, // Ensure exact aligned names from screenshots
+          allocatedRevenue: c.allocatedRevenue ?? def.allocatedRevenue,
+          buildPriority: c.buildPriority ?? def.buildPriority,
+          buildPriorityNum: c.buildPriorityNum ?? def.buildPriorityNum,
+          effort: c.effort ?? def.effort,
+          reuseCount: c.reuseCount ?? def.reuseCount,
+        };
+      });
+      const existingIds = new Set(enriched.map(c => c.id));
+      for (const def of DEFAULT_COMPONENTS) {
+        if (!existingIds.has(def.id)) {
+          enriched.push(def);
+        }
+      }
+      return enriched;
+    }
+  } catch (e) {
+    // Ignore error
+  }
+  return DEFAULT_COMPONENTS;
+};
+
 export const useMagicStore = create<MagicState>((set, get) => ({
-  components: loadStored('m42_magic_components', DEFAULT_COMPONENTS),
+  components: loadStoredComponents(),
   solutions: loadStored('m42_magic_solutions', DEFAULT_SOLUTIONS),
   countries: loadStored('m42_magic_countries', DEFAULT_COUNTRIES),
   reuseMatrix: loadStored('m42_magic_reuse_matrix', DEFAULT_REUSE_MATRIX),
