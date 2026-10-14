@@ -7,15 +7,63 @@ import {
   ChevronDown,
   RefreshCw,
   Calendar,
-  ChevronDown as ChevronDownSmall
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
-const OCTOBER_WEEKS = [
-  { label: 'Week 1: Oct 4 – Oct 10, 2026', short: 'Oct 4 – Oct 10, 2026' },
-  { label: 'Week 2: Oct 11 – Oct 17, 2026 (Current)', short: 'Oct 11 – Oct 17, 2026' },
-  { label: 'Week 3: Oct 18 – Oct 24, 2026', short: 'Oct 18 – Oct 24, 2026' },
-  { label: 'Week 4: Oct 25 – Oct 31, 2026', short: 'Oct 25 – Oct 31, 2026' },
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
+
+const MONTH_NAMES_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
+// Week is strictly from Monday to Sunday
+const WEEKDAY_NAMES = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+// Returns Monday and Sunday of the week containing the given date
+function getMondayToSundayWeek(date: Date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+  const diffToMonday = day === 0 ? 6 : day - 1;
+  const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diffToMonday);
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  return { monday, sunday };
+}
+
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function isDateInWeek(date: Date, monday: Date, sunday: Date) {
+  const time = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const mTime = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()).getTime();
+  const sTime = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate()).getTime();
+  return time >= mTime && time <= sTime;
+}
+
+function formatWeekDisplay(monday: Date, sunday: Date): string {
+  const mMonth = MONTH_NAMES_SHORT[monday.getMonth()];
+  const sMonth = MONTH_NAMES_SHORT[sunday.getMonth()];
+  const mDay = monday.getDate();
+  const sDay = sunday.getDate();
+  const year = sunday.getFullYear();
+
+  if (monday.getMonth() === sunday.getMonth() && monday.getFullYear() === sunday.getFullYear()) {
+    return `${mMonth} ${mDay} – ${sDay}, ${year}`;
+  }
+  if (monday.getFullYear() === sunday.getFullYear()) {
+    return `${mMonth} ${mDay} – ${sMonth} ${sDay}, ${year}`;
+  }
+  return `${mMonth} ${mDay}, ${monday.getFullYear()} – ${sMonth} ${sDay}, ${year}`;
+}
 
 
 interface NumericStepperInputProps {
@@ -128,21 +176,87 @@ function NumericStepperInput({
 }
 
 export default function UsageInsights() {
-  // Week selector state (October 2026 only, Sunday–Saturday)
-  const [selectedWeekIdx, setSelectedWeekIdx] = useState<number>(1); // Default: Week 2 (Current)
-  const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
-  const weekDropdownRef = useRef<HTMLDivElement>(null);
+  // Selected date state (defaults to October 14, 2026)
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(2026, 9, 14));
+  const [viewMonth, setViewMonth] = useState<number>(9); // 0-indexed: 9 = October
+  const [viewYear, setViewYear] = useState<number>(2026);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Derive Monday-to-Sunday week
+  const selectedWeek = useMemo(() => getMondayToSundayWeek(selectedDate), [selectedDate]);
+  const hoveredWeek = useMemo(() => hoveredDate ? getMondayToSundayWeek(hoveredDate) : null, [hoveredDate]);
 
   useEffect(() => {
-    if (!weekDropdownOpen) return;
+    if (!calendarOpen) return;
     const handler = (e: MouseEvent) => {
-      if (weekDropdownRef.current && !weekDropdownRef.current.contains(e.target as Node)) {
-        setWeekDropdownOpen(false);
+      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+        setCalendarOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [weekDropdownOpen]);
+  }, [calendarOpen]);
+
+  const handlePrevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else {
+      setViewMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else {
+      setViewMonth((m) => m + 1);
+    }
+  };
+
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const firstDayWeekday = firstDay.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+    const leadDays = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    const days: { date: Date; isCurrentMonth: boolean; dayNum: number }[] = [];
+
+    // Previous month trailing days
+    for (let i = leadDays - 1; i >= 0; i--) {
+      const d = new Date(viewYear, viewMonth, 1 - (i + 1));
+      days.push({ date: d, isCurrentMonth: false, dayNum: d.getDate() });
+    }
+
+    // Current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(viewYear, viewMonth, i);
+      days.push({ date: d, isCurrentMonth: true, dayNum: i });
+    }
+
+    // Trailing days to round up to full week (multiple of 7)
+    const remainder = days.length % 7;
+    if (remainder > 0) {
+      for (let i = 1; i <= 7 - remainder; i++) {
+        const d = new Date(viewYear, viewMonth + 1, i);
+        days.push({ date: d, isCurrentMonth: false, dayNum: i });
+      }
+    }
+
+    return days;
+  }, [viewYear, viewMonth]);
+
+  // Dynamic KPIs derived from selected week
+  const weekSeed = useMemo(() => {
+    return Math.abs((selectedWeek.monday.getDate() * 7 + selectedWeek.monday.getMonth() * 31) % 5);
+  }, [selectedWeek]);
+
+  const weekOutputsCount = useMemo(() => 18 + weekSeed, [weekSeed]);
+  const weekTokensConsumed = useMemo(() => (16.2 + weekSeed * 0.8).toFixed(1), [weekSeed]);
+  const weekAiCost = useMemo(() => 66 + weekSeed * 4, [weekSeed]);
 
   // Input assumptions state (Form inputs)
   const [formHours, setFormHours] = useState<number>(4);
@@ -243,105 +357,201 @@ export default function UsageInsights() {
             Overview
           </h2>
 
-          {/* Week Selector — top right, October 2026 only */}
-          <div className="relative" ref={weekDropdownRef}>
+          {/* Week Calendar Picker */}
+          <div className="relative" ref={calendarRef}>
             <button
               type="button"
-              onClick={() => setWeekDropdownOpen((o) => !o)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
+              onClick={() => {
+                setViewMonth(selectedDate.getMonth());
+                setViewYear(selectedDate.getFullYear());
+                setCalendarOpen((o) => !o);
+              }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
             >
-              <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-              <span>{OCTOBER_WEEKS[selectedWeekIdx].short}</span>
-              <ChevronDownSmall className={`w-3.5 h-3.5 text-gray-400 transition-transform ${weekDropdownOpen ? 'rotate-180' : ''}`} />
+              <Calendar className="w-3.5 h-3.5 text-[#ED4D19] shrink-0" />
+              <span className="font-medium text-[#0D212C]">
+                {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-150 ${calendarOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {weekDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 animate-in fade-in slide-in-from-top-1 duration-100">
-                {OCTOBER_WEEKS.map((week, idx) => (
+            {calendarOpen && (
+              <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-3.5 animate-in fade-in zoom-in-95 duration-100 select-none">
+                {/* Header: Month / Year with Navigation */}
+                <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-100">
                   <button
-                    key={idx}
+                    type="button"
+                    onClick={handlePrevMonth}
+                    className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                    aria-label="Previous month"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <div className="text-xs font-semibold text-[#0D212C] font-['Poppins']">
+                    {MONTH_NAMES[viewMonth]} {viewYear}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleNextMonth}
+                    className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                    aria-label="Next month"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Weekday Column Headers (Strictly Monday to Sunday) */}
+                <div className="grid grid-cols-7 mb-1 text-center">
+                  {WEEKDAY_NAMES.map((w) => (
+                    <span key={w} className="text-[10px] font-semibold text-gray-400 py-1">
+                      {w}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Days Grid */}
+                <div className="grid grid-cols-7 gap-y-1 text-center">
+                  {calendarDays.map((cell, idx) => {
+                    const isSelected = isSameDay(cell.date, selectedDate);
+                    const isInSelected = isDateInWeek(cell.date, selectedWeek.monday, selectedWeek.sunday);
+                    const isInHovered = hoveredWeek ? isDateInWeek(cell.date, hoveredWeek.monday, hoveredWeek.sunday) : false;
+                    const dayOfWeek = cell.date.getDay(); // 1 = Mon, ..., 0 = Sun
+                    const isMonday = dayOfWeek === 1;
+                    const isSunday = dayOfWeek === 0;
+
+                    let bgClass = '';
+                    if (isInSelected) {
+                      bgClass = 'bg-orange-50';
+                      if (isMonday) bgClass += ' rounded-l-full';
+                      if (isSunday) bgClass += ' rounded-r-full';
+                    } else if (isInHovered) {
+                      bgClass = 'bg-orange-50/50';
+                      if (isMonday) bgClass += ' rounded-l-full';
+                      if (isSunday) bgClass += ' rounded-r-full';
+                    }
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`h-8 flex items-center justify-center relative transition-colors ${bgClass}`}
+                        onMouseEnter={() => setHoveredDate(cell.date)}
+                        onMouseLeave={() => setHoveredDate(null)}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(cell.date);
+                            setCalendarOpen(false);
+                          }}
+                          className={`w-7 h-7 flex items-center justify-center text-xs transition-all cursor-pointer rounded-full ${
+                            isSelected
+                              ? 'bg-[#ED4D19] text-white font-semibold shadow-xs ring-2 ring-orange-200'
+                              : isInSelected
+                              ? cell.isCurrentMonth
+                                ? 'text-orange-950 font-medium hover:bg-orange-100/70'
+                                : 'text-orange-400 font-normal hover:bg-orange-100/70'
+                              : cell.isCurrentMonth
+                              ? 'text-gray-700 font-normal hover:bg-gray-100'
+                              : 'text-gray-300 font-normal hover:bg-gray-100'
+                          }`}
+                        >
+                          {cell.dayNum}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer with Selected Week Info & Quick Reset */}
+                <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between text-[11px]">
+                  <div className="text-gray-500 font-normal truncate">
+                    <span className="text-gray-400">Week: </span>
+                    <span className="font-medium text-[#0D212C]">
+                      {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
+                    </span>
+                  </div>
+                  <button
                     type="button"
                     onClick={() => {
-                      setSelectedWeekIdx(idx);
-                      setWeekDropdownOpen(false);
+                      const today = new Date(2026, 9, 14);
+                      setSelectedDate(today);
+                      setViewMonth(today.getMonth());
+                      setViewYear(today.getFullYear());
+                      setCalendarOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-xs transition-colors cursor-pointer ${
-                      selectedWeekIdx === idx
-                        ? 'text-[#ED4D19] font-semibold bg-orange-50'
-                        : 'text-gray-700 font-normal hover:bg-gray-50'
-                    }`}
+                    className="text-[#ED4D19] hover:underline font-medium text-[11px] shrink-0 ml-2 cursor-pointer"
                   >
-                    {week.label}
+                    This week
                   </button>
-                ))}
+                </div>
               </div>
             )}
           </div>
         </div>
 
-      {/* 1. Top KPI Cards (Matching Overview Page Card Design Exactly, Without Consumption Heading) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Card 1: Outputs Generated */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              OUTPUTS GENERATED
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] flex items-center justify-center">
-              <FileText className="w-4 h-4" />
+        {/* 1. Top KPI Cards (Matching Overview Page Card Design Exactly, Without Consumption Heading) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Card 1: Outputs Generated */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                OUTPUTS GENERATED
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] flex items-center justify-center">
+                <FileText className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>{weekOutputsCount}</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                {Math.round(weekOutputsCount * 0.6)} reports (P1) · {Math.round(weekOutputsCount * 0.4)} Magic Mode runs (P2)
+              </p>
             </div>
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>20</span>
-            </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              12 reports (P1) · 8 Magic Mode runs (P2)
-            </p>
-          </div>
-        </div>
 
-        {/* Card 2: Tokens Consumed */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              TOKENS CONSUMED
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <BarChart3 className="w-4 h-4" />
+          {/* Card 2: Tokens Consumed */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                TOKENS CONSUMED
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>{weekTokensConsumed}M</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
+              </p>
             </div>
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>18.6M</span>
-            </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              this week · auto-counted
-            </p>
-          </div>
-        </div>
 
-        {/* Card 3: Estimated AI Cost */}
-        <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-              ESTIMATED AI COST
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <DollarSign className="w-4 h-4" />
+          {/* Card 3: Estimated AI Cost */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                ESTIMATED AI COST
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <DollarSign className="w-4 h-4" />
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>$74</span>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>${weekAiCost}</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)} · @ $4 / 1M tokens
+              </p>
             </div>
-            <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-              this week · @ $4 / 1M tokens
-            </p>
           </div>
         </div>
       </div>
-    </div>
 
       {/* 2. Value/ROI Section */}
       <div className="space-y-3">
