@@ -8,50 +8,64 @@ import {
   RefreshCw,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Info,
+  Check
 } from 'lucide-react';
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+interface MonthWeek {
+  id: string;
+  label: string;
+  shortLabel: string;
+  monday: Date;
+  sunday: Date;
+  isCurrent?: boolean;
+}
+
+// All weeks for current month (October 2026, Monday to Sunday)
+const OCTOBER_WEEKS: MonthWeek[] = [
+  {
+    id: 'w1',
+    label: 'Sep 28 – Oct 4, 2026',
+    shortLabel: 'Sep 28 – Oct 4',
+    monday: new Date(2026, 8, 28),
+    sunday: new Date(2026, 9, 4),
+  },
+  {
+    id: 'w2',
+    label: 'Oct 5 – Oct 11, 2026',
+    shortLabel: 'Oct 5 – 11',
+    monday: new Date(2026, 9, 5),
+    sunday: new Date(2026, 9, 11),
+  },
+  {
+    id: 'w3',
+    label: 'Oct 12 – Oct 18, 2026',
+    shortLabel: 'Oct 12 – 18',
+    monday: new Date(2026, 9, 12),
+    sunday: new Date(2026, 9, 18),
+    isCurrent: true,
+  },
+  {
+    id: 'w4',
+    label: 'Oct 19 – Oct 25, 2026',
+    shortLabel: 'Oct 19 – 25',
+    monday: new Date(2026, 9, 19),
+    sunday: new Date(2026, 9, 25),
+  },
+  {
+    id: 'w5',
+    label: 'Oct 26 – Nov 1, 2026',
+    shortLabel: 'Oct 26 – Nov 1',
+    monday: new Date(2026, 9, 26),
+    sunday: new Date(2026, 10, 1),
+  },
 ];
-
-const MONTH_NAMES_SHORT = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-];
-
-// Week is strictly from Monday to Sunday
-const WEEKDAY_NAMES = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-
-// Returns Monday and Sunday of the week containing the given date
-function getMondayToSundayWeek(date: Date) {
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-  const diffToMonday = day === 0 ? 6 : day - 1;
-  const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diffToMonday);
-  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
-  return { monday, sunday };
-}
-
-function isSameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function isDateInWeek(date: Date, monday: Date, sunday: Date) {
-  const time = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-  const mTime = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()).getTime();
-  const sTime = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate()).getTime();
-  return time >= mTime && time <= sTime;
-}
 
 function formatWeekDisplay(monday: Date, sunday: Date): string {
-  const mMonth = MONTH_NAMES_SHORT[monday.getMonth()];
-  const sMonth = MONTH_NAMES_SHORT[sunday.getMonth()];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const mMonth = months[monday.getMonth()];
+  const sMonth = months[sunday.getMonth()];
   const mDay = monday.getDate();
   const sDay = sunday.getDate();
   const year = sunday.getFullYear();
@@ -175,75 +189,32 @@ function NumericStepperInput({
   );
 }
 
-const CURRENT_MONTH = 9; // October (0-indexed: 9 = October)
-const CURRENT_YEAR = 2026;
-
 export default function UsageInsights() {
-  // Selected date state (defaults to October 14, 2026, restricted to current month only)
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(CURRENT_YEAR, CURRENT_MONTH, 14));
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
+  // Week dropdown selection state (defaults to index 2: Oct 12 – 18, 2026 which is current week)
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(2);
+  const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
+  const weekDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Month and Year are strictly locked to current month (October 2026)
-  const viewMonth = CURRENT_MONTH;
-  const viewYear = CURRENT_YEAR;
-
-  // Derive Monday-to-Sunday week
-  const selectedWeek = useMemo(() => getMondayToSundayWeek(selectedDate), [selectedDate]);
-  const hoveredWeek = useMemo(() => hoveredDate ? getMondayToSundayWeek(hoveredDate) : null, [hoveredDate]);
+  const selectedWeek = OCTOBER_WEEKS[selectedWeekIndex];
 
   useEffect(() => {
-    if (!calendarOpen) return;
+    if (!weekDropdownOpen) return;
     const handler = (e: MouseEvent) => {
-      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
-        setCalendarOpen(false);
+      if (weekDropdownRef.current && !weekDropdownRef.current.contains(e.target as Node)) {
+        setWeekDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [calendarOpen]);
+  }, [weekDropdownOpen]);
 
-  const handleSelectDate = (date: Date) => {
-    // Strictly restrict selection to current month only
-    if (date.getMonth() !== CURRENT_MONTH || date.getFullYear() !== CURRENT_YEAR) {
-      return;
-    }
-    setSelectedDate(date);
-    setCalendarOpen(false);
+  const goToPrevWeek = () => {
+    setSelectedWeekIndex(prev => Math.max(0, prev - 1));
   };
 
-  const calendarDays = useMemo(() => {
-    const firstDay = new Date(viewYear, viewMonth, 1);
-    const firstDayWeekday = firstDay.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-    const leadDays = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-
-    const days: { date: Date; isCurrentMonth: boolean; dayNum: number }[] = [];
-
-    // Previous month trailing days
-    for (let i = leadDays - 1; i >= 0; i--) {
-      const d = new Date(viewYear, viewMonth, 1 - (i + 1));
-      days.push({ date: d, isCurrentMonth: false, dayNum: d.getDate() });
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      const d = new Date(viewYear, viewMonth, i);
-      days.push({ date: d, isCurrentMonth: true, dayNum: i });
-    }
-
-    // Trailing days to round up to full week (multiple of 7)
-    const remainder = days.length % 7;
-    if (remainder > 0) {
-      for (let i = 1; i <= 7 - remainder; i++) {
-        const d = new Date(viewYear, viewMonth + 1, i);
-        days.push({ date: d, isCurrentMonth: false, dayNum: i });
-      }
-    }
-
-    return days;
-  }, [viewYear, viewMonth]);
+  const goToNextWeek = () => {
+    setSelectedWeekIndex(prev => Math.min(OCTOBER_WEEKS.length - 1, prev + 1));
+  };
 
   // Dynamic KPIs derived from selected week
   const weekSeed = useMemo(() => {
@@ -353,132 +324,103 @@ export default function UsageInsights() {
             Overview
           </h2>
 
-          {/* Week Calendar Picker */}
-          <div className="relative" ref={calendarRef}>
+          {/* Week Selector: Arrow navigation + Dropdown + Info button */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Previous Week Arrow */}
             <button
               type="button"
-              onClick={() => setCalendarOpen((o) => !o)}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
+              disabled={selectedWeekIndex === 0}
+              onClick={goToPrevWeek}
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
+              title="Previous week"
+              aria-label="Previous week"
             >
-              <Calendar className="w-3.5 h-3.5 text-[#ED4D19] shrink-0" />
-              <span className="font-medium text-[#0D212C]">
-                {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
-              </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-150 ${calendarOpen ? 'rotate-180' : ''}`} />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
 
-            {calendarOpen && (
-              <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-3.5 animate-in fade-in zoom-in-95 duration-100 select-none">
-                {/* Header: Locked to Current Month Only (October 2026) */}
-                <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-100">
-                  <button
-                    type="button"
-                    disabled
-                    className="p-1 rounded-lg text-gray-300 opacity-25 cursor-not-allowed"
-                    title="Selection limited to current month only"
-                    aria-label="Previous month unavailable"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0D212C] font-['Poppins']">
-                    <span>{MONTH_NAMES[viewMonth]} {viewYear}</span>
-                    <span className="text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                      Current
-                    </span>
+            {/* Week Dropdown */}
+            <div className="relative" ref={weekDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setWeekDropdownOpen((o) => !o)}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-xs cursor-pointer"
+              >
+                <Calendar className="w-3.5 h-3.5 text-[#ED4D19] shrink-0" />
+                <span className="font-medium text-[#0D212C]">
+                  {selectedWeek.label}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-150 ${weekDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {weekDropdownOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
+                  <div className="px-3.5 py-2 text-[11px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <span>October 2026</span>
+                    <span className="text-[10px] text-gray-400 font-normal lowercase">5 weeks</span>
                   </div>
-                  <button
-                    type="button"
-                    disabled
-                    className="p-1 rounded-lg text-gray-300 opacity-25 cursor-not-allowed"
-                    title="Selection limited to current month only"
-                    aria-label="Next month unavailable"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Weekday Column Headers (Strictly Monday to Sunday) */}
-                <div className="grid grid-cols-7 mb-1 text-center">
-                  {WEEKDAY_NAMES.map((w) => (
-                    <span key={w} className="text-[10px] font-semibold text-gray-400 py-1">
-                      {w}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Days Grid */}
-                <div className="grid grid-cols-7 gap-y-1 text-center">
-                  {calendarDays.map((cell, idx) => {
-                    const isSelected = isSameDay(cell.date, selectedDate);
-                    const isInSelected = isDateInWeek(cell.date, selectedWeek.monday, selectedWeek.sunday);
-                    const isInHovered = hoveredWeek ? isDateInWeek(cell.date, hoveredWeek.monday, hoveredWeek.sunday) : false;
-                    const dayOfWeek = cell.date.getDay(); // 1 = Mon, ..., 0 = Sun
-                    const isMonday = dayOfWeek === 1;
-                    const isSunday = dayOfWeek === 0;
-
-                    let bgClass = '';
-                    if (cell.isCurrentMonth && isInSelected) {
-                      bgClass = 'bg-orange-50';
-                      if (isMonday) bgClass += ' rounded-l-full';
-                      if (isSunday) bgClass += ' rounded-r-full';
-                    } else if (cell.isCurrentMonth && isInHovered) {
-                      bgClass = 'bg-orange-50/50';
-                      if (isMonday) bgClass += ' rounded-l-full';
-                      if (isSunday) bgClass += ' rounded-r-full';
-                    }
-
-                    return (
-                      <div
-                        key={idx}
-                        className={`h-8 flex items-center justify-center relative transition-colors ${bgClass}`}
-                        onMouseEnter={() => {
-                          if (cell.isCurrentMonth) setHoveredDate(cell.date);
-                        }}
-                        onMouseLeave={() => setHoveredDate(null)}
-                      >
+                  <div className="py-1">
+                    {OCTOBER_WEEKS.map((w, idx) => {
+                      const isSelected = idx === selectedWeekIndex;
+                      return (
                         <button
+                          key={w.id}
                           type="button"
-                          disabled={!cell.isCurrentMonth}
-                          onClick={() => handleSelectDate(cell.date)}
-                          className={`w-7 h-7 flex items-center justify-center text-xs transition-all rounded-full ${
-                            !cell.isCurrentMonth
-                              ? 'text-gray-200 cursor-not-allowed pointer-events-none select-none opacity-30'
-                              : isSelected
-                              ? 'bg-[#ED4D19] text-white font-semibold shadow-xs ring-2 ring-orange-200 cursor-pointer'
-                              : isInSelected
-                              ? 'text-orange-950 font-medium hover:bg-orange-100/70 cursor-pointer'
-                              : 'text-gray-700 font-normal hover:bg-gray-100 cursor-pointer'
+                          onClick={() => {
+                            setSelectedWeekIndex(idx);
+                            setWeekDropdownOpen(false);
+                          }}
+                          className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                            isSelected
+                              ? 'bg-orange-50/80 text-[#ED4D19] font-medium'
+                              : 'text-gray-700 hover:bg-gray-50 font-normal'
                           }`}
-                          title={!cell.isCurrentMonth ? 'Only current month dates are available' : undefined}
                         >
-                          {cell.dayNum}
+                          <div className="flex items-center gap-2">
+                            <span>{w.label}</span>
+                            {w.isCurrent && (
+                              <span className="text-[10px] font-medium bg-orange-100 text-[#ED4D19] px-1.5 py-0.5 rounded-full">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-[#ED4D19] shrink-0" />
+                          )}
                         </button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Footer with Selected Week Info & Quick Reset */}
-                <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between text-[11px]">
-                  <div className="text-gray-500 font-normal truncate">
-                    <span className="text-gray-400">Week: </span>
-                    <span className="font-medium text-[#0D212C]">
-                      {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
-                    </span>
+                      );
+                    })}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const today = new Date(CURRENT_YEAR, CURRENT_MONTH, 14);
-                      handleSelectDate(today);
-                    }}
-                    className="text-[#ED4D19] hover:underline font-medium text-[11px] shrink-0 ml-2 cursor-pointer"
-                  >
-                    This week
-                  </button>
                 </div>
+              )}
+            </div>
+
+            {/* Next Week Arrow */}
+            <button
+              type="button"
+              disabled={selectedWeekIndex === OCTOBER_WEEKS.length - 1}
+              onClick={goToNextWeek}
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
+              title="Next week"
+              aria-label="Next week"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Info Button with Tooltip */}
+            <div className="relative group flex items-center">
+              <button
+                type="button"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+                title="Week selection info"
+                aria-label="Week selection info"
+              >
+                <Info className="w-3.5 h-3.5" />
+              </button>
+              {/* Tooltip on hover */}
+              <div className="absolute right-0 top-full mt-1.5 hidden group-hover:flex z-50 whitespace-nowrap bg-[#0D212C] text-white text-[11px] font-normal px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none items-center gap-1.5 animate-in fade-in duration-150">
+                <span>Week selection is valid for current month only</span>
               </div>
-            )}
+            </div>
           </div>
         </div>
 

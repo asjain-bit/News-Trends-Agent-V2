@@ -21,6 +21,16 @@ export default function ChooseReportType() {
 
   return (
     <div className="w-full px-5 py-8 md:py-10 flex flex-col">
+      {/* Page Header */}
+      <div className="mb-6 space-y-1">
+        <h1 className="text-[18px] font-semibold text-[#0D212C] font-['Poppins']">
+          Create a new intelligence report
+        </h1>
+        <p className="text-[14px] text-gray-500 font-normal">
+          Choose a report type and describe what you want to research.
+        </p>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -35,7 +45,7 @@ export default function ChooseReportType() {
           </div>
           <div className="flex flex-col gap-1.5 max-w-3xl">
             <h2 className="text-[1.125rem] font-semibold font-['Poppins'] text-[#0D212C] leading-snug">
-              Health Tech Landscape Report
+              Health Tech Landscape
             </h2>
             <p className="text-[0.875rem] text-slate-500 font-normal leading-relaxed">
               Healthcare technology market analysis for a selected country, covering trends, competitors, investments, and regulations.

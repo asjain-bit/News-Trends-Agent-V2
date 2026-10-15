@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
 import { v4 as uuidv4 } from 'uuid';
-import { ChevronLeft, Check, Upload, Clock, ChevronDown, Search, X, FileText, LayoutList, Paperclip, ShieldCheck, Globe, Tag, Layers, FileSearch, Target, MapPin, AlertTriangle, Sparkles } from 'lucide-react';
+import { ChevronLeft, Check, Upload, Clock, ChevronDown, Search, X, FileText, LayoutList, Paperclip, Shield, ShieldCheck, Globe, Tag, Layers, FileSearch, Target, MapPin, AlertTriangle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom hook for clicking outside dropdowns
@@ -62,7 +62,7 @@ export default function BuildRequest() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   
   const [inputs, setInputs] = useState({
-    reportType: 'Health Tech Landscape Report',
+    reportType: 'Health Tech Landscape',
     geography: [] as string[],
     domains: [] as string[],
     depth: 'Quick Overview',
@@ -204,10 +204,10 @@ export default function BuildRequest() {
   const showEmptyState = inputs.geography.length === 0 && inputs.domains.length === 0;
 
   const getRuntime = () => {
-    if (inputs.depth === 'Quick Overview') return '10 – 15 minutes';
-    if (inputs.depth === 'Standard Analysis') return '20 – 30 minutes';
-    if (inputs.depth === 'Deep Dive') return '30 – 45 minutes';
-    return '30 – 45 minutes'; // default fallback
+    if (inputs.depth === 'Quick Overview') return '10 –15 mins';
+    if (inputs.depth === 'Standard Analysis') return '20 –30 mins';
+    if (inputs.depth === 'Deep Dive') return '30 –45 mins';
+    return '10 –15 mins'; // default fallback
   };
 
   const handleBack = () => {
@@ -341,24 +341,24 @@ export default function BuildRequest() {
           {/* Flat Form Sections */}
           <div className="space-y-8 w-full">
             
-            {/* Technology (Fixed to Tech Landscape, disabled dropdown icon, soft dark grey color) */}
+            {/* Technology */}
             <div>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Technology</span>
                 <span className="text-red-500 ml-0.5">*</span>
               </label>
-              <div className="w-full bg-white border border-gray-200 rounded-lg p-3 flex items-center justify-between shadow-xs cursor-not-allowed">
-                <span className="text-[0.875rem] font-normal text-slate-700">Health Tech Landscape Report</span>
-                <ChevronDown className="w-4 h-4 text-gray-300" />
-              </div>
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-1.5">
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
                 Select the category of the report you want to generate.
               </p>
+              <div className="w-full bg-white border border-gray-200 rounded-lg p-3 flex items-center justify-between shadow-xs cursor-not-allowed">
+                <span className="text-[0.875rem] font-normal text-slate-700">Health Tech Landscape</span>
+                <ChevronDown className="w-4 h-4 text-gray-300" />
+              </div>
             </div>
 
             {/* Geography (Multi-select, Alphabetical, Search/Suggestions, Peer Suggestion Chip, Max 5 limit) */}
             <div className="relative" ref={openDropdown === 'geography' ? dropdownRef : null}>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <label className="flex items-center text-[0.875rem] font-medium text-slate-700">
                   <span>Geography</span>
                   <span className="text-red-500 ml-0.5">*</span>
@@ -367,6 +367,9 @@ export default function BuildRequest() {
                   {inputs.geography.length}/5 selected
                 </span>
               </div>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
+                Select up to 5 countries in alphabetical order. Agent peer suggestions are available.
+              </p>
               
               {/* Selected input field & dropdown trigger */}
               <div 
@@ -392,10 +395,6 @@ export default function BuildRequest() {
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
               </div>
-              
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-1.5">
-                Select up to 5 countries in alphabetical order. Agent peer suggestions are available.
-              </p>
 
               {/* Agent "Find peers" Suggestion Button & Chips (Visually appealing styling) */}
               {inputs.geography.length >= 1 && (
@@ -478,10 +477,13 @@ export default function BuildRequest() {
 
             {/* Technology Domain */}
             <div className="relative" ref={openDropdown === 'domain' ? dropdownRef : null}>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Technology Domain</span>
                 <span className="text-red-500 ml-0.5">*</span>
               </label>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
+                Select one or more technology domains relevant to your report.
+              </p>
               <div 
                 className={`w-full bg-white border rounded-lg p-2.5 flex items-center justify-between cursor-pointer transition-colors min-h-[46px] shadow-xs ${openDropdown === 'domain' ? 'border-gray-300 ring-1 ring-gray-200' : 'border-gray-200 hover:border-gray-300'}`}
                 onClick={() => setOpenDropdown(openDropdown === 'domain' ? null : 'domain')}
@@ -501,10 +503,6 @@ export default function BuildRequest() {
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
               </div>
-              
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-1.5">
-                Select one or more technology domains relevant to your report.
-              </p>
 
               {/* Agent Suggestion Chips for Technology Domain */}
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -568,12 +566,15 @@ export default function BuildRequest() {
               )}
             </div>
 
-            {/* Report Depth (Quick Overview selected by default, softer text and dark grey titles) */}
+            {/* Report Depth */}
             <div>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Report Depth</span>
                 <span className="text-red-500 ml-0.5">*</span>
               </label>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-3">
+                Choose the level of analysis and expected report size. Generation times are estimates.
+              </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
@@ -598,16 +599,16 @@ export default function BuildRequest() {
                   </div>
                 ))}
               </div>
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-2">
-                Choose the level of analysis and expected report size. Generation times are estimates.
-              </p>
             </div>
 
             {/* Focus Lens */}
             <div className="relative" ref={openDropdown === 'focus' ? dropdownRef : null}>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Focus Lens</span>
               </label>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
+                Select key areas you want the report to focus on.
+              </p>
               <div 
                 className={`w-full bg-white border rounded-lg p-2.5 flex items-center justify-between cursor-pointer transition-colors min-h-[46px] shadow-xs ${openDropdown === 'focus' ? 'border-gray-300 ring-1 ring-gray-200' : 'border-gray-200 hover:border-gray-300'}`}
                 onClick={() => setOpenDropdown(openDropdown === 'focus' ? null : 'focus')}
@@ -627,10 +628,6 @@ export default function BuildRequest() {
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
               </div>
-              
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-1.5">
-                Select key areas you want the report to focus on.
-              </p>
 
               {/* Agent Suggestion Chips for Focus Lens */}
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -693,9 +690,12 @@ export default function BuildRequest() {
 
             {/* Supporting Documents */}
             <div>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Supporting Documents</span>
               </label>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
+                Attach relevant research, briefs, or reference documents to include in the analysis.
+              </p>
 
               <div 
                 className="border border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center py-8 hover:border-gray-400 hover:bg-gray-50 cursor-pointer transition-colors relative shadow-xs"
@@ -739,9 +739,12 @@ export default function BuildRequest() {
 
             {/* Additional Instructions */}
             <div>
-              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-2">
+              <label className="flex items-center text-[0.875rem] font-medium text-slate-700 mb-1">
                 <span>Additional Instructions</span>
               </label>
+              <p className="text-[0.75rem] text-gray-500 font-normal mb-2">
+                Add any specific instructions or preferences for your report.
+              </p>
               
               <div className="relative">
                 <textarea
@@ -758,9 +761,6 @@ export default function BuildRequest() {
                   {inputs.additionalInstructions.length}/500
                 </div>
               </div>
-              <p className="text-[0.75rem] text-gray-400 font-normal mt-1.5">
-                Add any specific instructions or preferences for your report.
-              </p>
             </div>
 
           </div>
@@ -798,143 +798,167 @@ export default function BuildRequest() {
       >
         <div className="w-[420px] h-full flex flex-col">
           {/* Header */}
-          <div className="h-20 px-6 flex flex-col justify-center shrink-0">
-            <h2 className="text-[1.125rem] font-medium font-['Poppins'] text-slate-800 mb-0.5">Review Scope</h2>
+          <div className="h-20 px-6 flex flex-col justify-center shrink-0 border-b border-gray-100">
+            <h2 className="text-[1.125rem] font-bold font-['Poppins'] text-slate-900 mb-0.5">Review Scope</h2>
             <p className="text-[0.8125rem] text-gray-500 font-normal">Review your selections before generating the report.</p>
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-6 pb-6 flex flex-col custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col custom-scrollbar">
             
-            {showEmptyState ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-center px-4 py-12">
-                <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-3 border border-gray-100">
-                  <FileSearch className="w-7 h-7 text-gray-300" strokeWidth={1.5} />
+            {/* Top Teal Highlight Box */}
+            <div className="bg-[#f0fbfb] border border-[#cbebec] rounded-2xl p-4 mb-3">
+              <p className="text-[0.8125rem] text-slate-700 font-normal leading-relaxed">
+                Your report will include analysis of{' '}
+                <strong className="font-semibold text-slate-900">
+                  {inputs.domains.length > 0 ? inputs.domains.join(', ') : 'select domains'}
+                </strong>{' '}
+                in{' '}
+                <strong className="font-semibold text-slate-900">
+                  {inputs.geography.length > 0 ? inputs.geography.join(', ') : 'select countries'}
+                </strong>.
+              </p>
+            </div>
+
+            {/* List Details with Separators */}
+            <div className="divide-y divide-gray-100">
+              
+              {/* Technology */}
+              <div className="flex items-center justify-between py-4">
+                <div className="flex items-center gap-2.5 text-slate-700">
+                  <LayoutList className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="font-medium text-[0.875rem] text-slate-700">Technology</span>
                 </div>
-                <h3 className="text-[0.9375rem] font-medium text-slate-800 mb-1.5">No selections yet</h3>
-                <p className="text-[0.8125rem] text-gray-500 font-normal leading-relaxed max-w-[250px]">
-                  Fill in the required fields to generate a report summary for review before generating your report.
-                </p>
+                <span className="font-semibold text-slate-900 text-[0.875rem]">{inputs.reportType}</span>
               </div>
-            ) : (
-              <>
-                {/* Dynamic Summary Card */}
-                <div className="bg-cyan-50/40 border border-[#36c0c9]/20 rounded-xl p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <div className="text-[0.8125rem] text-slate-600 font-normal leading-relaxed">
-                      Your report will include analysis of {formatDomainsForSummary()} in {formatGeographyForSummary()}
-                      {inputs.focusLens.length > 0 && (
-                        <> with a specific focus on {formatFocusForSummary()}</>
-                      )}.
-                      <br/><br/>
-                      The report will cover market trends, key players, competitor analysis, regulations, investment activity, and emerging opportunities.
-                    </div>
+              
+              {/* Geography */}
+              <div className="py-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <Globe className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium text-[0.875rem] text-slate-700">Geography</span>
                   </div>
+                  {inputs.geography.length > 0 && (
+                    <span className="text-[0.75rem] text-gray-400 font-normal">
+                      {inputs.geography.length} {inputs.geography.length === 1 ? 'country' : 'countries'}
+                    </span>
+                  )}
                 </div>
-
-                {/* List Details */}
-                <div className="space-y-0">
-                  <div className="flex items-center justify-between py-3.5 border-b border-gray-100">
-                    <div className="flex items-center gap-2.5 text-gray-500">
-                      <LayoutList className="w-4 h-4 text-gray-400" />
-                      <span className="font-normal text-[0.8125rem] text-gray-500">Technology</span>
-                    </div>
-                    <span className="font-normal text-slate-700 text-[0.8125rem]">{inputs.reportType}</span>
-                  </div>
-                  
-                  <div className="flex flex-col gap-2 py-3.5 border-b border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 text-gray-500">
-                        <Globe className="w-4 h-4 text-gray-400" />
-                        <span className="font-normal text-[0.8125rem] text-gray-500">Geography</span>
-                      </div>
-                      <span className="text-[0.75rem] text-gray-400 font-normal">
-                        {inputs.geography.length} {inputs.geography.length === 1 ? 'country' : 'countries'}
+                {inputs.geography.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {inputs.geography.map(country => (
+                      <span key={country} className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-full text-[0.75rem] font-normal flex items-center gap-1">
+                        <span>{getCountryFlag(country)}</span>
+                        <span>{country}</span>
                       </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 w-full">
-                      {inputs.geography.length > 0 ? inputs.geography.map(country => (
-                        <span key={country} className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-full text-[0.75rem] font-normal flex items-center gap-1">
-                          <span>{getCountryFlag(country)}</span>
-                          <span>{country}</span>
-                        </span>
-                      )) : <span className="text-[0.8125rem] text-gray-400 font-normal">-</span>}
-                    </div>
+                    ))}
                   </div>
+                ) : (
+                  <span className="text-[0.875rem] text-slate-500 font-normal">Select Geography</span>
+                )}
+              </div>
 
-                  <div className="flex flex-col gap-2.5 py-3.5 border-b border-gray-100">
-                    <div className="flex items-center gap-2.5 text-gray-500">
-                      <Tag className="w-4 h-4 text-gray-400" />
-                      <span className="font-normal text-[0.8125rem] text-gray-500">Technology Domain</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 w-full">
-                      {inputs.domains.length > 0 ? inputs.domains.map(d => (
-                        <span key={d} className="px-2.5 py-1 bg-cyan-50/40 border border-[#36c0c9]/30 text-[#0E7C86] rounded-full text-[0.75rem] font-normal leading-none">{d}</span>
-                      )) : <span className="text-[0.8125rem] text-gray-400 font-normal">-</span>}
-                    </div>
+              {/* Technology Domain */}
+              <div className="py-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <Tag className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium text-[0.875rem] text-slate-700">Technology Domain</span>
                   </div>
-
-                  {inputs.focusLens.length > 0 && (
-                    <div className="flex flex-col gap-2.5 py-3.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2.5 text-gray-500">
-                        <Target className="w-4 h-4 text-gray-400" />
-                        <span className="font-normal text-[0.8125rem] text-gray-500">Focus Lens</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 w-full">
-                        {inputs.focusLens.map(f => (
-                          <span key={f} className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-full text-[0.75rem] font-normal leading-none">{f}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {inputs.additionalInstructions && (
-                    <div className="flex flex-col gap-2.5 py-3.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2.5 text-gray-500">
-                        <FileText className="w-4 h-4 text-gray-400" />
-                        <span className="font-normal text-[0.8125rem] text-gray-500">Additional Instructions</span>
-                      </div>
-                      <div className="text-[0.8125rem] text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 font-normal">
-                        {inputs.additionalInstructions}
-                      </div>
-                    </div>
-                  )}
-
-                  {inputs.files.length > 0 && (
-                    <div className="flex flex-col gap-2.5 py-3.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2.5 text-gray-500">
-                        <Paperclip className="w-4 h-4 text-gray-400" />
-                        <span className="font-normal text-[0.8125rem] text-gray-500">Supporting Documents</span>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        {inputs.files.map((f, i) => (
-                          <div key={i} className="flex items-center gap-2 text-[0.8125rem] bg-white border border-gray-200 p-2 rounded-md shadow-xs">
-                            <FileText className="w-3.5 h-3.5 text-[#36c0c9]" />
-                            <span className="truncate text-slate-700 font-normal">{f.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  {inputs.domains.length > 0 && (
+                    <span className="text-[0.75rem] text-gray-400 font-normal">
+                      {inputs.domains.length} {inputs.domains.length === 1 ? 'domain' : 'domains'}
+                    </span>
                   )}
                 </div>
-              </>
-            )}
+                {inputs.domains.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {inputs.domains.map(d => (
+                      <span key={d} className="px-2.5 py-1 bg-[#e6f7f8] border border-[#36c0c9]/30 text-[#0E7C86] rounded-full text-[0.75rem] font-medium">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-[0.875rem] text-slate-500 font-normal">Select Technology Domain</span>
+                )}
+              </div>
+
+              {/* Report Depth */}
+              <div className="flex items-center justify-between py-4">
+                <div className="flex items-center gap-2.5 text-slate-700">
+                  <Clock className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="font-medium text-[0.875rem] text-slate-700">Report Depth</span>
+                </div>
+                <span className="font-semibold text-slate-900 text-[0.875rem]">{inputs.depth || 'Quick Overview'}</span>
+              </div>
+
+              {/* Focus Lens (if selected) */}
+              {inputs.focusLens.length > 0 && (
+                <div className="py-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <Target className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium text-[0.875rem] text-slate-700">Focus Lens</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {inputs.focusLens.map(f => (
+                      <span key={f} className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-full text-[0.75rem] font-normal leading-none">{f}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Instructions (if provided) */}
+              {inputs.additionalInstructions && (
+                <div className="py-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium text-[0.875rem] text-slate-700">Additional Instructions</span>
+                  </div>
+                  <div className="text-[0.8125rem] text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 font-normal">
+                    {inputs.additionalInstructions}
+                  </div>
+                </div>
+              )}
+
+              {/* Supporting Documents (if uploaded) */}
+              {inputs.files.length > 0 && (
+                <div className="py-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <Paperclip className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium text-[0.875rem] text-slate-700">Supporting Documents</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {inputs.files.map((f, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[0.8125rem] bg-white border border-gray-200 p-2 rounded-md shadow-xs">
+                        <FileText className="w-3.5 h-3.5 text-[#36c0c9]" />
+                        <span className="truncate text-slate-700 font-normal">{f.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
 
           </div>
 
-          {/* Footer Info */}
-          <div className="p-5 bg-white border-t border-gray-100 shrink-0 flex flex-col gap-3.5 text-[0.8125rem] text-gray-500">
-            <div className="flex items-center gap-3 bg-[#f0f9fa] px-3.5 py-2.5 rounded-lg border border-[#36c0c9]/30 w-full">
-              <Clock className="w-4 h-4 text-[#36c0c9]" />
+          {/* Footer Info / Estimated Runtime Box matching Image 2 */}
+          <div className="p-5 bg-white border-t border-gray-100 shrink-0 flex flex-col gap-3.5">
+            <div className="bg-[#f0fbfb] border border-[#cbebec] rounded-2xl p-4 flex items-center gap-3.5 w-full">
+              <Clock className="w-5 h-5 text-[#0E7C86] shrink-0" />
               <div>
-                <div className="text-[0.75rem] font-medium text-slate-800">Estimated Runtime</div>
-                <div className="text-[0.8125rem] text-[#36c0c9] font-medium">{getRuntime()}</div>
+                <div className="text-[0.8125rem] font-bold text-slate-900">Estimated Runtime</div>
+                <div className="text-[0.9375rem] text-[#0E7C86] font-bold mt-0.5">{getRuntime()}</div>
               </div>
             </div>
-             <div className="flex gap-2.5">
-               <ShieldCheck className="w-4 h-4 shrink-0 text-gray-400 mt-0.5" />
-               <p className="leading-relaxed text-gray-500 text-[0.75rem] font-normal">You can review and edit the configuration anytime before the report is generated.</p>
-             </div>
+            <div className="flex items-start gap-2.5 px-1 text-gray-500 text-[0.75rem]">
+              <Shield className="w-4 h-4 shrink-0 text-gray-400 mt-0.5" />
+              <p className="leading-relaxed text-gray-500 text-[0.75rem] font-normal">
+                You can review and edit the configuration anytime before the report is generated.
+              </p>
+            </div>
           </div>
         </div>
       </div>
