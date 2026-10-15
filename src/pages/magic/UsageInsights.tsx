@@ -223,7 +223,6 @@ export default function UsageInsights() {
 
   const weekOutputsCount = useMemo(() => 18 + weekSeed, [weekSeed]);
   const weekTokensConsumed = useMemo(() => (16.2 + weekSeed * 0.8).toFixed(1), [weekSeed]);
-  const weekAiCost = useMemo(() => 66 + weekSeed * 4, [weekSeed]);
 
   // Input assumptions state (Form inputs)
   const [formHours, setFormHours] = useState<number>(4);
@@ -272,6 +271,8 @@ export default function UsageInsights() {
     const tokensM = parseFloat(weekTokensConsumed) || 0;
     return Math.max(1, Math.round(tokensM * appliedTokenPrice));
   }, [weekTokensConsumed, appliedTokenPrice]);
+
+  const weekAiCost = totalAiCost;
 
   const savedDollars = useMemo(() => {
     return Math.max(0, totalManualCost - totalAiCost);
@@ -470,10 +471,10 @@ export default function UsageInsights() {
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-                <span>${weekAiCost}</span>
+                <span>${weekAiCost.toLocaleString()}</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)} · @ $4 / 1M tokens
+                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)} · @ ${appliedTokenPrice % 1 === 0 ? appliedTokenPrice : appliedTokenPrice.toFixed(2)} / 1M tokens
               </p>
             </div>
           </div>
