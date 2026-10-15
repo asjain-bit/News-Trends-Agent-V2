@@ -147,10 +147,10 @@ function NumericStepperInput({
   };
 
   return (
-    <div className="flex items-center gap-1.5 shrink-0">
-      <div className="h-[26px] flex items-center bg-white border border-gray-200 rounded-lg px-2">
+    <div className="flex items-center gap-2 shrink-0">
+      <div className="h-[36px] flex items-center bg-white border border-gray-200 rounded-lg px-2.5 shadow-2xs hover:border-gray-300 transition-colors">
         {prefix && (
-          <span className="text-[11px] text-gray-400 font-normal mr-1 select-none">
+          <span className="text-xs text-gray-400 font-normal mr-1 select-none">
             {prefix}
           </span>
         )}
@@ -160,29 +160,29 @@ function NumericStepperInput({
           value={localStr}
           onChange={handleInputChange}
           onBlur={handleBlur}
-          className="w-12 bg-transparent text-[11px] font-semibold text-[#0D212C] text-right outline-none focus:outline-none focus:ring-0 mr-1.5 leading-none"
+          className="w-14 bg-transparent text-xs sm:text-[13px] font-semibold text-[#0D212C] text-right outline-none focus:outline-none focus:ring-0 mr-1.5 leading-none"
         />
-        {/* Stepper Chevron Arrows: compact, no fill, subtle gray */}
-        <div className="flex flex-col items-center justify-center border-l border-gray-100 pl-1 text-gray-400 -space-y-0.5">
+        {/* Stepper Chevron Arrows: comfortable click target */}
+        <div className="flex flex-col items-center justify-center border-l border-gray-100 pl-1.5 text-gray-400 -space-y-0.5">
           <button
             type="button"
             onClick={increment}
-            className="p-0 hover:text-gray-700 active:scale-95 transition-colors cursor-pointer bg-transparent border-0 leading-none"
+            className="p-0.5 hover:text-gray-700 active:scale-95 transition-colors cursor-pointer bg-transparent border-0 leading-none"
             title="Increase"
           >
-            <ChevronUp className="w-2.5 h-2.5 stroke-[2.2] fill-none" />
+            <ChevronUp className="w-3 h-3 stroke-[2.2] fill-none" />
           </button>
           <button
             type="button"
             onClick={decrement}
-            className="p-0 hover:text-gray-700 active:scale-95 transition-colors cursor-pointer bg-transparent border-0 leading-none"
+            className="p-0.5 hover:text-gray-700 active:scale-95 transition-colors cursor-pointer bg-transparent border-0 leading-none"
             title="Decrease"
           >
-            <ChevronDown className="w-2.5 h-2.5 stroke-[2.2] fill-none" />
+            <ChevronDown className="w-3 h-3 stroke-[2.2] fill-none" />
           </button>
         </div>
       </div>
-      <span className="text-[11px] text-gray-400 font-normal min-w-[34px] select-none">
+      <span className="text-xs text-gray-500 font-medium min-w-[36px] select-none">
         {unit}
       </span>
     </div>
@@ -229,27 +229,21 @@ export default function UsageInsights() {
   const [formHours, setFormHours] = useState<number>(4);
   const [formCostPerHour, setFormCostPerHour] = useState<number>(30);
   const [formTokenPrice, setFormTokenPrice] = useState<number>(4.00);
-  const [formAvgTokens, setFormAvgTokens] = useState<number>(25000);
-  const [formReportsPerWeek, setFormReportsPerWeek] = useState<number>(10);
 
   // Applied state: Right-side financial impact only recalculates when user clicks Recalculate
   const [appliedHours, setAppliedHours] = useState<number>(4);
   const [appliedCostPerHour, setAppliedCostPerHour] = useState<number>(30);
   const [appliedTokenPrice, setAppliedTokenPrice] = useState<number>(4.00);
-  const [appliedAvgTokens, setAppliedAvgTokens] = useState<number>(25000);
-  const [appliedReportsPerWeek, setAppliedReportsPerWeek] = useState<number>(10);
 
   const hasPendingChanges = useMemo(() => {
     return (
       formHours !== appliedHours ||
       formCostPerHour !== appliedCostPerHour ||
-      formTokenPrice !== appliedTokenPrice ||
-      formAvgTokens !== appliedAvgTokens ||
-      formReportsPerWeek !== appliedReportsPerWeek
+      formTokenPrice !== appliedTokenPrice
     );
   }, [
-    formHours, formCostPerHour, formTokenPrice, formAvgTokens, formReportsPerWeek,
-    appliedHours, appliedCostPerHour, appliedTokenPrice, appliedAvgTokens, appliedReportsPerWeek
+    formHours, formCostPerHour, formTokenPrice,
+    appliedHours, appliedCostPerHour, appliedTokenPrice
   ]);
 
   const [isRecalculating, setIsRecalculating] = useState<boolean>(false);
@@ -261,25 +255,23 @@ export default function UsageInsights() {
       setAppliedHours(formHours);
       setAppliedCostPerHour(formCostPerHour);
       setAppliedTokenPrice(formTokenPrice);
-      setAppliedAvgTokens(formAvgTokens);
-      setAppliedReportsPerWeek(formReportsPerWeek);
       setIsRecalculating(false);
     }, 800);
   };
 
-  // Live Calculated metrics derived from APPLIED state
+  // Live Calculated metrics derived from APPLIED state and selected week outputs/tokens
   const totalManualHours = useMemo(() => {
-    return Math.max(0, Math.round(appliedReportsPerWeek * appliedHours));
-  }, [appliedReportsPerWeek, appliedHours]);
+    return Math.max(0, Math.round(weekOutputsCount * appliedHours));
+  }, [weekOutputsCount, appliedHours]);
 
   const totalManualCost = useMemo(() => {
-    return Math.max(0, Math.round(appliedReportsPerWeek * appliedHours * appliedCostPerHour));
-  }, [appliedReportsPerWeek, appliedHours, appliedCostPerHour]);
+    return Math.max(0, Math.round(weekOutputsCount * appliedHours * appliedCostPerHour));
+  }, [weekOutputsCount, appliedHours, appliedCostPerHour]);
 
   const totalAiCost = useMemo(() => {
-    const rawCost = appliedReportsPerWeek * ((appliedAvgTokens / 1_000_000) * appliedTokenPrice + 0.90);
-    return Math.max(1, Math.round(rawCost));
-  }, [appliedReportsPerWeek, appliedAvgTokens, appliedTokenPrice]);
+    const tokensM = parseFloat(weekTokensConsumed) || 0;
+    return Math.max(1, Math.round(tokensM * appliedTokenPrice));
+  }, [weekTokensConsumed, appliedTokenPrice]);
 
   const savedDollars = useMemo(() => {
     return Math.max(0, totalManualCost - totalAiCost);
@@ -287,8 +279,8 @@ export default function UsageInsights() {
 
   const roiMultiple = useMemo(() => {
     if (totalAiCost <= 0) return 100;
-    return Math.max(1, Math.round(savedDollars / totalAiCost));
-  }, [savedDollars, totalAiCost]);
+    return Math.max(1, Math.round(totalManualCost / totalAiCost));
+  }, [totalManualCost, totalAiCost]);
 
   // Breakdown data matching Image 1
   const domainData = [
@@ -496,13 +488,13 @@ export default function UsageInsights() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* Left Column: Assumptions Table Card (50% width on lg) */}
-          <div className="w-full bg-white rounded-2xl border border-gray-200/90 p-3.5 sm:p-4 shadow-xs flex flex-col justify-between space-y-2">
-            <div className="divide-y divide-gray-100">
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
+            <div className="divide-y divide-gray-100 flex-1 flex flex-col justify-between py-1">
               {/* Row 1: Hours spent on manual research */}
-              <div className="py-1 flex items-center justify-between gap-3 first:pt-0">
-                <div className="text-[11px] sm:text-xs text-gray-700 leading-tight">
-                  <span>Hours spent on manual research</span>
-                  <span className="block text-[0.625rem] text-gray-400 font-normal">(per report)</span>
+              <div className="py-3 flex items-center justify-between gap-3 first:pt-0">
+                <div className="text-xs sm:text-[13px] text-gray-700 leading-tight">
+                  <span className="font-medium">Hours spent on manual research</span>
+                  <span className="block text-[11px] text-gray-400 font-normal mt-0.5">(per report)</span>
                 </div>
                 <NumericStepperInput
                   value={formHours}
@@ -514,8 +506,8 @@ export default function UsageInsights() {
               </div>
 
               {/* Row 2: Cost per hour */}
-              <div className="py-1 flex items-center justify-between gap-3">
-                <div className="text-[11px] sm:text-xs text-gray-700 leading-tight">
+              <div className="py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] font-medium text-gray-700 leading-tight">
                   Cost per hour
                 </div>
                 <NumericStepperInput
@@ -529,9 +521,9 @@ export default function UsageInsights() {
               </div>
 
               {/* Row 3: Token price */}
-              <div className="py-1 flex items-center justify-between gap-3">
-                <div className="text-[11px] sm:text-xs text-gray-700 leading-tight">
-                  Token price <span className="text-[0.625rem] text-gray-400 font-normal">(per 1M tokens)</span>
+              <div className="py-3 flex items-center justify-between gap-3 last:pb-0">
+                <div className="text-xs sm:text-[13px] text-gray-700 leading-tight">
+                  <span className="font-medium">Token price</span> <span className="text-[11px] text-gray-400 font-normal">(per 1M tokens)</span>
                 </div>
                 <NumericStepperInput
                   value={formTokenPrice}
@@ -543,41 +535,12 @@ export default function UsageInsights() {
                   max={100}
                 />
               </div>
-
-              {/* Row 4: Average tokens per report */}
-              <div className="py-1 flex items-center justify-between gap-3">
-                <div className="text-[11px] sm:text-xs text-gray-700 leading-tight">
-                  Average tokens per report
-                </div>
-                <NumericStepperInput
-                  value={formAvgTokens}
-                  onChange={setFormAvgTokens}
-                  unit="tokens"
-                  step={1000}
-                  min={1000}
-                  max={1000000}
-                />
-              </div>
-
-              {/* Row 5: Number of reports (per week) */}
-              <div className="py-1 flex items-center justify-between gap-3 last:pb-0">
-                <div className="text-[11px] sm:text-xs text-gray-700 leading-tight">
-                  Number of reports <span className="text-[0.625rem] text-gray-400 font-normal">(per week)</span>
-                </div>
-                <NumericStepperInput
-                  value={formReportsPerWeek}
-                  onChange={setFormReportsPerWeek}
-                  unit="reports"
-                  min={1}
-                  max={500}
-                />
-              </div>
             </div>
 
             {/* Recalculate CTA Button: disabled until edited, with reduced opacity */}
-            <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+            <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-1">
               <span className="text-[11px] text-gray-400 font-normal">
-                {hasPendingChanges ? 'Unapplied changes' : 'Values up to date'}
+                {hasPendingChanges ? 'Unapplied changes' : 'AI cost excludes web search'}
               </span>
               <button
                 type="button"
@@ -596,7 +559,7 @@ export default function UsageInsights() {
           </div>
 
           {/* Right Column: Unified Financial Impact & ROI Section (50% width on lg) */}
-          <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-xs p-3.5 sm:p-4.5 grid grid-rows-2 divide-y divide-gray-100 transition-all duration-300 relative overflow-hidden">
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-xs p-3.5 sm:p-4.5 grid grid-rows-2 divide-y divide-gray-100 transition-all duration-300 relative">
             {/* Loading Animation & Text during Recalculate */}
             {isRecalculating && (
               <div className="absolute inset-0 bg-white/95 backdrop-blur-2xs rounded-2xl flex flex-col items-center justify-center z-20 space-y-2.5 transition-all">
@@ -612,8 +575,18 @@ export default function UsageInsights() {
               <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
                 {/* Manual cost */}
                 <div className="sm:pr-5 space-y-0.5 pb-2 sm:pb-0">
-                  <div className="text-xs font-semibold text-gray-700">
-                    Manual cost
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                    <span>Manual cost</span>
+                    <div className="relative group/tip inline-flex items-center">
+                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Manual cost info">
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                        <div>Manual cost is the multiply of manual hours into cost per hour.</div>
+                        <div className="mt-0.5">Outputs × Manual hours × Cost per hour</div>
+                        <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-xl sm:text-2xl font-semibold text-[#0D212C] font-['Poppins']">
                     ${totalManualCost.toLocaleString()}
@@ -625,14 +598,24 @@ export default function UsageInsights() {
 
                 {/* AI cost */}
                 <div className="sm:pl-5 space-y-0.5 pt-2 sm:pt-0">
-                  <div className="text-xs font-semibold text-gray-700">
-                    AI cost
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                    <span>AI cost</span>
+                    <div className="relative group/tip inline-flex items-center">
+                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="AI cost info">
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                        <div>AI cost is the multiply of tokens consumed into token price per 1M tokens.</div>
+                        <div className="mt-0.5">Tokens consumed × Token price per 1M</div>
+                        <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-xl sm:text-2xl font-semibold text-[#ED4D19] font-['Poppins']">
                     ${totalAiCost.toLocaleString()}
                   </div>
                   <div className="text-[11px] text-gray-500 pt-0.5">
-                    Total tokens {(appliedReportsPerWeek * appliedAvgTokens).toLocaleString()} | Token price ${appliedTokenPrice.toFixed(2)}
+                    Total tokens {weekTokensConsumed}M | Token price ${appliedTokenPrice.toFixed(2)}
                   </div>
                 </div>
               </div>
@@ -643,8 +626,18 @@ export default function UsageInsights() {
               <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
                 {/* Estimated ROI */}
                 <div className="sm:pr-5 space-y-0.5 pb-2 sm:pb-0">
-                  <div className="text-xs font-semibold text-gray-700">
-                    Estimated ROI
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                    <span>Estimated ROI</span>
+                    <div className="relative group/tip inline-flex items-center">
+                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated ROI info">
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                        <div>Estimated ROI is calculated by dividing manual cost by AI cost.</div>
+                        <div className="mt-0.5">Manual cost ÷ AI cost</div>
+                        <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-xl sm:text-2xl font-semibold text-[#00C3CB] font-['Poppins']">
                     {roiMultiple}x
@@ -653,8 +646,18 @@ export default function UsageInsights() {
 
                 {/* Estimated savings */}
                 <div className="sm:pl-5 space-y-0.5 pt-2 sm:pt-0">
-                  <div className="text-xs font-semibold text-gray-700">
-                    Estimated savings
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                    <span>Estimated savings</span>
+                    <div className="relative group/tip inline-flex items-center">
+                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated savings info">
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                        <div>Estimated savings is calculated by subtracting AI cost from manual cost.</div>
+                        <div className="mt-0.5">Manual cost − AI cost</div>
+                        <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-xl sm:text-2xl font-semibold text-[#00C3CB] font-['Poppins'] flex items-baseline">
                     <span>${savedDollars.toLocaleString()}</span>

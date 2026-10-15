@@ -704,21 +704,21 @@ export default function BuildRoadmap() {
             )}
           </div>
 
-          {/* Custom Build Top Dropdown (Options 10, 20, 50) */}
+          {/* Custom Build Top Dropdown (Options 10, 20, 50 in Graph view; 3, 4, 5 in List view) */}
           <div className="relative" ref={buildTopRef}>
             <button
               type="button"
               onClick={() => setIsBuildTopOpen(!isBuildTopOpen)}
               className="inline-flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-lg px-3.5 py-1.5 text-[0.8125rem] text-gray-700 font-normal shadow-2xs transition-colors cursor-pointer"
             >
-              <span className="text-gray-500">{viewMode === 'grid' ? 'Sort by build priority:' : 'Build top:'}</span>
+              <span className="text-gray-500">{viewMode === 'grid' ? 'Build Priority:' : 'Build top:'}</span>
               <span className="font-semibold text-[#0D212C]">Top {buildTop}</span>
               <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isBuildTopOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isBuildTopOpen && (
               <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 overflow-hidden">
-                {['10', '20', '50'].map((opt) => (
+                {(viewMode === 'grid' ? ['10', '20', '50'] : ['3', '4', '5']).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -744,7 +744,10 @@ export default function BuildRoadmap() {
           <div className="inline-flex items-center p-0.5 bg-white border border-gray-200 rounded-lg shadow-2xs">
             <button
               type="button"
-              onClick={() => setViewMode('grid')}
+              onClick={() => {
+                setViewMode('grid');
+                if (!['10', '20', '50'].includes(buildTop)) setBuildTop('10');
+              }}
               title="Grid view"
               className={`p-1.5 rounded-md transition-all cursor-pointer ${
                 viewMode === 'grid'
@@ -756,7 +759,10 @@ export default function BuildRoadmap() {
             </button>
             <button
               type="button"
-              onClick={() => setViewMode('table')}
+              onClick={() => {
+                setViewMode('table');
+                if (!['3', '4', '5'].includes(buildTop)) setBuildTop('3');
+              }}
               title="Table view"
               className={`p-1.5 rounded-md transition-all cursor-pointer ${
                 viewMode === 'table'
