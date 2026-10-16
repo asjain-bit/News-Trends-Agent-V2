@@ -19,6 +19,12 @@ import {
   Check
 } from 'lucide-react';
 import { useMagicStore } from '../../store/magicStore';
+import { 
+  ExpectedRevenueOverlayTrigger,
+  BuildEffortOverlayTrigger,
+  Revenue3YrOverlayTrigger,
+  ScoreOverlayTrigger
+} from './MetricOverlays';
 
 export default function Overview() {
   const { solutions } = useMagicStore();
@@ -172,10 +178,12 @@ export default function Overview() {
             </div>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-              <span>$170M</span>
-              <span className="text-xs font-normal text-gray-400 font-sans">over 3 years</span>
-            </div>
+            <ExpectedRevenueOverlayTrigger>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins'] cursor-help group/rev">
+                <span className="group-hover/rev:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">$170M</span>
+                <span className="text-xs font-normal text-gray-400 font-sans">over 3 years</span>
+              </div>
+            </ExpectedRevenueOverlayTrigger>
             <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
               ~$57M per year · 8 solutions · illustrative
             </p>
@@ -371,13 +379,25 @@ export default function Overview() {
                         </span>
                       </td>
                       <td className="py-3.5 px-6 text-xs text-gray-500 font-normal">
-                        {sol.effort}
+                        <BuildEffortOverlayTrigger solutionName={sol.name} effortText={sol.effort}>
+                          <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                            {sol.effort}
+                          </span>
+                        </BuildEffortOverlayTrigger>
                       </td>
                       <td className="py-3.5 px-6 text-xs sm:text-[0.8125rem] font-normal text-[#0D212C] font-mono">
-                        {sol.revenue}
+                        <Revenue3YrOverlayTrigger solutionName={sol.name} revenueText={sol.revenue}>
+                          <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                            {sol.revenue}
+                          </span>
+                        </Revenue3YrOverlayTrigger>
                       </td>
                       <td className="py-3.5 px-6 text-right font-semibold text-xs sm:text-sm text-[#ED4D19] font-mono">
-                        {sol.score}
+                        <ScoreOverlayTrigger solutionName={sol.name} score={sol.score}>
+                          <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                            {sol.score}
+                          </span>
+                        </ScoreOverlayTrigger>
                       </td>
                     </tr>
                   ))

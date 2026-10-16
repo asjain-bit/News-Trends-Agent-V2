@@ -21,6 +21,7 @@ import {
   Ban,
   ArrowUpRight
 } from 'lucide-react';
+import { ScoreOverlayTrigger } from './MetricOverlays';
 
 // Factor Metadata
 export interface FactorInfo {
@@ -405,6 +406,166 @@ const INITIAL_SOLUTION_SCORES: SolutionScoringItem[] = [
       ]
     },
     fScores: { F1: 2, F2: 1, F3: 2, F4: 3, F5: 2, F6: 1 }
+  },
+  {
+    id: 's9',
+    name: 'Genomics & Precision Oncology',
+    status: 'Prioritised',
+    revenue3Yr: '$32M',
+    revenueNum: 32,
+    marketFit: {
+      score: 4.2,
+      winRate: '62%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$32.0M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$28.5M' },
+        { rank: 3, country: 'Qatar', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$9.2M' },
+        { rank: 4, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$6.1M' },
+        { rank: 5, country: 'Oman', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.2M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 5, F2: 4, F3: 4, F4: 3, F5: 4, F6: 4 }
+  },
+  {
+    id: 's10',
+    name: 'Diagnostic Imaging AI',
+    status: 'In progress',
+    revenue3Yr: '$29M',
+    revenueNum: 29,
+    marketFit: {
+      score: 4.1,
+      winRate: '61%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 5, fitLabel: '5 · Excellent', winRate: '70%', revenue: '$29.0M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$24.6M' },
+        { rank: 3, country: 'Qatar', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$8.4M' },
+        { rank: 4, country: 'Jordan', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$5.5M' },
+        { rank: 5, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.9M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 4, F2: 5, F3: 4, F4: 4, F5: 3, F6: 4 }
+  },
+  {
+    id: 's11',
+    name: 'Cardiovascular Telehealth',
+    status: 'Completed',
+    revenue3Yr: '$22M',
+    revenueNum: 22,
+    marketFit: {
+      score: 3.7,
+      winRate: '56%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$22.0M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$18.4M' },
+        { rank: 3, country: 'Egypt', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$5.8M' },
+        { rank: 4, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.2M' },
+        { rank: 5, country: 'Bahrain', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$2.9M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 3, F2: 4, F3: 4, F4: 4, F5: 3, F6: 3 }
+  },
+  {
+    id: 's12',
+    name: 'Maternal & Neonatal Care',
+    status: 'New',
+    revenue3Yr: '$16M',
+    revenueNum: 16,
+    marketFit: {
+      score: 3.4,
+      winRate: '52%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$16.0M' },
+        { rank: 2, country: 'UAE', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$14.2M' },
+        { rank: 3, country: 'Jordan', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.9M' },
+        { rank: 4, country: 'Egypt', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$3.1M' },
+        { rank: 5, country: 'Oman', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.0M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 4, F2: 3, F3: 3, F4: 3, F5: 3, F6: 3 }
+  },
+  {
+    id: 's13',
+    name: 'Mental Health AI & Therapy',
+    status: 'New',
+    revenue3Yr: '$14M',
+    revenueNum: 14,
+    marketFit: {
+      score: 2.9,
+      winRate: '47%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$14.0M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$11.8M' },
+        { rank: 3, country: 'Qatar', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$3.2M' },
+        { rank: 4, country: 'Jordan', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.5M' },
+        { rank: 5, country: 'Kuwait', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$1.8M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 4, F2: 2, F3: 3, F4: 3, F5: 2, F6: 2 }
+  },
+  {
+    id: 's14',
+    name: 'Supply Chain & Inventory AI',
+    status: 'Prioritised',
+    revenue3Yr: '$18M',
+    revenueNum: 18,
+    marketFit: {
+      score: 3.6,
+      winRate: '54%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$18.0M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$15.5M' },
+        { rank: 3, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$4.1M' },
+        { rank: 4, country: 'Qatar', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.6M' },
+        { rank: 5, country: 'Egypt', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.8M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 3, F2: 3, F3: 3, F4: 4, F5: 4, F6: 3 }
+  },
+  {
+    id: 's15',
+    name: 'Emergency Care Triage AI',
+    status: 'In progress',
+    revenue3Yr: '$15M',
+    revenueNum: 15,
+    marketFit: {
+      score: 3.5,
+      winRate: '53%',
+      topSellableCountries: [
+        { rank: 1, country: 'Saudi Arabia', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$15.0M' },
+        { rank: 2, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$13.2M' },
+        { rank: 3, country: 'Qatar', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$3.5M' },
+        { rank: 4, country: 'Kuwait', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$2.9M' },
+        { rank: 5, country: 'Egypt', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.1M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 4, F2: 3, F3: 3, F4: 3, F5: 3, F6: 3 }
+  },
+  {
+    id: 's16',
+    name: 'Pathology Digital Workflow',
+    status: 'New',
+    revenue3Yr: '$13M',
+    revenueNum: 13,
+    marketFit: {
+      score: 3.1,
+      winRate: '49%',
+      topSellableCountries: [
+        { rank: 1, country: 'UAE', fitScore: 4, fitLabel: '4 · Strong', winRate: '60%', revenue: '$13.0M' },
+        { rank: 2, country: 'Saudi Arabia', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$10.4M' },
+        { rank: 3, country: 'Jordan', fitScore: 3, fitLabel: '3 · Moderate', winRate: '50%', revenue: '$2.6M' },
+        { rank: 4, country: 'Qatar', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$2.0M' },
+        { rank: 5, country: 'Oman', fitScore: 2, fitLabel: '2 · Weak', winRate: '40%', revenue: '$1.5M' },
+      ],
+      restricted: []
+    },
+    fScores: { F1: 3, F2: 3, F3: 2, F4: 4, F5: 2, F6: 2 }
   }
 ];
 
@@ -1421,19 +1582,21 @@ function FactorCellTooltip({
               <span className="font-semibold text-gray-800">Basis: </span>
               <span className="text-gray-600">{details.basis}</span>
             </div>
-            <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between">
-              <span className="font-semibold text-gray-800">Sources: </span>
-              <a
-                href={details.sourceUrl || "https://www.who.int/data/gho"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium underline text-[11px] truncate max-w-[170px]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="truncate">{details.sources}</span>
-                <ArrowUpRight className="w-3 h-3 shrink-0" />
-              </a>
-            </div>
+            {!(factor.code === 'F2' || factor.code === 'F4') && (
+              <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between">
+                <span className="font-semibold text-gray-800">Sources: </span>
+                <a
+                  href={details.sourceUrl || "https://www.who.int/data/gho"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium underline text-[11px] truncate max-w-[170px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="truncate">{details.sources}</span>
+                  <ArrowUpRight className="w-3 h-3 shrink-0" />
+                </a>
+              </div>
+            )}
           </div>
         </div>,
         document.body
@@ -1473,6 +1636,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
   const [isRubricOpen, setIsRubricOpen] = useState(false);
   const [isFactorsDrawerOpen, setIsFactorsDrawerOpen] = useState(false);
   const [isEyeTooltipHovered, setIsEyeTooltipHovered] = useState(false);
+  const [isExpandedRanking, setIsExpandedRanking] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [isStatusFilterOpen, setIsStatusFilterOpen] = useState(false);
@@ -2026,15 +2190,14 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
 
                           {/* Score / 100 */}
                           <td className="py-4 px-6 text-right font-semibold text-[0.875rem] text-[#ED4D19]">
-                            <SolutionMetricTooltip
-                              title={`${solution.name} · Solution Score (${solution.score}/100)`}
-                              explanation={getSolutionScoreExplanation({ name: solution.name, score: solution.score })}
-                              source="M42 AI Prioritisation Engine (Clinical, Interop, Feasibility)"
+                            <ScoreOverlayTrigger
+                              solutionName={solution.name}
+                              score={solution.score}
                             >
-                              <span className="cursor-help underline decoration-dotted decoration-[#ED4D19]/40 hover:opacity-80">
+                              <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
                                 {solution.score}
                               </span>
-                            </SolutionMetricTooltip>
+                            </ScoreOverlayTrigger>
                           </td>
                         </tr>
                       ))
@@ -2109,106 +2272,108 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
           </div>
 
           {/* 2-Column Grid: Sliders on Left, Live Ranking on Right */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Left Column: Factor Weights Sliders (6 Cols) */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs space-y-6">
-              <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
-                  Factor weights
-                </h3>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleResetWeights}
-                    disabled={!isEditingWeightage}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-colors"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
-                    <span>Reset to default</span>
-                  </button>
-                  
-                  {/* Edit Controls moved here */}
-                  {!isEditingWeightage ? (
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs space-y-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                  <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
+                    Factor weights
+                  </h3>
+                  <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => {
-                        setTempWeights({ ...weights });
-                        setIsEditingWeightage(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#ED4D19] hover:text-[#C93B0E] active:opacity-90 bg-transparent border-0 px-2 py-1 cursor-pointer transition-colors"
+                      onClick={handleResetWeights}
+                      disabled={!isEditingWeightage}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-colors"
                     >
-                      <Settings2 className="w-3.5 h-3.5 text-[#ED4D19]" />
-                      <span>Edit</span>
+                      <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
+                      <span>Reset to default</span>
                     </button>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setIsEditingWeightage(false)}
-                        className="px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
-                      >
-                        Cancel
-                      </button>
+                    
+                    {/* Edit Controls moved here */}
+                    {!isEditingWeightage ? (
                       <button
                         type="button"
                         onClick={() => {
-                          setWeights({ ...tempWeights });
-                          setIsEditingWeightage(false);
+                          setTempWeights({ ...weights });
+                          setIsEditingWeightage(true);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-opacity cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#ED4D19] hover:text-[#C93B0E] active:opacity-90 bg-transparent border-0 px-2 py-1 cursor-pointer transition-colors"
                       >
-                        <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
-                        <span>Save</span>
+                        <Settings2 className="w-3.5 h-3.5 text-[#ED4D19]" />
+                        <span>Edit</span>
                       </button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingWeightage(false)}
+                          className="px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWeights({ ...tempWeights });
+                            setIsEditingWeightage(false);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-opacity cursor-pointer"
+                        >
+                          <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                          <span>Save</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-5">
-                {FACTORS.map((factor) => {
-                  const currentWeight = isEditingWeightage 
-                    ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
-                    : (weights[factor.id] ?? factor.defaultWeight);
-                  return (
-                    <div key={factor.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-xs font-normal text-gray-400">
-                            {factor.code} {factor.name}
+                <div className="space-y-5 mt-5">
+                  {FACTORS.map((factor) => {
+                    const currentWeight = isEditingWeightage 
+                      ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
+                      : (weights[factor.id] ?? factor.defaultWeight);
+                    return (
+                      <div key={factor.id} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-xs font-normal text-gray-400">
+                              {factor.code} {factor.name}
+                            </div>
+                          </div>
+
+                          {/* Multiplier Value */}
+                          <div className="text-sm font-semibold text-[#0D212C] font-mono">
+                            {currentWeight}x
                           </div>
                         </div>
 
-                        {/* Multiplier Value */}
-                        <div className="text-sm font-semibold text-[#0D212C] font-mono">
-                          {currentWeight}x
+                        {/* Slider Input with Part B Orange Track and White/Orange Thumb */}
+                        <div className="flex items-center gap-3 py-1">
+                          <input
+                            type="range"
+                            min="0"
+                            max="3"
+                            step="1"
+                            disabled={!isEditingWeightage}
+                            value={currentWeight}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              setTempWeights((prev) => ({ ...prev, [factor.id]: val }));
+                            }}
+                            className={`w-full h-1.5 rounded-full custom-slider-orange ${
+                              isEditingWeightage ? 'cursor-pointer opacity-100' : 'pointer-events-none opacity-100'
+                            }`}
+                            style={{
+                              background: `linear-gradient(to right, #ED4D19 ${(currentWeight / 3) * 100}%, #e5e7eb ${(currentWeight / 3) * 100}%)`
+                            }}
+                          />
                         </div>
                       </div>
-
-                      {/* Slider Input with Part B Orange Track and White/Orange Thumb */}
-                      <div className="flex items-center gap-3 py-1">
-                        <input
-                          type="range"
-                          min="0"
-                          max="3"
-                          step="1"
-                          disabled={!isEditingWeightage}
-                          value={currentWeight}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value, 10);
-                            setTempWeights((prev) => ({ ...prev, [factor.id]: val }));
-                          }}
-                          className={`w-full h-1.5 rounded-full custom-slider-orange ${
-                            isEditingWeightage ? 'cursor-pointer opacity-100' : 'pointer-events-none opacity-100'
-                          }`}
-                          style={{
-                            background: `linear-gradient(to right, #ED4D19 ${(currentWeight / 3) * 100}%, #e5e7eb ${(currentWeight / 3) * 100}%)`
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
 
               {/* How weighting works info callout */}
@@ -2224,21 +2389,22 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
             </div>
 
             {/* Right Column: Live Ranking Card (6 Cols) */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs space-y-5">
-              <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs flex flex-col h-full overflow-hidden">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
                 <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
                   Live ranking
                 </h3>
                 <span className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-[11px] font-medium">
-                  Top 8 · recomputes live
+                  {rankedSolutions.length} solutions
                 </span>
               </div>
 
-              <div className="divide-y divide-gray-100">
+              {/* Scrollable List matching card height with upfront visible scrollbar */}
+              <div className="flex-1 min-h-0 max-h-[480px] overflow-y-scroll visible-scrollbar divide-y divide-gray-100 pr-2 my-2">
                 {rankedSolutions.map((sol, index) => (
                   <div 
                     key={sol.id} 
-                    className="py-3 flex items-center justify-between gap-4 hover:bg-gray-50/50 px-2 rounded-lg transition-colors"
+                    className="py-2.5 flex items-center justify-between gap-4 hover:bg-gray-50/50 px-2 rounded-lg transition-colors"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span className="text-xs font-semibold text-gray-400 w-4 text-center">

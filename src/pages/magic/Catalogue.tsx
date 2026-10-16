@@ -1,6 +1,20 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useMagicStore } from '../../store/magicStore';
+import {
+  ScoreOverlayTrigger,
+  Revenue3YrOverlayTrigger,
+  PortfolioSynergyOverlayTrigger,
+  CountriesMarketOverlayTrigger,
+  TotalHealthSpendOverlayTrigger,
+  DigitalShareOverlayTrigger,
+  DealAnchorOverlayTrigger,
+  ConfidenceOverlayTrigger,
+  RegulatoryProfileOverlayTrigger,
+  SpendPerCapitaOverlayTrigger,
+  PopulationOverlayTrigger,
+  ObtainableSliceOverlayTrigger,
+} from './MetricOverlays';
 import { 
   ChevronDown, 
   ChevronLeft, 
@@ -33,7 +47,8 @@ import {
   AlertTriangle,
   Trash2,
   Ban,
-  RotateCw
+  RotateCw,
+  PauseCircle,
 } from 'lucide-react';
 
 // Custom hook for clicking outside dropdowns
@@ -1498,6 +1513,158 @@ export function CountryFlag({ country, className = "w-4 h-3" }: { country: strin
   );
 }
 
+export const COUNTRY_RESEARCH_DATA: Record<string, {
+  code: string;
+  spendCapita: string;
+  population: string;
+  totalSpend: string;
+  digitalShare: string;
+  obtainableSlice: string;
+  dealAnchor: string;
+  confidence: 'High' | 'Medium' | 'Low';
+}> = {
+  'Jordan': {
+    code: 'JO',
+    spendCapita: '$342',
+    population: '11.5M',
+    totalSpend: '$4B',
+    digitalShare: '3.5%',
+    obtainableSlice: '2%',
+    dealAnchor: '$3M',
+    confidence: 'Low',
+  },
+  'Saudi Arabia': {
+    code: 'SA',
+    spendCapita: '$1,485',
+    population: '36.9M',
+    totalSpend: '$55B',
+    digitalShare: '3.0%',
+    obtainableSlice: '0.37%',
+    dealAnchor: '$6M',
+    confidence: 'High',
+  },
+  'United Arab Emirates': {
+    code: 'AE',
+    spendCapita: '$1,842',
+    population: '9.4M',
+    totalSpend: '$17B',
+    digitalShare: '3.0%',
+    obtainableSlice: '1.0%',
+    dealAnchor: '$5M',
+    confidence: 'High',
+  },
+  'Estonia': {
+    code: 'EE',
+    spendCapita: '$1,733',
+    population: '1.3M',
+    totalSpend: '$2B',
+    digitalShare: '6.0%',
+    obtainableSlice: '1.5%',
+    dealAnchor: '$2M',
+    confidence: 'High',
+  },
+  'South Korea': {
+    code: 'KR',
+    spendCapita: '$2,600',
+    population: '51.7M',
+    totalSpend: '$134B',
+    digitalShare: '3.0%',
+    obtainableSlice: '0.2%',
+    dealAnchor: '$8M',
+    confidence: 'Medium',
+  },
+  'United States': {
+    code: 'US',
+    spendCapita: '$12,555',
+    population: '333M',
+    totalSpend: '$4.2T',
+    digitalShare: '3.0%',
+    obtainableSlice: '0.013%',
+    dealAnchor: '$16M',
+    confidence: 'Low',
+  },
+  'Azerbaijan': {
+    code: 'AZ',
+    spendCapita: '$230',
+    population: '10.1M',
+    totalSpend: '$2B',
+    digitalShare: '2.0%',
+    obtainableSlice: '2.2%',
+    dealAnchor: '$1M',
+    confidence: 'Low',
+  },
+  'United Kingdom': {
+    code: 'GB',
+    spendCapita: '$5,820',
+    population: '67.5M',
+    totalSpend: '$407.3B',
+    digitalShare: '3.8%',
+    obtainableSlice: '1.5%',
+    dealAnchor: '$232.1M',
+    confidence: 'Medium',
+  },
+  'Germany': {
+    code: 'DE',
+    spendCapita: '$6,500',
+    population: '83.2M',
+    totalSpend: '$460B',
+    digitalShare: '3.2%',
+    obtainableSlice: '1.0%',
+    dealAnchor: '$14.7M',
+    confidence: 'High',
+  },
+  'Singapore': {
+    code: 'SG',
+    spendCapita: '$3,200',
+    population: '5.9M',
+    totalSpend: '$19B',
+    digitalShare: '5.5%',
+    obtainableSlice: '1.8%',
+    dealAnchor: '$18.8M',
+    confidence: 'High',
+  },
+  'Qatar': {
+    code: 'QA',
+    spendCapita: '$2,100',
+    population: '2.7M',
+    totalSpend: '$5.7B',
+    digitalShare: '4.0%',
+    obtainableSlice: '1.2%',
+    dealAnchor: '$2.7M',
+    confidence: 'High',
+  },
+  'Kuwait': {
+    code: 'KW',
+    spendCapita: '$1,600',
+    population: '4.3M',
+    totalSpend: '$6.9B',
+    digitalShare: '3.0%',
+    obtainableSlice: '1.0%',
+    dealAnchor: '$2.1M',
+    confidence: 'Medium',
+  },
+  'Oman': {
+    code: 'OM',
+    spendCapita: '$1,100',
+    population: '4.6M',
+    totalSpend: '$5.1B',
+    digitalShare: '2.8%',
+    obtainableSlice: '1.1%',
+    dealAnchor: '$1.6M',
+    confidence: 'Medium',
+  },
+  'Bahrain': {
+    code: 'BH',
+    spendCapita: '$1,350',
+    population: '1.5M',
+    totalSpend: '$2.0B',
+    digitalShare: '3.4%',
+    obtainableSlice: '1.0%',
+    dealAnchor: '$1.0M',
+    confidence: 'Medium',
+  },
+};
+
 // Custom ComboBox (Input + Select) Component
 function CustomComboBox({
   label,
@@ -1516,15 +1683,23 @@ function CustomComboBox({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
+  const [isTyping, setIsTyping] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  useOnClickOutside(ref, () => setIsOpen(false));
+  useOnClickOutside(ref, () => {
+    setIsOpen(false);
+    setIsTyping(false);
+    setInputValue(value);
+  });
 
   // Sync value when parent changes it
   React.useEffect(() => {
     setInputValue(value);
+    setIsTyping(false);
   }, [value]);
 
-  const filteredOptions = options.filter(o => o.label.toLowerCase().includes(inputValue.toLowerCase()));
+  const filteredOptions = isTyping
+    ? options.filter(o => o.label.toLowerCase().includes(inputValue.toLowerCase()))
+    : options;
   const hasCountryFlag = COUNTRY_FLAG_MAP[inputValue] !== undefined;
 
   return (
@@ -1540,9 +1715,15 @@ function CustomComboBox({
           type="text"
           disabled={disabled}
           value={inputValue}
-          onFocus={() => !disabled && setIsOpen(true)}
+          onFocus={() => {
+            if (!disabled) {
+              setIsOpen(true);
+              setIsTyping(false);
+            }
+          }}
           onChange={(e) => {
             setInputValue(e.target.value);
+            setIsTyping(true);
             onChange?.(e.target.value);
             setIsOpen(true);
           }}
@@ -1556,8 +1737,13 @@ function CustomComboBox({
         <button
           type="button"
           disabled={disabled}
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+          onClick={() => {
+            if (!disabled) {
+              setIsOpen(!isOpen);
+              setIsTyping(false);
+            }
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
         >
           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
@@ -1574,6 +1760,7 @@ function CustomComboBox({
                   type="button"
                   onClick={() => {
                     setInputValue(option.value);
+                    setIsTyping(false);
                     onChange?.(option.value);
                     setIsOpen(false);
                   }}
@@ -1806,6 +1993,59 @@ export default function Catalogue() {
   // Close menus on outside click
   const menuRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(menuRef, () => setActiveMenuId(null));
+
+  // Countries Action Menus and Modals
+  const [activeCountryMenuId, setActiveCountryMenuId] = useState<string | null>(null);
+  const countryMenuRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(countryMenuRef, () => setActiveCountryMenuId(null));
+
+  // Edit Country Modal
+  const [editingCountry, setEditingCountry] = useState<CountryItem | null>(null);
+  const [editCountryName, setEditCountryName] = useState('');
+  const [editCountryNote, setEditCountryNote] = useState('');
+  const [showEditConfirmation, setShowEditConfirmation] = useState(false);
+
+  // Delete Country Modal
+  const [deletingCountry, setDeletingCountry] = useState<CountryItem | null>(null);
+
+  // Deactivate Country Modal
+  const [deactivatingCountry, setDeactivatingCountry] = useState<CountryItem | null>(null);
+
+  // Reactivate Country Modal
+  const [reactivatingCountry, setReactivatingCountry] = useState<CountryItem | null>(null);
+
+  const handleOpenEditCountry = (c: CountryItem) => {
+    setEditingCountry(c);
+    setEditCountryName(c.name);
+    setEditCountryNote(c.note || '');
+    setShowEditConfirmation(false);
+  };
+
+  const handleSaveCountryChanges = () => {
+    if (!editingCountry) return;
+    const research = COUNTRY_RESEARCH_DATA[editCountryName];
+    setCountries((prev) =>
+      prev.map((c) => {
+        if (c.id === editingCountry.id) {
+          return {
+            ...c,
+            name: editCountryName,
+            note: editCountryNote,
+            spendCapita: research ? research.spendCapita : c.spendCapita,
+            population: research ? research.population : c.population,
+            totalSpend: research ? research.totalSpend : c.totalSpend,
+            digitalShare: research ? research.digitalShare : c.digitalShare,
+            obtainableSlice: research ? research.obtainableSlice : c.obtainableSlice,
+            dealAnchor: research ? research.dealAnchor : c.dealAnchor,
+            confidence: research ? research.confidence : c.confidence,
+          };
+        }
+        return c;
+      })
+    );
+    setShowEditConfirmation(false);
+    setEditingCountry(null);
+  };
   
   // Reuse Grid & Versioning State
   const [tempReuseMatrix, setTempReuseMatrix] = useState<Record<string, string[]>>(reuseMatrix);
@@ -2411,39 +2651,47 @@ export default function Catalogue() {
 
               {/* 4 Metric Highlights Cards with reduced font weight/size and compact card height */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5 pt-4 border-t border-gray-100">
-                <div className="bg-orange-50/30 border border-orange-200/80 rounded-xl p-3 space-y-0.5">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">REVENUE (3-YR)</div>
-                  <div className="text-lg sm:text-xl font-semibold text-[#ED4D19]">{viewingSolution.revenue3Yr}</div>
-                  <div className="text-[11px] text-gray-400 font-normal">Cumulative addressable ARR</div>
-                </div>
-
-                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">SCORE</div>
-                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C] flex items-center gap-1.5">
-                    <span>{viewingSolution.score}</span>
-                    <span className="text-xs font-normal text-gray-400 font-sans">/ 100</span>
+                <Revenue3YrOverlayTrigger solutionName={viewingSolution.name} revenueText={viewingSolution.revenue3Yr} className="w-full">
+                  <div className="bg-orange-50/30 border border-orange-200/80 rounded-xl p-3 space-y-0.5 cursor-pointer hover:border-orange-300/80 transition-colors">
+                    <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">REVENUE (3-YR)</div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#ED4D19]">{viewingSolution.revenue3Yr}</div>
+                    <div className="text-[11px] text-gray-400 font-normal">Cumulative addressable ARR</div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1 mt-1 overflow-hidden">
-                    <div 
-                      className="bg-[#ED4D19] h-full rounded-full" 
-                      style={{ width: `${viewingSolution.score}%` }} 
-                    />
-                  </div>
-                </div>
+                </Revenue3YrOverlayTrigger>
 
-                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COMP.</div>
-                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{viewingSolution.compCount} Modules</div>
-                  <div className="text-[11px] text-gray-400 font-normal">
-                    80% portfolio synergy
+                <ScoreOverlayTrigger solutionName={viewingSolution.name} score={viewingSolution.score} className="w-full">
+                  <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5 cursor-pointer hover:border-gray-300 transition-colors">
+                    <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">SCORE</div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C] flex items-center gap-1.5">
+                      <span>{viewingSolution.score}</span>
+                      <span className="text-xs font-normal text-gray-400 font-sans">/ 100</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-1 overflow-hidden">
+                      <div 
+                        className="bg-[#ED4D19] h-full rounded-full" 
+                        style={{ width: `${viewingSolution.score}%` }} 
+                      />
+                    </div>
                   </div>
-                </div>
+                </ScoreOverlayTrigger>
 
-                <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5">
-                  <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COUNTRIES</div>
-                  <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{targetCountryItems.length} Markets</div>
-                  <div className="text-[11px] text-gray-400 font-normal">High-conviction expansion slice</div>
-                </div>
+                <PortfolioSynergyOverlayTrigger solutionName={viewingSolution.name} className="w-full">
+                  <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5 cursor-pointer hover:border-gray-300 transition-colors">
+                    <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COMP.</div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{viewingSolution.compCount} Modules</div>
+                    <div className="text-[11px] text-gray-400 font-normal">
+                      80% portfolio synergy
+                    </div>
+                  </div>
+                </PortfolioSynergyOverlayTrigger>
+
+                <CountriesMarketOverlayTrigger solutionName={viewingSolution.name} className="w-full">
+                  <div className="bg-white border border-gray-200/70 rounded-xl p-3 space-y-0.5 cursor-pointer hover:border-gray-300 transition-colors">
+                    <div className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">COUNTRIES</div>
+                    <div className="text-lg sm:text-xl font-semibold text-[#0D212C]">{targetCountryItems.length} Markets</div>
+                    <div className="text-[11px] text-gray-400 font-normal">High-conviction expansion slice</div>
+                  </div>
+                </CountriesMarketOverlayTrigger>
               </div>
             </div>
 
@@ -2539,24 +2787,49 @@ export default function Catalogue() {
                             </div>
                           </td>
                           <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                            {country.totalSpend}
+                            <TotalHealthSpendOverlayTrigger
+                              countryName={country.name}
+                              spendCapita={country.spendCapita}
+                              population={country.population}
+                              totalSpend={country.totalSpend}
+                            >
+                              <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.totalSpend}</span>
+                            </TotalHealthSpendOverlayTrigger>
                           </td>
                           <td className="py-3.5 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                            {country.digitalShare}
+                            <DigitalShareOverlayTrigger
+                              countryName={country.name}
+                              digitalShare={country.digitalShare}
+                            >
+                              <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.digitalShare}</span>
+                            </DigitalShareOverlayTrigger>
                           </td>
                           <td className="py-3.5 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
-                            {country.dealAnchor}
+                            <DealAnchorOverlayTrigger
+                              countryName={country.name}
+                              dealAnchor={country.dealAnchor}
+                              totalHealthSpend={country.totalSpend}
+                              digitalShare={country.digitalShare}
+                              obtainableSlice={country.obtainableSlice}
+                            >
+                              <span className="cursor-pointer hover:opacity-80 transition-opacity">{country.dealAnchor}</span>
+                            </DealAnchorOverlayTrigger>
                           </td>
                           <td className="py-3.5 px-6">
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
-                              country.confidence === 'High'
-                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                                : country.confidence === 'Medium'
-                                ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                                : 'bg-red-50 text-red-600 border border-red-200'
-                            }`}>
-                              {country.confidence}
-                            </span>
+                            <ConfidenceOverlayTrigger
+                              countryName={country.name}
+                              confidence={country.confidence as 'High' | 'Medium' | 'Low'}
+                            >
+                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide cursor-pointer ${
+                                country.confidence === 'High'
+                                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                                  : country.confidence === 'Medium'
+                                  ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                                  : 'bg-red-50 text-red-600 border border-red-200'
+                              }`}>
+                                {country.confidence}
+                              </span>
+                            </ConfidenceOverlayTrigger>
                           </td>
                         </tr>
                       ))}
@@ -2773,25 +3046,23 @@ export default function Catalogue() {
                             </span>
                           </td>
 
-                          {/* Score with Explanation & Source Tooltip */}
+                          {/* Score with Calculation Overlay (Image 4) */}
                           <td className="py-3.5 px-3.5 text-[0.875rem] font-normal text-gray-700 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                            <SolutionMetricTooltip
-                              title={`AI Feasibility Score · ${solution.score} / 100`}
-                              explanation={getSolutionScoreExplanation(solution)}
-                              source="M42 AI Multi-Factor Evaluation Model 2025"
+                            <ScoreOverlayTrigger
+                              solutionName={solution.name}
+                              score={solution.score}
                             >
                               <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
                                 {solution.score}
                               </span>
-                            </SolutionMetricTooltip>
+                            </ScoreOverlayTrigger>
                           </td>
 
-                          {/* Revenue with Explanation & Source Tooltip */}
+                          {/* Revenue with Calculation Overlay (Image 5) */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap min-w-0" onClick={(e) => e.stopPropagation()}>
-                            <SolutionMetricTooltip
-                              title={`3-Year Revenue · ${solution.revenue3Yr}`}
-                              explanation="Expected cumulative 3-year revenue across sellable catalogue countries based on deal anchors, win rates, and depth multipliers."
-                              source="M42 Commercial GTM Pipeline & Deal Database 2025"
+                            <Revenue3YrOverlayTrigger
+                              solutionName={solution.name}
+                              revenueText={solution.revenue3Yr}
                             >
                               <div className="flex flex-col leading-tight cursor-help group/rev">
                                 <span className="text-[0.8125rem] font-normal text-[#0D212C] group-hover/rev:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
@@ -2801,7 +3072,7 @@ export default function Catalogue() {
                                   ${(parseFloat(solution.revenue3Yr.replace(/[^0-9.]/g, '') || '21') / 3).toFixed(1)}M / yr
                                 </span>
                               </div>
-                            </SolutionMetricTooltip>
+                            </Revenue3YrOverlayTrigger>
                           </td>
 
                           {/* Comp Count */}
@@ -3292,51 +3563,79 @@ export default function Catalogue() {
                       </div>
                     </th>
                     <th className="py-3 px-6 font-normal">CONFIDENCE</th>
+                    <th className="py-3 px-6 font-normal text-right">ACTION</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                   {paginatedCountries.map((country) => (
                     <tr key={country.id} className="hover:bg-gray-50/70 transition-colors">
                       <td className="py-4 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
-                        <div className="flex items-center gap-2.5">
-                          <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
-                          <span>{country.name}</span>
-                        </div>
+                        <RegulatoryProfileOverlayTrigger countryName={country.name}>
+                          <div className="flex items-center gap-2.5 cursor-pointer">
+                            <CountryFlag country={country.name} className="w-4 h-3 rounded-2xs" />
+                            <span className="hover:text-[#ED4D19] transition-colors">{country.name}</span>
+                            {country.isDeactivated && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                                Deactivated
+                              </span>
+                            )}
+                          </div>
+                        </RegulatoryProfileOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        <CountrySourceCell country={country} field="spendCapita">
-                          <span>{country.spendCapita}</span>
-                        </CountrySourceCell>
+                        <SpendPerCapitaOverlayTrigger countryName={country.name} spendCapita={country.spendCapita}>
+                          <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.spendCapita}</span>
+                        </SpendPerCapitaOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        <CountrySourceCell country={country} field="population">
-                          <span>{country.population}</span>
-                        </CountrySourceCell>
+                        <PopulationOverlayTrigger countryName={country.name} population={country.population}>
+                          <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.population}</span>
+                        </PopulationOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        <CountrySourceCell country={country} field="totalSpend">
-                          <span>{country.totalSpend}</span>
-                        </CountrySourceCell>
+                        <TotalHealthSpendOverlayTrigger
+                          countryName={country.name}
+                          spendCapita={country.spendCapita}
+                          population={country.population}
+                          totalSpend={country.totalSpend}
+                        >
+                          <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.totalSpend}</span>
+                        </TotalHealthSpendOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        <CountrySourceCell country={country} field="digitalShare">
-                          <span>{country.digitalShare}</span>
-                        </CountrySourceCell>
+                        <DigitalShareOverlayTrigger
+                          countryName={country.name}
+                          digitalShare={country.digitalShare}
+                        >
+                          <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.digitalShare}</span>
+                        </DigitalShareOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-[0.8125rem] text-gray-700 font-normal">
-                        <CountrySourceCell country={country} field="obtainableSlice">
-                          <span>{country.obtainableSlice}</span>
-                        </CountrySourceCell>
+                        <ObtainableSliceOverlayTrigger
+                          countryName={country.name}
+                          obtainableSlice={country.obtainableSlice}
+                        >
+                          <span className="cursor-pointer hover:text-gray-900 transition-colors">{country.obtainableSlice}</span>
+                        </ObtainableSliceOverlayTrigger>
                       </td>
                       {/* Deal Anchor in primary color (#ED4D19) */}
                       <td className="py-4 px-6 text-[0.8125rem] text-[#ED4D19] font-normal">
-                        <CountrySourceCell country={country} field="dealAnchor">
-                          <span>{country.dealAnchor}</span>
-                        </CountrySourceCell>
+                        <DealAnchorOverlayTrigger
+                          countryName={country.name}
+                          dealAnchor={country.dealAnchor}
+                          totalHealthSpend={country.totalSpend}
+                          digitalShare={country.digitalShare}
+                          obtainableSlice={country.obtainableSlice}
+                        >
+                          <span className="cursor-pointer hover:opacity-80 transition-opacity">{country.dealAnchor}</span>
+                        </DealAnchorOverlayTrigger>
                       </td>
                       <td className="py-4 px-6">
-                        <CountrySourceCell country={country} field="confidence">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide ${
+                        <ConfidenceOverlayTrigger
+                          countryName={country.name}
+                          confidence={country.confidence as 'High' | 'Medium' | 'Low'}
+                        >
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide cursor-pointer ${
                             country.confidence === 'High'
                               ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                               : country.confidence === 'Medium'
@@ -3345,7 +3644,82 @@ export default function Catalogue() {
                           }`}>
                             {country.confidence}
                           </span>
-                        </CountrySourceCell>
+                        </ConfidenceOverlayTrigger>
+                      </td>
+                      <td className="py-4 px-6 text-right relative">
+                        <div className="inline-flex items-center justify-end">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveCountryMenuId(activeCountryMenuId === country.id ? null : country.id);
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-gray-700 active:text-gray-900 bg-transparent transition-colors cursor-pointer border-0 rounded-lg hover:bg-gray-100"
+                            title="Actions"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {activeCountryMenuId === country.id && (
+                          <div 
+                            ref={countryMenuRef} 
+                            className="absolute right-6 top-12 bg-white border border-gray-200 rounded-xl shadow-xl z-50 w-[185px] py-1 text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleOpenEditCountry(country);
+                                setActiveCountryMenuId(null);
+                              }}
+                              className="w-full text-left px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors cursor-pointer border-0 bg-transparent font-medium"
+                            >
+                              <Edit2 className="w-3.5 h-3.5 text-gray-400" />
+                              <span>Edit country</span>
+                            </button>
+
+                            {country.isDeactivated ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setReactivatingCountry(country);
+                                  setActiveCountryMenuId(null);
+                                }}
+                                className="w-full text-left px-3.5 py-2.5 text-xs text-emerald-600 hover:bg-emerald-50 flex items-center gap-2.5 transition-colors cursor-pointer border-0 bg-transparent font-medium"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5 text-emerald-500" />
+                                <span>Reactivate country</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDeactivatingCountry(country);
+                                  setActiveCountryMenuId(null);
+                                }}
+                                className="w-full text-left px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 flex items-center gap-2.5 transition-colors cursor-pointer border-0 bg-transparent font-medium"
+                              >
+                                <Ban className="w-3.5 h-3.5 text-orange-600" />
+                                <span>Deactivate country</span>
+                              </button>
+                            )}
+
+                            <div className="my-1 border-t border-gray-100" />
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDeletingCountry(country);
+                                setActiveCountryMenuId(null);
+                              }}
+                              className="w-full text-left px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer border-0 bg-transparent font-medium"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                              <span>Delete country</span>
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -3662,6 +4036,300 @@ export default function Catalogue() {
                 className="px-6 py-3.5 rounded-xl text-white text-[0.875rem] font-medium cursor-pointer flex-1 border-0 transition shadow-2xs capitalize bg-[#E50000] hover:bg-red-700"
               >
                 {confirmActionPopup.action}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT COUNTRY MODAL */}
+      {editingCountry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 text-left max-h-[90vh] overflow-y-auto subtle-scrollbar">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
+              <h3 className="text-base font-bold text-[#0D212C] font-['Poppins']">
+                Edit Country
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingCountry(null)}
+                className="p-1 text-gray-400 hover:text-gray-600 bg-transparent rounded-lg transition-colors cursor-pointer border-0"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Country Selector Dropdown (matches Add Country dropdown) */}
+            <div className="mb-5">
+              <CustomComboBox
+                label={<>Country <span className="text-red-500">*</span></>}
+                value={editCountryName}
+                onChange={setEditCountryName}
+                options={[
+                  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Bahrain', 
+                  'Oman', 'Kuwait', 'Egypt', 'Jordan', 'Estonia', 'South Korea',
+                  'United Kingdom', 'United States', 'Azerbaijan', 'Singapore',
+                  'Germany', 'France', 'Australia', 'Canada', 'India', 'Japan'
+                ].map(c => ({ label: c, value: c }))}
+                placeholder="Search or select country"
+              />
+            </div>
+
+            {/* Researched Figures (Clean white background, no grey bg!) */}
+            <div className="mb-5">
+              <label className="block text-xs font-semibold text-[#0D212C] mb-2">
+                Researched figures
+              </label>
+              {(() => {
+                const currentResearch = COUNTRY_RESEARCH_DATA[editCountryName] || {
+                  spendCapita: editingCountry.spendCapita,
+                  population: editingCountry.population,
+                  totalSpend: editingCountry.totalSpend,
+                  digitalShare: editingCountry.digitalShare,
+                  obtainableSlice: editingCountry.obtainableSlice,
+                  dealAnchor: editingCountry.dealAnchor,
+                  confidence: editingCountry.confidence,
+                };
+                return (
+                  <div className="border border-gray-200/90 rounded-xl divide-y divide-gray-100 bg-white">
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Spend / capita</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.spendCapita}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Population</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.population}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Total health spend</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.totalSpend}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Digital share</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.digitalShare}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Obtainable slice</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.obtainableSlice}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Deal anchor (per-country)</span>
+                      <span className="font-semibold text-gray-900 font-mono">{currentResearch.dealAnchor}</span>
+                    </div>
+                    <div className="py-2.5 px-3.5 flex items-center justify-between text-xs">
+                      <span className="text-gray-500 font-normal">Confidence</span>
+                      <span className="font-semibold text-gray-900">{currentResearch.confidence}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+              <p className="text-[11px] text-gray-400 mt-2.5 leading-relaxed font-light">
+                These figures come from the quarterly research run. A figure believed to be wrong is corrected at the next run, not by overtyping it here.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setEditingCountry(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold cursor-pointer border-0 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowEditConfirmation(true)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#ED4D19] hover:bg-[#D43D0B] text-white text-xs font-semibold cursor-pointer border-0 transition-colors shadow-xs"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT COUNTRY CONFIRMATION POPUP */}
+      {showEditConfirmation && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 w-full max-w-sm shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 text-center">
+            <button
+              onClick={() => setShowEditConfirmation(false)}
+              className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="w-16 h-16 rounded-2xl bg-orange-50 text-[#ED4D19] border border-orange-200/60 flex items-center justify-center mx-auto mb-4 shadow-2xs">
+              <Edit2 className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-[#0D212C] mb-2 font-['Poppins']">
+              Save Changes
+            </h3>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto mb-6 leading-relaxed">
+              Are you sure you want to save changes to {editCountryName}?
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowEditConfirmation(false)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold cursor-pointer border-0 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCountryChanges}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#ED4D19] hover:bg-[#D43D0B] text-white text-xs font-semibold cursor-pointer border-0 transition-colors shadow-xs"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE COUNTRY MODAL (Matches 2nd attached image) */}
+      {deletingCountry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 w-full max-w-sm shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 text-center">
+            <button
+              onClick={() => setDeletingCountry(null)}
+              className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Circular soft red container with red triangle icon */}
+            <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 border border-red-100 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-7 h-7 stroke-[1.75]" />
+            </div>
+
+            <h3 className="text-xl font-bold text-[#0D212C] mb-2 font-['Poppins']">
+              Delete Country
+            </h3>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto mb-6 leading-relaxed">
+              Are you sure you want to delete {deletingCountry.name}? This cannot be undone.
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setDeletingCountry(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold cursor-pointer border-0 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCountries((prev) => prev.filter((c) => c.id !== deletingCountry.id));
+                  setDeletingCountry(null);
+                }}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#DC2626] hover:bg-red-700 text-white text-xs font-semibold cursor-pointer border-0 transition-colors shadow-xs"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DEACTIVATE COUNTRY MODAL (Distinct colors and popup design from Delete) */}
+      {deactivatingCountry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 w-full max-w-sm shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 text-center">
+            <button
+              onClick={() => setDeactivatingCountry(null)}
+              className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Amber squircle icon (distinct from Delete circular red) */}
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/80 shadow-xs flex items-center justify-center mx-auto mb-4">
+              <Ban className="w-7 h-7 stroke-[1.75]" />
+            </div>
+
+            <h3 className="text-xl font-bold text-[#0D212C] mb-2 font-['Poppins']">
+              Deactivate Country
+            </h3>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto mb-6 leading-relaxed">
+              Are you sure you want to deactivate {deactivatingCountry.name}?
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setDeactivatingCountry(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold cursor-pointer border-0 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCountries((prev) =>
+                    prev.map((c) => (c.id === deactivatingCountry.id ? { ...c, isDeactivated: true } : c))
+                  );
+                  setDeactivatingCountry(null);
+                }}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#ED4D19] hover:bg-[#D43D0B] text-white text-xs font-semibold cursor-pointer border-0 transition-colors shadow-xs"
+              >
+                Deactivate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REACTIVATE COUNTRY CONFIRMATION MODAL */}
+      {reactivatingCountry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 w-full max-w-sm shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200 text-center">
+            <button
+              onClick={() => setReactivatingCountry(null)}
+              className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 bg-transparent rounded-full transition-colors cursor-pointer border-0"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Emerald rounded-2xl icon */}
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-xs flex items-center justify-center mx-auto mb-4">
+              <RotateCcw className="w-7 h-7 stroke-[1.75]" />
+            </div>
+
+            <h3 className="text-xl font-bold text-[#0D212C] mb-2 font-['Poppins']">
+              Reactivate Country
+            </h3>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto mb-6 leading-relaxed">
+              Are you sure you want to reactivate {reactivatingCountry.name}?
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setReactivatingCountry(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold cursor-pointer border-0 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCountries((prev) =>
+                    prev.map((c) => (c.id === reactivatingCountry.id ? { ...c, isDeactivated: false } : c))
+                  );
+                  setReactivatingCountry(null);
+                }}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold cursor-pointer border-0 transition-colors shadow-xs"
+              >
+                Reactivate
               </button>
             </div>
           </div>

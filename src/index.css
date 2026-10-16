@@ -146,3 +146,28 @@ th button, th div, th span {
   background: rgba(156, 163, 175, 0.5);
 }
 
+/* Upfront clearly visible scrollbar */
+.visible-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #94A3B8 #F1F5F9;
+}
+
+.visible-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.visible-scrollbar::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 9999px;
+}
+
+.visible-scrollbar::-webkit-scrollbar-thumb {
+  background: #94A3B8;
+  border-radius: 9999px;
+}
+
+.visible-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+

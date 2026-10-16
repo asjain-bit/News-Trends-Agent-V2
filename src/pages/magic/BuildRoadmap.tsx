@@ -1,6 +1,13 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight, Info, Check, CheckCircle2, TrendingUp, Clock, ArrowLeft, Search, Filter, LayoutGrid, Menu, RotateCcw, ArrowUpDown } from 'lucide-react';
 import { useMagicStore, ComponentItem } from '../../store/magicStore';
+import {
+  RevenueUnlockedOverlayTrigger,
+  ComplexityOverlayTrigger,
+  Effort1FteOverlayTrigger,
+  AllocatedRevenueOverlayTrigger,
+  BuildPriorityOverlayTrigger,
+} from './MetricOverlays';
 
 const COMPONENT_DETAILS_DATA: Record<string, {
   rank: number;
@@ -811,9 +818,14 @@ export default function BuildRoadmap() {
               </div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins']">
-                ${totalUnlockedRevenue}M
-              </div>
+              <RevenueUnlockedOverlayTrigger
+                totalUnlockedRev={totalUnlockedRevenue}
+                unlockedSolutions={unlockedSolutions}
+              >
+                <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins'] cursor-help group/rev">
+                  <span className="border-b border-dotted border-gray-300 group-hover/rev:text-[#ED4D19] transition-colors">${totalUnlockedRevenue}M</span>
+                </div>
+              </RevenueUnlockedOverlayTrigger>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
                 Cumulative addressable ARR from unlocked solutions
               </p>
@@ -1518,21 +1530,34 @@ export default function BuildRoadmap() {
                             </td>
 
                             {/* Complexity in Title Case */}
-                            <td className="py-4 px-6 text-center">
-                              <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal ${
-                                compComplexity === 'Low' 
-                                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                  : compComplexity === 'Medium'
-                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
-                              }`}>
-                                {compComplexity}
-                              </span>
+                            <td className="py-4 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                              <ComplexityOverlayTrigger
+                                componentName={comp.name}
+                                complexity={compComplexity}
+                              >
+                                <span className={`inline-block px-3 py-1 rounded-full text-[0.75rem] font-normal cursor-help hover:opacity-90 transition-opacity ${
+                                  compComplexity === 'Low' 
+                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : compComplexity === 'Medium'
+                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                }`}>
+                                  {compComplexity}
+                                </span>
+                              </ComplexityOverlayTrigger>
                             </td>
 
                             {/* Effort - same font styling as component name */}
-                            <td className="py-4 px-6 text-center font-normal text-[#0D212C] text-[0.8125rem]">
-                              {compEffort}
+                            <td className="py-4 px-6 text-center font-normal text-[#0D212C] text-[0.8125rem]" onClick={(e) => e.stopPropagation()}>
+                              <Effort1FteOverlayTrigger
+                                componentName={comp.name}
+                                effortText={compEffort}
+                                complexity={compComplexity}
+                              >
+                                <span className="cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                                  {compEffort}
+                                </span>
+                              </Effort1FteOverlayTrigger>
                             </td>
 
                             {/* Reuse - exact same text color and styling */}
@@ -1543,17 +1568,29 @@ export default function BuildRoadmap() {
                             </td>
 
                             {/* Allocated Revenue */}
-                            <td className="py-4 px-6 text-center">
-                              <span className="font-normal text-[#0D212C] text-[0.8125rem]">
-                                {formatRevenue(allocatedRev)}
-                              </span>
+                            <td className="py-4 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                              <AllocatedRevenueOverlayTrigger
+                                componentName={comp.name}
+                                allocatedRevenue={formatRevenue(allocatedRev)}
+                              >
+                                <span className="font-normal text-[#0D212C] text-[0.8125rem] cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                                  {formatRevenue(allocatedRev)}
+                                </span>
+                              </AllocatedRevenueOverlayTrigger>
                             </td>
 
                             {/* Build Priority */}
-                            <td className="py-4 px-6 text-center">
-                              <span className="font-normal text-[#0D212C] text-[0.8125rem]">
-                                {formatPriority(comp)}
-                              </span>
+                            <td className="py-4 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                              <BuildPriorityOverlayTrigger
+                                componentName={comp.name}
+                                allocatedRev={formatRevenue(allocatedRev)}
+                                effortPd={compEffort.replace('~', '')}
+                                priority={formatPriority(comp)}
+                              >
+                                <span className="font-normal text-[#0D212C] text-[0.8125rem] cursor-help hover:text-[#ED4D19] transition-colors border-b border-dotted border-gray-300">
+                                  {formatPriority(comp)}
+                                </span>
+                              </BuildPriorityOverlayTrigger>
                             </td>
 
                             {/* Quadrant as normal text (not chip), 1 row shows High Value, other rows show Defer */}

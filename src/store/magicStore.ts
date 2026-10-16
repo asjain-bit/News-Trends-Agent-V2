@@ -50,6 +50,8 @@ export interface CountryItem {
   obtainableSlice: string;
   dealAnchor: string;
   confidence: 'High' | 'Medium' | 'Low';
+  isDeactivated?: boolean;
+  note?: string;
 }
 
 export const DEFAULT_COMPONENTS: ComponentItem[] = [
