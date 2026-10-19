@@ -41,6 +41,47 @@ export default function ReportSummary() {
   // Confidence Breakdown & Scoring Drawer State (always expanded scoring breakdown)
   const [isConfidenceExpanded, setIsConfidenceExpanded] = useState(false);
   const [isScoringExpanded, setIsScoringExpanded] = useState(true);
+  const expandedTimestampRef = useRef<number>(0);
+
+  // Automatically collapse confidence score details as soon as user scrolls
+  useEffect(() => {
+    if (!isConfidenceExpanded) return;
+
+    expandedTimestampRef.current = Date.now();
+
+    const handleWheel = (e: WheelEvent) => {
+      // 200ms grace period after opening so that opening gesture doesn't immediately dismiss
+      if (Date.now() - expandedTimestampRef.current < 200) return;
+      if (Math.abs(e.deltaY) > 3) {
+        setIsConfidenceExpanded(false);
+      }
+    };
+
+    const handleTouchMove = () => {
+      if (Date.now() - expandedTimestampRef.current < 200) return;
+      setIsConfidenceExpanded(false);
+    };
+
+    const scrollContainer = document.getElementById('report-scroll-container');
+    const handleScroll = () => {
+      if (Date.now() - expandedTimestampRef.current < 200) return;
+      setIsConfidenceExpanded(false);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchmove', handleTouchMove);
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isConfidenceExpanded]);
 
   // Zoom Level State (Default 100% with compact page size for seamless fit)
   const [zoomLevel, setZoomLevel] = useState<number>(100);
