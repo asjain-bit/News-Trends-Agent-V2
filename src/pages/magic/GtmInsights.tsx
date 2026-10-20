@@ -30,6 +30,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMagicStore } from '../../store/magicStore';
 import { CountryFlag, COUNTRY_FLAG_MAP } from './Catalogue';
+import { ScoreOverlayTrigger } from './MetricOverlays';
 
 const GTM_GENERATION_STEPS = [
   "Validating target market profile & strategic positioning",
@@ -303,6 +304,7 @@ export interface MarketMatrixRow {
   name: string;
   status: 'Completed' | 'In progress' | 'Prioritised' | 'New';
   positioning: 'Distinctive' | 'Mixed' | 'Common';
+  score: number;
   total3Yr: string;
   totalNum: number;
   cells: Record<string, MatrixCellData>;
@@ -411,6 +413,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Remote Patient Monitoring',
     status: 'Prioritised',
     positioning: 'Distinctive',
+    score: 78,
     total3Yr: '$26.7M',
     totalNum: 26.7,
     cells: {
@@ -428,6 +431,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Population Health & Analytics',
     status: 'New',
     positioning: 'Distinctive',
+    score: 73,
     total3Yr: '$21.7M',
     totalNum: 21.7,
     cells: {
@@ -445,6 +449,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Drug Discovery',
     status: 'New',
     positioning: 'Distinctive',
+    score: 69,
     total3Yr: '$20.3M',
     totalNum: 20.3,
     cells: {
@@ -462,6 +467,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'InsurTech & Reimbursement',
     status: 'In progress',
     positioning: 'Distinctive',
+    score: 80,
     total3Yr: '$20.1M',
     totalNum: 20.1,
     cells: {
@@ -479,6 +485,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'EMR & Interoperability',
     status: 'Completed',
     positioning: 'Common',
+    score: 66,
     total3Yr: '$19.1M',
     totalNum: 19.1,
     cells: {
@@ -496,6 +503,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Hospital Ops & Clinical Workflow',
     status: 'In progress',
     positioning: 'Mixed',
+    score: 75,
     total3Yr: '$18.5M',
     totalNum: 18.5,
     cells: {
@@ -513,6 +521,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Home & Community Care',
     status: 'New',
     positioning: 'Mixed',
+    score: 58,
     total3Yr: '$15.5M',
     totalNum: 15.5,
     cells: {
@@ -530,6 +539,7 @@ export const MARKET_MATRIX_DATA: MarketMatrixRow[] = [
     name: 'Pharmacy & Medication',
     status: 'Prioritised',
     positioning: 'Mixed',
+    score: 59,
     total3Yr: '$11.3M',
     totalNum: 11.3,
     cells: {
@@ -746,6 +756,10 @@ export default function GtmInsights() {
     if (matrixSortCol === 'solution') {
       list = [...list].sort((a, b) =>
         matrixSortDir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+      );
+    } else if (matrixSortCol === 'score') {
+      list = [...list].sort((a, b) =>
+        matrixSortDir === 'asc' ? a.score - b.score : b.score - a.score
       );
     } else if (matrixSortCol === 'total') {
       list = [...list].sort((a, b) =>
@@ -1264,14 +1278,15 @@ export default function GtmInsights() {
               </div>
             </div>
 
-            {/* Market Matrix Table */}
+            {/* Market Matrix Table with Fixed Solution & Total Columns, Scrollable In-Between Columns */}
             <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[980px]" onMouseLeave={() => { if (!selectedCellBasis) handleCellMouseLeave(); }}>
+              <div className="overflow-x-auto subtle-scrollbar">
+                <table className="w-full text-left border-separate border-spacing-0 min-w-[1525px]" onMouseLeave={() => { if (!selectedCellBasis) handleCellMouseLeave(); }}>
                   <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
+                    <tr className="bg-[#F9FAFB] text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
+                      {/* Fixed Left Column: Solution */}
                       <th 
-                        className="py-3 px-5 font-normal cursor-pointer hover:text-gray-800 transition-colors w-[22%]"
+                        className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 font-normal cursor-pointer hover:text-gray-800 transition-colors w-[230px] min-w-[230px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]"
                         onClick={() => {
                           setMatrixSortCol('solution');
                           setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -1282,10 +1297,26 @@ export default function GtmInsights() {
                           <span className="text-[10px] text-gray-400">⇅</span>
                         </div>
                       </th>
+
+                      {/* Scrollable In-Between Column: Score */}
+                      <th 
+                        className="py-3 px-3 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors w-[80px] min-w-[80px] border-b border-gray-200 bg-[#F9FAFB]"
+                        onClick={() => {
+                          setMatrixSortCol('score');
+                          setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                        }}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1">
+                          <span>SCORE</span>
+                          <span className="text-[10px] text-gray-400">⇅</span>
+                        </div>
+                      </th>
+
+                      {/* Scrollable In-Between Columns: Countries */}
                       {MATRIX_COUNTRIES.map((cnt) => (
                         <th 
                           key={cnt}
-                          className="py-3 px-2 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors"
+                          className="py-3 px-2 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors w-[155px] min-w-[155px] border-b border-gray-200 bg-[#F9FAFB]"
                           onClick={() => {
                             setMatrixSortCol(cnt);
                             setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -1297,8 +1328,10 @@ export default function GtmInsights() {
                           </div>
                         </th>
                       ))}
+
+                      {/* Fixed Right Column: Total (3-Yr) */}
                       <th 
-                        className="py-3 px-4 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors bg-gray-50/80 border-l border-gray-200 text-gray-700 w-[11%]"
+                        className="sticky right-0 z-30 py-3 px-4 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors bg-[#F9FAFB] border-b border-l border-gray-200 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.06)] text-gray-700 w-[130px] min-w-[130px]"
                         onClick={() => {
                           setMatrixSortCol('total');
                           setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -1311,10 +1344,10 @@ export default function GtmInsights() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+                  <tbody className="text-[0.875rem]">
                     {filteredMatrixData.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="py-10 text-center text-xs text-gray-400">
+                        <td colSpan={10} className="py-10 text-center text-xs text-gray-400 border-b border-gray-100">
                           No solutions found matching "{matrixSearch}".
                         </td>
                       </tr>
@@ -1322,10 +1355,10 @@ export default function GtmInsights() {
                       filteredMatrixData.map((row) => (
                         <tr 
                           key={row.id} 
-                          className="hover:bg-gray-50/70 transition-colors"
+                          className="hover:bg-gray-50/70 transition-colors group"
                         >
-                          {/* Solution Name & Subtitle */}
-                          <td className="py-3.5 px-5">
+                          {/* Fixed Left Cell: Solution Name & Subtitle */}
+                          <td className="sticky left-0 z-20 bg-white group-hover:bg-[#F9FAFB] transition-colors py-3.5 px-5 w-[230px] min-w-[230px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
                             <div className="flex flex-col">
                               <span className="font-medium text-[#0D212C] text-[0.8125rem]">
                                 {row.name}
@@ -1336,14 +1369,23 @@ export default function GtmInsights() {
                             </div>
                           </td>
 
-                          {/* Country Cells with Plain Box Colors */}
+                          {/* Scrollable Cell: Score Column */}
+                          <td className="py-3.5 px-3 text-center w-[80px] min-w-[80px] border-b border-gray-100 bg-white group-hover:bg-gray-50/70 transition-colors">
+                            <ScoreOverlayTrigger solutionName={row.name} score={row.score}>
+                              <span className="inline-flex items-center justify-center font-semibold text-[#0D212C] text-[0.8125rem] font-mono cursor-pointer hover:text-[#ED4D19] transition-colors">
+                                {row.score}
+                              </span>
+                            </ScoreOverlayTrigger>
+                          </td>
+
+                          {/* Scrollable Cells: Country Cells with Plain Box Colors */}
                           {MATRIX_COUNTRIES.map((cnt) => {
                             const cell = row.cells[cnt] || {};
                             const fitNum = cell.fit ? parseInt(cell.fit.match(/\d+/)?.[0] || '3', 10) : 3;
                             const winRate = 20 + 10 * fitNum;
 
                             return (
-                              <td key={cnt} className="py-2 px-1.5 text-center">
+                              <td key={cnt} className="py-2 px-1.5 text-center w-[155px] min-w-[155px] border-b border-gray-100 bg-white group-hover:bg-gray-50/70 transition-colors">
                                 {cell.restricted ? (
                                   <div className="inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-400 text-[11px] font-normal w-full select-none">
                                     <Ban className="w-3.5 h-3.5 text-gray-400 shrink-0" />
@@ -1397,8 +1439,8 @@ export default function GtmInsights() {
                             );
                           })}
 
-                          {/* Row Total with Subtle Grey Background */}
-                          <td className="py-3.5 px-4 text-center font-semibold text-[#0D212C] text-[0.8125rem] bg-gray-50/40 border-l border-gray-200">
+                          {/* Fixed Right Cell: Row Total with Subtle Grey Background */}
+                          <td className="sticky right-0 z-20 py-3.5 px-4 text-center font-semibold text-[#0D212C] text-[0.8125rem] bg-[#FAFAFA] group-hover:bg-[#F0F2F5] transition-colors border-b border-l border-gray-200 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[130px] min-w-[130px]">
                             {row.total3Yr}
                           </td>
                         </tr>
@@ -1406,18 +1448,23 @@ export default function GtmInsights() {
                     )}
                   </tbody>
 
-                  {/* Summary Footer Row with Subtle Grey Background */}
+                  {/* Summary Footer Row with Fixed Left & Right Cells */}
                   <tfoot>
-                    <tr className="bg-gray-50/90 border-t border-gray-200 font-semibold text-[0.8125rem] text-[#0D212C]">
-                      <td className="py-3 px-5 text-gray-900">
+                    <tr className="bg-[#F9FAFB] font-semibold text-[0.8125rem] text-[#0D212C]">
+                      {/* Fixed Left Cell: Total Label */}
+                      <td className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 text-gray-900 border-t border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[230px] min-w-[230px]">
                         Total (3-yr)
                       </td>
+                      <td className="py-3 px-3 text-center text-gray-400 font-normal border-t border-gray-200 bg-[#F9FAFB] w-[80px] min-w-[80px]">
+                        —
+                      </td>
                       {MATRIX_COUNTRIES.map((cnt) => (
-                        <td key={cnt} className="py-3 px-2 text-center font-semibold text-[#0D212C]">
+                        <td key={cnt} className="py-3 px-2 text-center font-semibold text-[#0D212C] border-t border-gray-200 bg-[#F9FAFB] w-[155px] min-w-[155px]">
                           {MATRIX_TOTALS[cnt] || '—'}
                         </td>
                       ))}
-                      <td className="py-3 px-4 text-center font-bold text-gray-900 bg-gray-100/70 border-l border-gray-200">
+                      {/* Fixed Right Cell: Total Summary */}
+                      <td className="sticky right-0 z-30 py-3 px-4 text-center font-bold text-gray-900 bg-gray-100 border-t border-l border-gray-200 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[130px] min-w-[130px]">
                         {MATRIX_TOTALS['Total'] || '$153.1M'}
                       </td>
                     </tr>

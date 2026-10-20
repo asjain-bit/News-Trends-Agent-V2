@@ -617,10 +617,10 @@ export default function BuildRoadmap() {
   }, [solutionImpactStatuses, impactSearch, impactSort]);
 
   return (
-    <div className="w-full px-5 py-6 md:py-8 space-y-6">
+    <div className={`w-full px-5 ${viewMode === 'grid' && activeTab === 'components' && !viewingComponent ? 'h-full flex flex-col py-3 sm:py-3.5 space-y-3' : 'py-6 md:py-8 space-y-6'}`}>
       
       {/* Top Underline Tabs (Matching Catalogue Design Exactly) */}
-      <div className="inline-block border-b border-gray-200">
+      <div className="inline-block border-b border-gray-200 shrink-0">
         <nav className="flex space-x-1 sm:space-x-2 -mb-[1px]">
           <button
             onClick={() => {
@@ -652,66 +652,68 @@ export default function BuildRoadmap() {
       </div>
 
       {/* Page Header - Clean title & build top custom dropdown */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
         <div>
           <h2 className="text-[1.125rem] sm:text-[1.25rem] font-medium text-[#0D212C] font-['Poppins']">
             Build roadmap
           </h2>
         </div>
 
-        {/* Top Controls: Order by, Build top, and Grid/Table icon toggle */}
+        {/* Top Controls: Order by (Table view only), Build top, and Grid/Table icon toggle */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Order By Dropdown */}
-          <div className="relative" ref={orderByRef}>
-            <button
-              type="button"
-              onClick={() => setIsOrderByOpen(!isOrderByOpen)}
-              className="inline-flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-lg px-3.5 py-1.5 text-[0.8125rem] text-gray-700 font-normal shadow-2xs transition-colors cursor-pointer"
-            >
-              <span className="text-gray-500">Order by:</span>
-              <span className="font-semibold text-[#0D212C]">
-                {orderBy === 'priority' ? 'Build priority' : 'Reuse count'}
-              </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOrderByOpen ? 'rotate-180' : ''}`} />
-            </button>
+          {/* Order By Dropdown - Only shown in Table view */}
+          {viewMode === 'table' && (
+            <div className="relative" ref={orderByRef}>
+              <button
+                type="button"
+                onClick={() => setIsOrderByOpen(!isOrderByOpen)}
+                className="inline-flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-lg px-3.5 py-1.5 text-[0.8125rem] text-gray-700 font-normal shadow-2xs transition-colors cursor-pointer"
+              >
+                <span className="text-gray-500">Order by:</span>
+                <span className="font-semibold text-[#0D212C]">
+                  {orderBy === 'priority' ? 'Build priority' : 'Reuse count'}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOrderByOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            {isOrderByOpen && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrderBy('priority');
-                    setIsOrderByOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
-                    orderBy === 'priority'
-                      ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
-                      : 'text-gray-700 hover:bg-gray-50 font-normal'
-                  }`}
-                >
-                  <span>Build priority</span>
-                  {orderBy === 'priority' && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrderBy('reuse');
-                    setIsOrderByOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
-                    orderBy === 'reuse'
-                      ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
-                      : 'text-gray-700 hover:bg-gray-50 font-normal'
-                  }`}
-                >
-                  <span>Reuse count</span>
-                  {orderBy === 'reuse' && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
-                </button>
-              </div>
-            )}
-          </div>
+              {isOrderByOpen && (
+                <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderBy('priority');
+                      setIsOrderByOpen(false);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                      orderBy === 'priority'
+                        ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
+                        : 'text-gray-700 hover:bg-gray-50 font-normal'
+                    }`}
+                  >
+                    <span>Build priority</span>
+                    {orderBy === 'priority' && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderBy('reuse');
+                      setIsOrderByOpen(false);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                      orderBy === 'reuse'
+                        ? 'bg-[#fef3eb] text-[#ED4D19] font-medium'
+                        : 'text-gray-700 hover:bg-gray-50 font-normal'
+                    }`}
+                  >
+                    <span>Reuse count</span>
+                    {orderBy === 'reuse' && <Check className="w-3.5 h-3.5 text-[#ED4D19]" />}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-          {/* Custom Build Top Dropdown (Options 10, 20, 50 in Graph view; 3, 4, 5 in List view) */}
+          {/* Custom Build Top Dropdown (Options 10, 20 in Graph view; 1, 2, 3, 4, 5 in List view) */}
           <div className="relative" ref={buildTopRef}>
             <button
               type="button"
@@ -725,7 +727,7 @@ export default function BuildRoadmap() {
 
             {isBuildTopOpen && (
               <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 overflow-hidden">
-                {(viewMode === 'grid' ? ['10', '20', '50'] : ['3', '4', '5']).map((opt) => (
+                {(viewMode === 'grid' ? ['10', '20'] : ['1', '2', '3', '4', '5']).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -753,7 +755,7 @@ export default function BuildRoadmap() {
               type="button"
               onClick={() => {
                 setViewMode('grid');
-                if (!['10', '20', '50'].includes(buildTop)) setBuildTop('10');
+                if (!['10', '20'].includes(buildTop)) setBuildTop('10');
               }}
               title="Grid view"
               className={`p-1.5 rounded-md transition-all cursor-pointer ${
@@ -768,7 +770,7 @@ export default function BuildRoadmap() {
               type="button"
               onClick={() => {
                 setViewMode('table');
-                if (!['3', '4', '5'].includes(buildTop)) setBuildTop('3');
+                if (!['1', '2', '3', '4', '5'].includes(buildTop)) setBuildTop('3');
               }}
               title="Table view"
               className={`p-1.5 rounded-md transition-all cursor-pointer ${
@@ -783,8 +785,8 @@ export default function BuildRoadmap() {
         </div>
       </div>
 
-      {/* 3 KPI Cards Displayed Across Both Tabs with Icons & Reduced Font Weight (Hidden when viewing component details) */}
-      {!viewingComponent && (
+      {/* 3 KPI Cards Displayed in Table view and Build Impact (Hidden in Grid view and when viewing component details) */}
+      {!viewingComponent && (activeTab === 'impact' || viewMode === 'table') && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Card 1: Solutions Unlocked */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
@@ -857,7 +859,7 @@ export default function BuildRoadmap() {
 
       {/* TAB 1: COMPONENT BUILD */}
       {activeTab === 'components' && (
-        <div className="space-y-4">
+        <div className={viewMode === 'grid' && !viewingComponent ? 'flex-1 flex flex-col min-h-0' : 'space-y-4'}>
           {viewingComponent ? (
             /* COMPONENT DETAILS VIEW (Matching Snapshot 1 & 2 + Part B Branding) */
             <div className="space-y-4">
@@ -1018,18 +1020,18 @@ export default function BuildRoadmap() {
               })()}
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="bg-white rounded-2xl border border-gray-200/90 p-5 md:p-6 shadow-xs flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 min-h-0 bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row gap-5">
               {/* Left Side: 2D Quadrant Scatter Plot */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex flex-1 min-h-[460px]">
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex flex-1 min-h-0">
                   {/* Y-Axis Label and Ticks - Slim container utilizing empty space */}
-                  <div className="flex items-center select-none pr-1.5">
-                    <div className="w-5 h-[500px] flex items-center justify-center relative">
+                  <div className="flex items-center select-none pr-1.5 h-full">
+                    <div className="w-5 h-full flex items-center justify-center relative">
                       <span className="-rotate-90 text-[0.75rem] font-medium text-gray-500 whitespace-nowrap tracking-wide absolute">
                         Allocated revenue (3-yr) →
                       </span>
                     </div>
-                    <div className="flex flex-col justify-between h-[500px] text-[0.6875rem] text-gray-400 font-mono text-right py-1 pl-1">
+                    <div className="flex flex-col justify-between h-full text-[0.6875rem] text-gray-400 font-mono text-right py-1 pl-1">
                       {['$50M', '$45M', '$40M', '$35M', '$30M', '$25M', '$20M', '$15M', '$10M', '$5M', '$0M'].map((tick) => (
                         <span key={tick}>{tick}</span>
                       ))}
@@ -1037,8 +1039,8 @@ export default function BuildRoadmap() {
                   </div>
 
                   {/* Quadrant Graph Area */}
-                  <div className="flex-1 flex flex-col">
-                    <div className="relative w-full h-[500px] rounded-xl border border-gray-200/90 overflow-hidden bg-white select-none">
+                  <div className="flex-1 flex flex-col min-h-0">
+                    <div className="relative w-full flex-1 min-h-0 rounded-xl border border-gray-200/90 overflow-hidden bg-white select-none">
                       {/* Top-Left Quadrant: HIGH VALUE */}
                       <div
                         className="absolute top-0 left-0 bg-blue-50/40 transition-all duration-200"
@@ -1103,29 +1105,29 @@ export default function BuildRoadmap() {
                         style={{ top: `${Math.max(5, Math.min(95, (1 - revenueSplit / 50) * 100))}%` }}
                       />
 
-                      {/* Component Scatter Bubbles - Dynamic based on Build Top 10, 20, 50 */}
+                      {/* Component Scatter Bubbles - Dynamic based on Build Top 10, 20 */}
                       {displayedGraphComponents.map((comp) => {
                         const actualReuse = (reuseMatrix[comp.id] || []).length || comp.reuseCount || 0;
                         const allocatedRev = comp.allocatedRevenue ?? 0;
                         const quad = getQuadrant(actualReuse, allocatedRev, reuseSplit, revenueSplit);
 
-                        // Precise, uncluttered layout mapping utilizing the full horizontal width
-                        const layoutMap: Record<string, { x: number; y: number; labelPos: 'top' | 'bottom' | 'left' | 'right' }> = {
-                          c1: { x: 5.6, y: 41.5, labelPos: 'top' },          // AI Chatbot · CRAG
-                          c12: { x: 3.5, y: 28.0, labelPos: 'top' },         // FHIR Integration Gateway
-                          c5: { x: 4.8, y: 22.0, labelPos: 'top' },          // Analytics & Dashboards
-                          c4: { x: 2.1, y: 22.0, labelPos: 'right' },        // Clinical Notes · NLP
-                          c3: { x: 6.2, y: 14.0, labelPos: 'top' },          // Patient Profile
-                          c2: { x: 4.1, y: 10.8, labelPos: 'top' },          // Payment Module
-                          c9: { x: 2.4, y: 7.2, labelPos: 'top' },           // Device Telemetry Hub
-                          c7: { x: 1.7, y: 6.2, labelPos: 'top' },           // Appointment Booking
-                          c6: { x: 0.9, y: 2.8, labelPos: 'right' },         // Fraud-Claim Detection (labelPos right avoids left clipping)
-                          c11: { x: 5.4, y: 3.2, labelPos: 'right' },        // Notification Service
-                          c8: { x: 0.45, y: 1.5, labelPos: 'right' },        // Prescription Engine
-                          c10: { x: 1.1, y: 0.8, labelPos: 'bottom' },       // Insurance Directory · Unmapped
+                        // Precise, uncluttered layout mapping utilizing the full canvas without bubble overlap
+                        const layoutMap: Record<string, { x: number; y: number }> = {
+                          c1: { x: 5.6, y: 41.5 },          // AI Chatbot · CRAG
+                          c12: { x: 3.5, y: 28.0 },         // FHIR Integration Gateway
+                          c5: { x: 4.8, y: 22.0 },          // Analytics & Dashboards
+                          c4: { x: 2.1, y: 22.0 },          // Clinical Notes · NLP
+                          c3: { x: 6.2, y: 14.0 },          // Patient Profile
+                          c2: { x: 4.1, y: 10.8 },          // Payment Module
+                          c9: { x: 2.5, y: 7.8 },           // Device Telemetry Hub
+                          c7: { x: 1.8, y: 6.0 },           // Appointment Booking
+                          c6: { x: 0.9, y: 3.2 },           // Fraud-Claim Detection
+                          c11: { x: 5.4, y: 3.2 },          // Notification Service
+                          c8: { x: 0.4, y: 1.5 },           // Prescription Engine
+                          c10: { x: 1.4, y: 1.0 },          // Insurance Directory · Unmapped
                         };
 
-                        const layout = layoutMap[comp.id] || { x: actualReuse, y: allocatedRev, labelPos: 'top' as const };
+                        const layout = layoutMap[comp.id] || { x: actualReuse, y: allocatedRev };
                         const xPct = Math.max(4, Math.min(94, (layout.x / 7) * 100));
                         const yPct = Math.max(6, Math.min(94, (1 - layout.y / 50) * 100));
 
@@ -1143,20 +1145,10 @@ export default function BuildRoadmap() {
                             ? 'bg-amber-400 text-amber-950 border border-amber-500'
                             : 'bg-slate-300 text-slate-800 border border-slate-400';
 
-                        // Label offset class based on direction
-                        const labelClass =
-                          layout.labelPos === 'bottom'
-                            ? 'top-full mt-1.5 left-1/2 -translate-x-1/2'
-                            : layout.labelPos === 'left'
-                            ? 'right-full mr-2 top-1/2 -translate-y-1/2'
-                            : layout.labelPos === 'right'
-                            ? 'left-full ml-2 top-1/2 -translate-y-1/2'
-                            : 'bottom-full mb-1.5 left-1/2 -translate-x-1/2';
-
                         return (
                           <div
                             key={comp.id}
-                            className="absolute z-20 group -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110"
+                            className="absolute z-20 group -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-115"
                             style={{ left: `${xPct}%`, top: `${yPct}%` }}
                             onClick={() => setViewingComponent(comp)}
                             onMouseEnter={() => setHoveredBubble(comp)}
@@ -1167,16 +1159,19 @@ export default function BuildRoadmap() {
                               style={{ width: `${bubbleSize}px`, height: `${bubbleSize}px` }}
                             />
 
-                            {/* Uncluttered Label beside bubble */}
-                            <div className={`absolute ${labelClass} pointer-events-none whitespace-nowrap z-20`}>
-                              <span className="text-[10px] sm:text-[11px] font-medium text-gray-700 bg-white/80 px-1 py-0.5 rounded backdrop-blur-2xs shadow-2xs border border-gray-100/60">
-                                {comp.name}
-                              </span>
-                            </div>
-
-                            {/* Interactive Tooltip on hover (Light Theme) */}
+                            {/* Interactive Tooltip on hover showing bubble name & metrics */}
                             {hoveredBubble?.id === comp.id && (
-                              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-56 bg-white border border-gray-200/90 text-[#0D212C] p-3 rounded-xl shadow-xl text-left z-50 pointer-events-none animate-in fade-in duration-150">
+                              <div
+                                className={`absolute ${
+                                  yPct < 22 ? 'top-full mt-3' : 'bottom-full mb-3'
+                                } ${
+                                  xPct > 80
+                                    ? 'right-0 translate-x-0'
+                                    : xPct < 20
+                                    ? 'left-0 translate-x-0'
+                                    : 'left-1/2 -translate-x-1/2'
+                                } w-56 bg-white border border-gray-200/90 text-[#0D212C] p-3 rounded-xl shadow-xl text-left z-50 pointer-events-none animate-in fade-in duration-150`}
+                              >
                                 <div className="text-xs font-semibold text-[#0D212C]">{comp.name}</div>
                                 <div className="text-[10px] text-gray-500 mb-2">{comp.subtitle}</div>
                                 <div className="grid grid-cols-2 gap-1.5 text-[11px] pt-1.5 border-t border-gray-100">
@@ -1220,7 +1215,7 @@ export default function BuildRoadmap() {
               </div>
 
               {/* Right Side: Quadrant Thresholds & Legend Panel (without SHOW section) */}
-              <div className="w-full lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-gray-100 pt-5 lg:pt-0 lg:pl-6 space-y-6">
+              <div className="w-full lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-5 space-y-4">
                 <div className="space-y-4">
                   <h4 className="text-[0.6875rem] font-semibold text-gray-400 uppercase tracking-wider">
                     QUADRANT THRESHOLDS

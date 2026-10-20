@@ -2774,7 +2774,6 @@ export default function Catalogue() {
                         <th className="py-3 px-6 font-normal">TOTAL HEALTH SPEND</th>
                         <th className="py-3 px-6 font-normal">DIGITAL SHARE</th>
                         <th className="py-3 px-6 font-normal">DEAL ANCHOR (PER-COUNTRY)</th>
-                        <th className="py-3 px-6 font-normal">CONFIDENCE</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-[0.875rem]">
@@ -2814,22 +2813,6 @@ export default function Catalogue() {
                             >
                               <span className="cursor-pointer hover:opacity-80 transition-opacity">{country.dealAnchor}</span>
                             </DealAnchorOverlayTrigger>
-                          </td>
-                          <td className="py-3.5 px-6">
-                            <ConfidenceOverlayTrigger
-                              countryName={country.name}
-                              confidence={country.confidence as 'High' | 'Medium' | 'Low'}
-                            >
-                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide cursor-pointer ${
-                                country.confidence === 'High'
-                                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                                  : country.confidence === 'Medium'
-                                  ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                                  : 'bg-red-50 text-red-600 border border-red-200'
-                              }`}>
-                                {country.confidence}
-                              </span>
-                            </ConfidenceOverlayTrigger>
                           </td>
                         </tr>
                       ))}
@@ -3275,14 +3258,13 @@ export default function Catalogue() {
                         <ArrowUpDown className={`w-3.5 h-3.5 ${componentsSort.column === 'reuse' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors shrink-0`} />
                       </div>
                     </th>
-                    <th className="py-3 px-3.5 font-normal w-[16%]">DEPENDENCY</th>
                     <th className="py-3 px-3.5 font-normal text-right w-[4%]">ACTION</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-[0.875rem]">
                   {paginatedComponents.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-gray-400 text-sm">
+                      <td colSpan={6} className="py-12 text-center text-gray-400 text-sm">
                         No components found matching the search or filters.
                       </td>
                     </tr>
@@ -3337,15 +3319,6 @@ export default function Catalogue() {
                         {/* Reuse text size matching component title text size (text-[0.8125rem]) */}
                         <td className="py-3.5 px-3.5 text-[0.8125rem] font-normal text-[#0D212C] whitespace-nowrap">
                           {component.reuseCount} solutions
-                        </td>
-
-                        {/* Dependency (1 line with tooltip) */}
-                        <td className="py-3.5 px-3.5 text-xs text-gray-600 font-normal min-w-0">
-                          <InstantTooltip content={getComponentDependencies(component)} className="w-full min-w-0">
-                            <span className="truncate block leading-relaxed">
-                              {getComponentDependencies(component)}
-                            </span>
-                          </InstantTooltip>
                         </td>
 
                         {/* Action Column - 3-dot menu */}
@@ -3562,7 +3535,6 @@ export default function Catalogue() {
                         DEAL ANCHOR (PER-COUNTRY) <ArrowUpDown className={`w-3.5 h-3.5 ${countriesSort.column === 'anchor' ? 'text-gray-600' : 'text-gray-400 group-hover:text-gray-500'} transition-colors`} />
                       </div>
                     </th>
-                    <th className="py-3 px-6 font-normal">CONFIDENCE</th>
                     <th className="py-3 px-6 font-normal text-right">ACTION</th>
                   </tr>
                 </thead>
@@ -3629,22 +3601,6 @@ export default function Catalogue() {
                         >
                           <span className="cursor-pointer hover:opacity-80 transition-opacity">{country.dealAnchor}</span>
                         </DealAnchorOverlayTrigger>
-                      </td>
-                      <td className="py-4 px-6">
-                        <ConfidenceOverlayTrigger
-                          countryName={country.name}
-                          confidence={country.confidence as 'High' | 'Medium' | 'Low'}
-                        >
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide cursor-pointer ${
-                            country.confidence === 'High'
-                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                              : country.confidence === 'Medium'
-                              ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                              : 'bg-red-50 text-red-600 border border-red-200'
-                          }`}>
-                            {country.confidence}
-                          </span>
-                        </ConfidenceOverlayTrigger>
                       </td>
                       <td className="py-4 px-6 text-right relative">
                         <div className="inline-flex items-center justify-end">
