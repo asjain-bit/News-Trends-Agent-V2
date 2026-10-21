@@ -2274,110 +2274,108 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
           {/* 2-Column Grid: Sliders on Left, Live Ranking on Right */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Left Column: Factor Weights Sliders (6 Cols) */}
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs space-y-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
-                    Factor weights
-                  </h3>
-                  <div className="flex items-center gap-3">
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 p-6 md:p-7 shadow-xs flex flex-col h-full">
+              <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                <h3 className="text-base font-semibold text-[#0D212C] font-['Poppins']">
+                  Factor weights
+                </h3>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleResetWeights}
+                    disabled={!isEditingWeightage}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-colors"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Reset to default</span>
+                  </button>
+                  
+                  {/* Edit Controls moved here */}
+                  {!isEditingWeightage ? (
                     <button
                       type="button"
-                      onClick={handleResetWeights}
-                      disabled={!isEditingWeightage}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer bg-transparent border-0 p-0 transition-colors"
+                      onClick={() => {
+                        setTempWeights({ ...weights });
+                        setIsEditingWeightage(true);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#ED4D19] hover:text-[#C93B0E] active:opacity-90 bg-transparent border-0 px-2 py-1 cursor-pointer transition-colors"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
-                      <span>Reset to default</span>
+                      <Settings2 className="w-3.5 h-3.5 text-[#ED4D19]" />
+                      <span>Edit</span>
                     </button>
-                    
-                    {/* Edit Controls moved here */}
-                    {!isEditingWeightage ? (
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingWeightage(false)}
+                        className="px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
+                      >
+                        Cancel
+                      </button>
                       <button
                         type="button"
                         onClick={() => {
-                          setTempWeights({ ...weights });
-                          setIsEditingWeightage(true);
+                          setWeights({ ...tempWeights });
+                          setIsEditingWeightage(false);
                         }}
-                        className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#ED4D19] hover:text-[#C93B0E] active:opacity-90 bg-transparent border-0 px-2 py-1 cursor-pointer transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-opacity cursor-pointer"
                       >
-                        <Settings2 className="w-3.5 h-3.5 text-[#ED4D19]" />
-                        <span>Edit</span>
+                        <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <span>Save</span>
                       </button>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingWeightage(false)}
-                          className="px-2.5 py-1 text-gray-600 hover:text-gray-900 bg-transparent border-0 text-[0.8125rem] font-medium cursor-pointer transition-colors"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setWeights({ ...tempWeights });
-                            setIsEditingWeightage(false);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#ED4D19] to-[#C93B0E] hover:opacity-95 text-white text-xs font-medium rounded-lg shadow-xs transition-opacity cursor-pointer"
-                        >
-                          <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
-                          <span>Save</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-5 mt-5">
-                  {FACTORS.map((factor) => {
-                    const currentWeight = isEditingWeightage 
-                      ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
-                      : (weights[factor.id] ?? factor.defaultWeight);
-                    return (
-                      <div key={factor.id} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-xs font-normal text-gray-400">
-                              {factor.code} {factor.name}
-                            </div>
-                          </div>
-
-                          {/* Multiplier Value */}
-                          <div className="text-sm font-semibold text-[#0D212C] font-mono">
-                            {currentWeight}x
-                          </div>
-                        </div>
-
-                        {/* Slider Input with Part B Orange Track and White/Orange Thumb */}
-                        <div className="flex items-center gap-3 py-1">
-                          <input
-                            type="range"
-                            min="0"
-                            max="3"
-                            step="1"
-                            disabled={!isEditingWeightage}
-                            value={currentWeight}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value, 10);
-                              setTempWeights((prev) => ({ ...prev, [factor.id]: val }));
-                            }}
-                            className={`w-full h-1.5 rounded-full custom-slider-orange ${
-                              isEditingWeightage ? 'cursor-pointer opacity-100' : 'pointer-events-none opacity-100'
-                            }`}
-                            style={{
-                              background: `linear-gradient(to right, #ED4D19 ${(currentWeight / 3) * 100}%, #e5e7eb ${(currentWeight / 3) * 100}%)`
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* How weighting works info callout */}
-              <div className="pt-4 border-t border-gray-100 flex items-start gap-2.5 text-xs text-gray-500">
+              <div className="space-y-3.5 mt-3.5">
+                {FACTORS.map((factor) => {
+                  const currentWeight = isEditingWeightage 
+                    ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
+                    : (weights[factor.id] ?? factor.defaultWeight);
+                  return (
+                    <div key={factor.id} className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xs font-normal text-gray-400">
+                            {factor.code} {factor.name}
+                          </div>
+                        </div>
+
+                        {/* Multiplier Value */}
+                        <div className="text-sm font-semibold text-[#0D212C] font-mono">
+                          {currentWeight}x
+                        </div>
+                      </div>
+
+                      {/* Slider Input with Part B Orange Track and White/Orange Thumb */}
+                      <div className="flex items-center gap-3 py-0.5">
+                        <input
+                          type="range"
+                          min="0"
+                          max="3"
+                          step="1"
+                          disabled={!isEditingWeightage}
+                          value={currentWeight}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            setTempWeights((prev) => ({ ...prev, [factor.id]: val }));
+                          }}
+                          className={`w-full h-1.5 rounded-full custom-slider-orange ${
+                            isEditingWeightage ? 'cursor-pointer opacity-100' : 'pointer-events-none opacity-100'
+                          }`}
+                          style={{
+                            background: `linear-gradient(to right, #ED4D19 ${(currentWeight / 3) * 100}%, #e5e7eb ${(currentWeight / 3) * 100}%)`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* How weighting works info callout with reduced spacing directly below F6 Revenue depth */}
+              <div className="mt-3.5 pt-3.5 border-t border-gray-100 flex items-start gap-2.5 text-xs text-gray-500">
                 <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <div className="font-semibold text-gray-700">How weighting works</div>
@@ -2399,12 +2397,12 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 </span>
               </div>
 
-              {/* Scrollable List matching card height with upfront visible scrollbar */}
-              <div className="flex-1 min-h-0 max-h-[480px] overflow-y-scroll visible-scrollbar divide-y divide-gray-100 pr-2 my-2">
+              {/* Scrollable List showing 11 rankings upfront, remainder in scroll */}
+              <div className="flex-1 min-h-0 h-[429px] max-h-[429px] overflow-y-auto visible-scrollbar divide-y divide-gray-100 pr-2 my-1">
                 {rankedSolutions.map((sol, index) => (
                   <div 
                     key={sol.id} 
-                    className="py-2.5 flex items-center justify-between gap-4 hover:bg-gray-50/50 px-2 rounded-lg transition-colors"
+                    className="h-[39px] flex items-center justify-between gap-4 hover:bg-gray-50/50 px-2 rounded-lg transition-colors shrink-0"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span className="text-xs font-semibold text-gray-400 w-4 text-center">

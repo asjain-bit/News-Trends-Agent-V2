@@ -659,10 +659,10 @@ export default function BuildRoadmap() {
           </h2>
         </div>
 
-        {/* Top Controls: Order by (Table view only), Build top, and Grid/Table icon toggle */}
+        {/* Top Controls: Order by, Build top, and Grid/Table icon toggle */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Order By Dropdown - Only shown in Table view */}
-          {viewMode === 'table' && (
+          {/* Order By Dropdown - Shown in Table view and Build Impact tab */}
+          {(viewMode === 'table' || activeTab === 'impact') && (
             <div className="relative" ref={orderByRef}>
               <button
                 type="button"
@@ -713,21 +713,21 @@ export default function BuildRoadmap() {
             </div>
           )}
 
-          {/* Custom Build Top Dropdown (Options 10, 20 in Graph view; 1, 2, 3, 4, 5 in List view) */}
+          {/* Custom Build Top Dropdown (Options 10, 20 in Graph view; 1, 2, 3, 4, 5 in List/Impact view) */}
           <div className="relative" ref={buildTopRef}>
             <button
               type="button"
               onClick={() => setIsBuildTopOpen(!isBuildTopOpen)}
               className="inline-flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-lg px-3.5 py-1.5 text-[0.8125rem] text-gray-700 font-normal shadow-2xs transition-colors cursor-pointer"
             >
-              <span className="text-gray-500">{viewMode === 'grid' ? 'Build Priority:' : 'Build top:'}</span>
+              <span className="text-gray-500">{viewMode === 'grid' && activeTab === 'components' ? 'Build Priority:' : 'Build top:'}</span>
               <span className="font-semibold text-[#0D212C]">Top {buildTop}</span>
               <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isBuildTopOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isBuildTopOpen && (
               <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg py-1 z-50 overflow-hidden">
-                {(viewMode === 'grid' ? ['10', '20'] : ['1', '2', '3', '4', '5']).map((opt) => (
+                {(viewMode === 'grid' && activeTab === 'components' ? ['10', '20'] : ['1', '2', '3', '4', '5']).map((opt) => (
                   <button
                     key={opt}
                     type="button"
@@ -749,39 +749,41 @@ export default function BuildRoadmap() {
             )}
           </div>
 
-          {/* Segmented Table & Grid toggle (Icons only, Grid default, Table 2nd - Orange Active) */}
-          <div className="inline-flex items-center p-0.5 bg-white border border-gray-200 rounded-lg shadow-2xs">
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('grid');
-                if (!['10', '20'].includes(buildTop)) setBuildTop('10');
-              }}
-              title="Grid view"
-              className={`p-1.5 rounded-md transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-[#ED4D19] text-white shadow-xs'
-                  : 'text-gray-500 hover:text-gray-900 bg-transparent'
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('table');
-                if (!['1', '2', '3', '4', '5'].includes(buildTop)) setBuildTop('3');
-              }}
-              title="Table view"
-              className={`p-1.5 rounded-md transition-all cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-[#ED4D19] text-white shadow-xs'
-                  : 'text-gray-500 hover:text-gray-900 bg-transparent'
-              }`}
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-          </div>
+          {/* Segmented Table & Grid toggle (Only shown in Component build tab) */}
+          {activeTab === 'components' && (
+            <div className="inline-flex items-center p-0.5 bg-white border border-gray-200 rounded-lg shadow-2xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode('grid');
+                  if (!['10', '20'].includes(buildTop)) setBuildTop('10');
+                }}
+                title="Grid view"
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-[#ED4D19] text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900 bg-transparent'
+                }`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode('table');
+                  if (!['1', '2', '3', '4', '5'].includes(buildTop)) setBuildTop('3');
+                }}
+                title="Table view"
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-[#ED4D19] text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900 bg-transparent'
+                }`}
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
