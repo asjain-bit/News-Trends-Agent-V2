@@ -617,7 +617,7 @@ export default function BuildRoadmap() {
   }, [solutionImpactStatuses, impactSearch, impactSort]);
 
   return (
-    <div className={`w-full px-5 ${viewMode === 'grid' && activeTab === 'components' && !viewingComponent ? 'h-full flex flex-col py-3 sm:py-3.5 space-y-3' : 'py-6 md:py-8 space-y-6'}`}>
+    <div className={`w-full px-5 py-3.5 sm:py-4 space-y-3 sm:space-y-3.5 ${viewMode === 'grid' && activeTab === 'components' && !viewingComponent ? 'h-full flex flex-col' : ''}`}>
       
       {/* Top Underline Tabs (Matching Catalogue Design Exactly) */}
       <div className="inline-block border-b border-gray-200 shrink-0">
@@ -785,8 +785,8 @@ export default function BuildRoadmap() {
         </div>
       </div>
 
-      {/* 3 KPI Cards Displayed in Table view and Build Impact (Hidden in Grid view and when viewing component details) */}
-      {!viewingComponent && (activeTab === 'impact' || viewMode === 'table') && (
+      {/* 3 KPI Cards Displayed in Build Impact only (Hidden in Component build) */}
+      {!viewingComponent && activeTab === 'impact' && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Card 1: Solutions Unlocked */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">

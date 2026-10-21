@@ -317,15 +317,13 @@ export default function UsageInsights() {
     return Math.max(1, Math.round(totalManualCost / totalAiCost));
   }, [totalManualCost, totalAiCost]);
 
-  // Comparison Historical Data for Line Chart: Only passed weeks and current week
-  // Formatted with 7-day window single dates: Sept 28, Oct 5, Oct 12
+  // Comparison Historical Data for Line Chart: All 5 weeks of current month
+  // Formatted with 7-day window single dates: Sept 28, Oct 5, Oct 12, Oct 19, Oct 26
   const comparisonData = useMemo(() => {
-    // Current week is index 2 (Oct 12 – 18); only include passed weeks (0, 1) and current week (2)
-    const passedAndCurrent = OCTOBER_WEEKS.slice(0, 3);
-    const dateLabels = ['Sept 28', 'Oct 5', 'Oct 12'];
-    const weekOutputsBase = [14, 17, 20];
+    const dateLabels = ['Sept 28', 'Oct 5', 'Oct 12', 'Oct 19', 'Oct 26'];
+    const weekOutputsBase = [14, 17, 20, 22, 24];
 
-    return passedAndCurrent.map((w, idx) => {
+    return OCTOBER_WEEKS.map((w, idx) => {
       const isSelected = idx === selectedWeekIndex;
       if (isSelected) {
         return {
@@ -984,9 +982,13 @@ export default function UsageInsights() {
                             top: '8%',
                             transform: hoveredPointIndex === 0 
                               ? 'translateX(-15%)' 
-                              : hoveredPointIndex === comparisonData.length - 1 
-                              ? 'translateX(-85%)' 
-                              : 'translateX(-50%)',
+                              : hoveredPointIndex === 1
+                              ? 'translateX(-32%)'
+                              : hoveredPointIndex === 2
+                              ? 'translateX(-50%)'
+                              : hoveredPointIndex === 3
+                              ? 'translateX(-68%)'
+                              : 'translateX(-85%)',
                           }}
                         >
                           <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-1.5 mb-2">
@@ -1031,9 +1033,13 @@ export default function UsageInsights() {
                             style={{
                               left: hoveredPointIndex === 0
                                 ? '15%'
-                                : hoveredPointIndex === comparisonData.length - 1
-                                ? '85%'
-                                : '50%',
+                                : hoveredPointIndex === 1
+                                ? '32%'
+                                : hoveredPointIndex === 2
+                                ? '50%'
+                                : hoveredPointIndex === 3
+                                ? '68%'
+                                : '85%',
                               transform: 'translateX(-50%)',
                             }}
                           />
@@ -1156,11 +1162,16 @@ export default function UsageInsights() {
         {/* Single unified card with 3 columns divided by vertical borders */}
         <div className="bg-white rounded-2xl border border-gray-200/90 p-6 shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-            {/* Column 1: Top report domains */}
+            {/* Column 1: Top Reports */}
             <div className="space-y-1 md:pr-6 pb-6 md:pb-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins'] pb-2">
-                Top report domains
-              </h3>
+              <div className="pb-2.5">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                  Top Reports
+                </h3>
+                <p className="text-[11px] text-gray-400 font-normal mt-0.5">
+                  Based on Part A reports
+                </p>
+              </div>
               <div className="divide-y divide-gray-100">
                 {domainData.map((item) => (
                   <div key={item.label} className="py-2.5 flex items-center justify-between text-xs">
@@ -1175,9 +1186,14 @@ export default function UsageInsights() {
 
             {/* Column 2: Top countries */}
             <div className="space-y-1 md:px-6 py-6 md:py-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins'] pb-2">
-                Top countries
-              </h3>
+              <div className="pb-2.5">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                  Top countries
+                </h3>
+                <p className="text-[11px] text-gray-400 font-normal mt-0.5">
+                  Based on Part A reports and Part B country decks
+                </p>
+              </div>
               <div className="divide-y divide-gray-100">
                 {countryData.map((item) => (
                   <div key={item.label} className="py-2.5 flex items-center justify-between text-xs">
@@ -1192,9 +1208,14 @@ export default function UsageInsights() {
 
             {/* Column 3: Top solutions (Magic Mode) */}
             <div className="space-y-1 md:pl-6 pt-6 md:pt-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins'] pb-2">
-                Top solutions (Magic Mode)
-              </h3>
+              <div className="pb-2.5">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
+                  Top solutions (Magic Mode)
+                </h3>
+                <p className="text-[11px] text-gray-400 font-normal mt-0.5">
+                  Based on Part B solution decks
+                </p>
+              </div>
               <div className="divide-y divide-gray-100">
                 {solutionData.map((item) => (
                   <div key={item.label} className="py-2.5 flex items-center justify-between text-xs">
