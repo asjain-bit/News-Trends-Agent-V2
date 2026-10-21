@@ -3,6 +3,9 @@ import {
   DollarSign, 
   FileText, 
   BarChart3,
+  Search,
+  LineChart,
+  Menu,
   ChevronUp,
   ChevronDown,
   RefreshCw,
@@ -62,24 +65,6 @@ const OCTOBER_WEEKS: MonthWeek[] = [
   },
 ];
 
-function formatWeekDisplay(monday: Date, sunday: Date): string {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const mMonth = months[monday.getMonth()];
-  const sMonth = months[sunday.getMonth()];
-  const mDay = monday.getDate();
-  const sDay = sunday.getDate();
-  const year = sunday.getFullYear();
-
-  if (monday.getMonth() === sunday.getMonth() && monday.getFullYear() === sunday.getFullYear()) {
-    return `${mMonth} ${mDay} – ${sDay}, ${year}`;
-  }
-  if (monday.getFullYear() === sunday.getFullYear()) {
-    return `${mMonth} ${mDay} – ${sMonth} ${sDay}, ${year}`;
-  }
-  return `${mMonth} ${mDay}, ${monday.getFullYear()} – ${sMonth} ${sDay}, ${year}`;
-}
-
-
 interface NumericStepperInputProps {
   value: number;
   onChange: (val: number) => void;
@@ -88,6 +73,7 @@ interface NumericStepperInputProps {
   step?: number;
   min?: number;
   max?: number;
+  precision?: number;
 }
 
 function NumericStepperInput({
@@ -98,6 +84,7 @@ function NumericStepperInput({
   step = 1,
   min = 0,
   max = 9999999,
+  precision,
 }: NumericStepperInputProps) {
   // Local string to allow direct typing freely
   const [localStr, setLocalStr] = useState<string>(String(value));
@@ -106,6 +93,15 @@ function NumericStepperInput({
   React.useEffect(() => {
     setLocalStr(String(value));
   }, [value]);
+
+  const getDecimals = (s: number) => {
+    if (precision !== undefined) return precision;
+    if (s < 0.001) return 4;
+    if (s < 0.01) return 3;
+    if (s < 0.1) return 2;
+    if (s < 1) return 1;
+    return 0;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -127,21 +123,25 @@ function NumericStepperInput({
       onChange(min);
     } else {
       const clamped = Math.max(min, Math.min(max, num));
-      setLocalStr(String(clamped));
-      onChange(clamped);
+      const dec = getDecimals(step);
+      const rounded = parseFloat(clamped.toFixed(dec));
+      setLocalStr(String(rounded));
+      onChange(rounded);
     }
   };
 
   const increment = () => {
     const next = Math.min(max, (value || 0) + step);
-    const rounded = Math.round(next * 100) / 100;
+    const dec = getDecimals(step);
+    const rounded = parseFloat(next.toFixed(dec));
     setLocalStr(String(rounded));
     onChange(rounded);
   };
 
   const decrement = () => {
     const next = Math.max(min, (value || 0) - step);
-    const rounded = Math.round(next * 100) / 100;
+    const dec = getDecimals(step);
+    const rounded = parseFloat(next.toFixed(dec));
     setLocalStr(String(rounded));
     onChange(rounded);
   };
@@ -160,9 +160,9 @@ function NumericStepperInput({
           value={localStr}
           onChange={handleInputChange}
           onBlur={handleBlur}
-          className="w-14 bg-transparent text-xs sm:text-[13px] font-semibold text-[#0D212C] text-right outline-none focus:outline-none focus:ring-0 mr-1.5 leading-none"
+          className="w-16 bg-transparent text-xs sm:text-[13px] font-semibold text-[#0D212C] text-right outline-none focus:outline-none focus:ring-0 mr-1.5 leading-none"
         />
-        {/* Stepper Chevron Arrows: comfortable click target */}
+        {/* Stepper Chevron Arrows */}
         <div className="flex flex-col items-center justify-center border-l border-gray-100 pl-1.5 text-gray-400 -space-y-0.5">
           <button
             type="button"
@@ -221,28 +221,50 @@ export default function UsageInsights() {
     return Math.abs((selectedWeek.monday.getDate() * 7 + selectedWeek.monday.getMonth() * 31) % 5);
   }, [selectedWeek]);
 
-  const weekOutputsCount = useMemo(() => 18 + weekSeed, [weekSeed]);
-  const weekTokensConsumed = useMemo(() => (16.2 + weekSeed * 0.8).toFixed(1), [weekSeed]);
+  // Selected week baseline data
+  const isDefaultWeek = selectedWeekIndex === 2;
+  const weekOutputsCount = isDefaultWeek ? 20 : Math.max(14, 20 + (weekSeed - 2) * 2);
+  const weekReportsCount = isDefaultWeek ? 14 : Math.round(weekOutputsCount * 0.7);
+  const weekDecksCount = weekOutputsCount - weekReportsCount;
 
-  // Input assumptions state (Form inputs)
-  const [formHours, setFormHours] = useState<number>(4);
-  const [formCostPerHour, setFormCostPerHour] = useState<number>(30);
-  const [formTokenPrice, setFormTokenPrice] = useState<number>(4.00);
+  const weekInputTokens = isDefaultWeek ? 16.0 : parseFloat((16.0 + (weekSeed - 2) * 1.2).toFixed(1));
+  const weekOutputTokens = isDefaultWeek ? 4.0 : parseFloat((4.0 + (weekSeed - 2) * 0.3).toFixed(1));
+  const weekEmbeddingTokens = isDefaultWeek ? 5.0 : parseFloat((5.0 + (weekSeed - 2) * 0.4).toFixed(1));
+  const weekTokensConsumed = (weekInputTokens + weekOutputTokens + weekEmbeddingTokens).toFixed(1);
+  const weekSearchCredits = isDefaultWeek ? 2500 : 2500 + (weekSeed - 2) * 200;
 
-  // Applied state: Right-side financial impact only recalculates when user clicks Recalculate
-  const [appliedHours, setAppliedHours] = useState<number>(4);
-  const [appliedCostPerHour, setAppliedCostPerHour] = useState<number>(30);
-  const [appliedTokenPrice, setAppliedTokenPrice] = useState<number>(4.00);
+  // View mode for Right Card (Graph view vs Data view) - Default to Graph view
+  const [roiViewMode, setRoiViewMode] = useState<'graph' | 'data'>('graph');
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
+
+  // 6 Input assumptions state (Form inputs) matching Image 2
+  const [formManualHours, setFormManualHours] = useState<number>(6);
+  const [formCostPerHour, setFormCostPerHour] = useState<number>(35);
+  const [formInputTokenPrice, setFormInputTokenPrice] = useState<number>(1.25);
+  const [formOutputTokenPrice, setFormOutputTokenPrice] = useState<number>(10);
+  const [formEmbeddingTokenPrice, setFormEmbeddingTokenPrice] = useState<number>(0.13);
+  const [formSearchCreditPrice, setFormSearchCreditPrice] = useState<number>(0.008);
+
+  // 6 Applied states: Right-side financial impact recalculates when user clicks Recalculate
+  const [appliedManualHours, setAppliedManualHours] = useState<number>(6);
+  const [appliedCostPerHour, setAppliedCostPerHour] = useState<number>(35);
+  const [appliedInputTokenPrice, setAppliedInputTokenPrice] = useState<number>(1.25);
+  const [appliedOutputTokenPrice, setAppliedOutputTokenPrice] = useState<number>(10);
+  const [appliedEmbeddingTokenPrice, setAppliedEmbeddingTokenPrice] = useState<number>(0.13);
+  const [appliedSearchCreditPrice, setAppliedSearchCreditPrice] = useState<number>(0.008);
 
   const hasPendingChanges = useMemo(() => {
     return (
-      formHours !== appliedHours ||
+      formManualHours !== appliedManualHours ||
       formCostPerHour !== appliedCostPerHour ||
-      formTokenPrice !== appliedTokenPrice
+      formInputTokenPrice !== appliedInputTokenPrice ||
+      formOutputTokenPrice !== appliedOutputTokenPrice ||
+      formEmbeddingTokenPrice !== appliedEmbeddingTokenPrice ||
+      formSearchCreditPrice !== appliedSearchCreditPrice
     );
   }, [
-    formHours, formCostPerHour, formTokenPrice,
-    appliedHours, appliedCostPerHour, appliedTokenPrice
+    formManualHours, formCostPerHour, formInputTokenPrice, formOutputTokenPrice, formEmbeddingTokenPrice, formSearchCreditPrice,
+    appliedManualHours, appliedCostPerHour, appliedInputTokenPrice, appliedOutputTokenPrice, appliedEmbeddingTokenPrice, appliedSearchCreditPrice
   ]);
 
   const [isRecalculating, setIsRecalculating] = useState<boolean>(false);
@@ -251,37 +273,106 @@ export default function UsageInsights() {
     if (!hasPendingChanges || isRecalculating) return;
     setIsRecalculating(true);
     setTimeout(() => {
-      setAppliedHours(formHours);
+      setAppliedManualHours(formManualHours);
       setAppliedCostPerHour(formCostPerHour);
-      setAppliedTokenPrice(formTokenPrice);
+      setAppliedInputTokenPrice(formInputTokenPrice);
+      setAppliedOutputTokenPrice(formOutputTokenPrice);
+      setAppliedEmbeddingTokenPrice(formEmbeddingTokenPrice);
+      setAppliedSearchCreditPrice(formSearchCreditPrice);
       setIsRecalculating(false);
-    }, 800);
+    }, 600);
   };
 
-  // Live Calculated metrics derived from APPLIED state and selected week outputs/tokens
+  // Live Calculated metrics derived from APPLIED state
   const totalManualHours = useMemo(() => {
-    return Math.max(0, Math.round(weekOutputsCount * appliedHours));
-  }, [weekOutputsCount, appliedHours]);
+    return Math.max(0, Math.round(weekOutputsCount * appliedManualHours));
+  }, [weekOutputsCount, appliedManualHours]);
 
   const totalManualCost = useMemo(() => {
-    return Math.max(0, Math.round(weekOutputsCount * appliedHours * appliedCostPerHour));
-  }, [weekOutputsCount, appliedHours, appliedCostPerHour]);
+    return Math.max(0, Math.round(totalManualHours * appliedCostPerHour));
+  }, [totalManualHours, appliedCostPerHour]);
+
+  const totalModelCost = useMemo(() => {
+    const raw = (weekInputTokens * appliedInputTokenPrice) + 
+                (weekOutputTokens * appliedOutputTokenPrice) + 
+                (weekEmbeddingTokens * appliedEmbeddingTokenPrice);
+    return Math.round(raw * 100) / 100;
+  }, [weekInputTokens, weekOutputTokens, weekEmbeddingTokens, appliedInputTokenPrice, appliedOutputTokenPrice, appliedEmbeddingTokenPrice]);
+
+  const totalSearchCost = useMemo(() => {
+    const raw = weekSearchCredits * appliedSearchCreditPrice;
+    return Math.round(raw * 100) / 100;
+  }, [weekSearchCredits, appliedSearchCreditPrice]);
 
   const totalAiCost = useMemo(() => {
-    const tokensM = parseFloat(weekTokensConsumed) || 0;
-    return Math.max(1, Math.round(tokensM * appliedTokenPrice));
-  }, [weekTokensConsumed, appliedTokenPrice]);
-
-  const weekAiCost = totalAiCost;
+    return Math.round((totalModelCost + totalSearchCost) * 100) / 100;
+  }, [totalModelCost, totalSearchCost]);
 
   const savedDollars = useMemo(() => {
-    return Math.max(0, totalManualCost - totalAiCost);
+    return Math.max(0, Math.round((totalManualCost - totalAiCost) * 100) / 100);
   }, [totalManualCost, totalAiCost]);
 
   const roiMultiple = useMemo(() => {
     if (totalAiCost <= 0) return 100;
     return Math.max(1, Math.round(totalManualCost / totalAiCost));
   }, [totalManualCost, totalAiCost]);
+
+  // Comparison Historical Data for Line Chart: Only passed weeks and current week
+  // Formatted with 7-day window single dates: Sept 28, Oct 5, Oct 12
+  const comparisonData = useMemo(() => {
+    // Current week is index 2 (Oct 12 – 18); only include passed weeks (0, 1) and current week (2)
+    const passedAndCurrent = OCTOBER_WEEKS.slice(0, 3);
+    const dateLabels = ['Sept 28', 'Oct 5', 'Oct 12'];
+    const weekOutputsBase = [14, 17, 20];
+
+    return passedAndCurrent.map((w, idx) => {
+      const isSelected = idx === selectedWeekIndex;
+      if (isSelected) {
+        return {
+          id: w.id,
+          date: dateLabels[idx],
+          fullLabel: w.label,
+          manual: totalManualCost,
+          ai: totalAiCost,
+          isCurrent: w.isCurrent,
+          isSelected: true,
+        };
+      }
+      const outputs = weekOutputsBase[idx];
+      const mCost = Math.round(outputs * appliedManualHours * appliedCostPerHour);
+      const ratio = outputs / 20;
+      const mTokensIn = 16.0 * ratio;
+      const mTokensOut = 4.0 * ratio;
+      const mTokensEmbed = 5.0 * ratio;
+      const sCredits = 2500 * ratio;
+      const aiCost = Math.round(
+        ((mTokensIn * appliedInputTokenPrice) +
+         (mTokensOut * appliedOutputTokenPrice) +
+         (mTokensEmbed * appliedEmbeddingTokenPrice) +
+         (sCredits * appliedSearchCreditPrice)) * 100
+      ) / 100;
+
+      return {
+        id: w.id,
+        date: dateLabels[idx],
+        fullLabel: w.label,
+        manual: mCost,
+        ai: aiCost,
+        isCurrent: w.isCurrent,
+        isSelected: false,
+      };
+    });
+  }, [
+    selectedWeekIndex,
+    totalManualCost,
+    totalAiCost,
+    appliedManualHours,
+    appliedCostPerHour,
+    appliedInputTokenPrice,
+    appliedOutputTokenPrice,
+    appliedEmbeddingTokenPrice,
+    appliedSearchCreditPrice
+  ]);
 
   // Breakdown data matching Image 1
   const domainData = [
@@ -417,8 +508,8 @@ export default function UsageInsights() {
           </div>
         </div>
 
-        {/* 1. Top KPI Cards (Matching Overview Page Card Design Exactly, Without Consumption Heading) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* 1. Top 4 KPI Cards (Matching Image 1 Design & Content) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Outputs Generated */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
@@ -434,7 +525,7 @@ export default function UsageInsights() {
                 <span>{weekOutputsCount}</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                {Math.round(weekOutputsCount * 0.6)} reports (P1) · {Math.round(weekOutputsCount * 0.4)} Magic Mode runs (P2)
+                {weekReportsCount} reports | {weekDecksCount} decks
               </p>
             </div>
           </div>
@@ -445,7 +536,7 @@ export default function UsageInsights() {
               <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
                 TOKENS CONSUMED
               </span>
-              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
             </div>
@@ -454,12 +545,32 @@ export default function UsageInsights() {
                 <span>{weekTokensConsumed}M</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)}
+                {weekInputTokens.toFixed(1)}M input | {weekOutputTokens.toFixed(1)}M output | {weekEmbeddingTokens.toFixed(1)}M embedding
               </p>
             </div>
           </div>
 
-          {/* Card 3: Estimated AI Cost */}
+          {/* Card 3: Web Search Credits */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                WEB SEARCH CREDITS
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Search className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
+                <span>{weekSearchCredits.toLocaleString()}</span>
+              </div>
+              <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
+                Search, extract & page reads
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4: Estimated AI Cost */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
@@ -471,10 +582,10 @@ export default function UsageInsights() {
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] flex items-baseline gap-1.5 font-['Poppins']">
-                <span>${weekAiCost.toLocaleString()}</span>
+                <span>${totalAiCost.toFixed(2)}</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                week of {formatWeekDisplay(selectedWeek.monday, selectedWeek.sunday)} · @ ${appliedTokenPrice % 1 === 0 ? appliedTokenPrice : appliedTokenPrice.toFixed(2)} / 1M tokens
+                ${totalModelCost.toFixed(2)} model | ${totalSearchCost.toFixed(2)} search
               </p>
             </div>
           </div>
@@ -488,28 +599,29 @@ export default function UsageInsights() {
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
-          {/* Left Column: Assumptions Table Card (50% width on lg) */}
-          <div className="w-full bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
-            <div className="divide-y divide-gray-100 flex-1 flex flex-col justify-between py-1">
-              {/* Row 1: Hours spent on manual research */}
-              <div className="py-3 flex items-center justify-between gap-3 first:pt-0">
-                <div className="text-xs sm:text-[13px] text-gray-700 leading-tight">
-                  <span className="font-medium">Hours spent on manual research</span>
-                  <span className="block text-[11px] text-gray-400 font-normal mt-0.5">(per report)</span>
+          {/* Left Column: 6 Assumptions Table Card (Matching Image 2) */}
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-xs flex flex-col justify-between min-h-[460px]">
+            <div className="divide-y divide-gray-100 flex-1 flex flex-col justify-between py-0.5">
+              {/* Row 1: Manual hours per output */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3 first:pt-0">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Manual hours per output</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">per report or deck</div>
                 </div>
                 <NumericStepperInput
-                  value={formHours}
-                  onChange={setFormHours}
+                  value={formManualHours}
+                  onChange={setFormManualHours}
                   unit="hours"
                   min={1}
                   max={100}
                 />
               </div>
 
-              {/* Row 2: Cost per hour */}
-              <div className="py-3 flex items-center justify-between gap-3">
-                <div className="text-xs sm:text-[13px] font-medium text-gray-700 leading-tight">
-                  Cost per hour
+              {/* Row 2: Resource cost per hour */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Resource cost per hour</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">Cost of the person doing the research manually</div>
                 </div>
                 <NumericStepperInput
                   value={formCostPerHour}
@@ -521,27 +633,79 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 3: Token price */}
-              <div className="py-3 flex items-center justify-between gap-3 last:pb-0">
-                <div className="text-xs sm:text-[13px] text-gray-700 leading-tight">
-                  <span className="font-medium">Token price</span> <span className="text-[11px] text-gray-400 font-normal">(per 1M tokens)</span>
+              {/* Row 3: Input token price */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Input token price</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M input tokens</div>
                 </div>
                 <NumericStepperInput
-                  value={formTokenPrice}
-                  onChange={setFormTokenPrice}
+                  value={formInputTokenPrice}
+                  onChange={setFormInputTokenPrice}
+                  unit="USD"
+                  prefix="$"
+                  step={0.05}
+                  min={0.01}
+                  precision={2}
+                />
+              </div>
+
+              {/* Row 4: Output token price */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Output token price</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M output tokens</div>
+                </div>
+                <NumericStepperInput
+                  value={formOutputTokenPrice}
+                  onChange={setFormOutputTokenPrice}
                   unit="USD"
                   prefix="$"
                   step={0.5}
                   min={0.1}
-                  max={100}
+                  precision={2}
+                />
+              </div>
+
+              {/* Row 5: Embedding token price */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Embedding token price</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M tokens · uploaded files</div>
+                </div>
+                <NumericStepperInput
+                  value={formEmbeddingTokenPrice}
+                  onChange={setFormEmbeddingTokenPrice}
+                  unit="USD"
+                  prefix="$"
+                  step={0.01}
+                  min={0.01}
+                  precision={2}
+                />
+              </div>
+
+              {/* Row 6: Price per search credit */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3 last:pb-0">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800">Price per search credit</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">web search (Tavily)</div>
+                </div>
+                <NumericStepperInput
+                  value={formSearchCreditPrice}
+                  onChange={setFormSearchCreditPrice}
+                  unit="USD"
+                  prefix="$"
+                  step={0.001}
+                  min={0.001}
+                  precision={3}
                 />
               </div>
             </div>
 
-            {/* Recalculate CTA Button: disabled until edited, with reduced opacity */}
+            {/* Recalculate CTA Button */}
             <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-1">
               <span className="text-[11px] text-gray-400 font-normal">
-                {hasPendingChanges ? 'Unapplied changes' : 'AI cost excludes web search'}
+                {hasPendingChanges ? 'Unapplied changes' : 'AI cost includes model + web search'}
               </span>
               <button
                 type="button"
@@ -559,11 +723,11 @@ export default function UsageInsights() {
             </div>
           </div>
 
-          {/* Right Column: Unified Financial Impact & ROI Section (50% width on lg) */}
-          <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-xs p-3.5 sm:p-4.5 grid grid-rows-2 divide-y divide-gray-100 transition-all duration-300 relative">
+          {/* Right Column: Comparison Graph or Numbers View (Matching Image 3) */}
+          <div className="w-full bg-white rounded-2xl border border-gray-200/90 shadow-xs p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 relative min-h-[460px]">
             {/* Loading Animation & Text during Recalculate */}
             {isRecalculating && (
-              <div className="absolute inset-0 bg-white/95 backdrop-blur-2xs rounded-2xl flex flex-col items-center justify-center z-20 space-y-2.5 transition-all">
+              <div className="absolute inset-0 bg-white/95 backdrop-blur-2xs rounded-2xl flex flex-col items-center justify-center z-30 space-y-2.5 transition-all">
                 <div className="w-6 h-6 border-2 border-gray-200 border-t-[#ED4D19] rounded-full animate-spin" />
                 <span className="text-xs font-medium text-gray-600 font-['Poppins']">
                   Recalculating value/roi...
@@ -571,102 +735,414 @@ export default function UsageInsights() {
               </div>
             )}
 
-            {/* Top Row: Manual cost vs AI cost separated by vertical line (Exact 50% height) */}
-            <div className="flex flex-col justify-center pb-2.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-                {/* Manual cost */}
-                <div className="sm:pr-5 space-y-0.5 pb-2 sm:pb-0">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
-                    <span>Manual cost</span>
-                    <div className="relative group/tip inline-flex items-center">
-                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Manual cost info">
-                        <Info className="w-3.5 h-3.5" />
-                      </button>
-                      <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                        <div>Manual cost is the multiply of manual hours into cost per hour.</div>
-                        <div className="mt-0.5">Outputs × Manual hours × Cost per hour</div>
-                        <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
-                      </div>
+            {/* Header: Title, Legend & View Mode Toggle (Segmented Buttons from Build Roadmap) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 shrink-0">
+              <div className="flex flex-wrap items-center gap-4">
+                <h3 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+                  Manual cost vs AI cost
+                </h3>
+                {/* Legend (Only shown in graph view, removed in data view) */}
+                {roiViewMode === 'graph' && (
+                  <div className="flex items-center gap-3.5 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3.5 h-0.5 bg-[#36C0C9] rounded-full inline-block" />
+                      <span className="text-gray-600 font-normal text-[11px]">Manual cost</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3.5 h-0.5 bg-[#ED4D19] rounded-full inline-block" />
+                      <span className="text-gray-600 font-normal text-[11px]">AI cost</span>
                     </div>
                   </div>
-                  <div className="text-xl sm:text-2xl font-semibold text-[#0D212C] font-['Poppins']">
-                    ${totalManualCost.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-gray-500 pt-0.5">
-                    Total hours {totalManualHours} | Cost per hour ${appliedCostPerHour}
-                  </div>
-                </div>
+                )}
+              </div>
 
-                {/* AI cost */}
-                <div className="sm:pl-5 space-y-0.5 pt-2 sm:pt-0">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
-                    <span>AI cost</span>
-                    <div className="relative group/tip inline-flex items-center">
-                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="AI cost info">
-                        <Info className="w-3.5 h-3.5" />
-                      </button>
-                      <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                        <div>AI cost is the multiply of tokens consumed into token price per 1M tokens.</div>
-                        <div className="mt-0.5">Tokens consumed × Token price per 1M</div>
-                        <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-xl sm:text-2xl font-semibold text-[#ED4D19] font-['Poppins']">
-                    ${totalAiCost.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-gray-500 pt-0.5">
-                    Total tokens {weekTokensConsumed}M | Token price ${appliedTokenPrice.toFixed(2)}
-                  </div>
-                </div>
+              {/* Segmented Switcher Buttons (Matching Build Roadmap style) */}
+              <div className="inline-flex items-center p-0.5 bg-white border border-gray-200 rounded-lg shadow-2xs shrink-0 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setRoiViewMode('graph')}
+                  title="Graph view"
+                  className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                    roiViewMode === 'graph'
+                      ? 'bg-[#ED4D19] text-white shadow-xs'
+                      : 'text-gray-500 hover:text-gray-900 bg-transparent'
+                  }`}
+                >
+                  <LineChart className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRoiViewMode('data')}
+                  title="Data view"
+                  className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                    roiViewMode === 'data'
+                      ? 'bg-[#ED4D19] text-white shadow-xs'
+                      : 'text-gray-500 hover:text-gray-900 bg-transparent'
+                  }`}
+                >
+                  <Menu className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
-            {/* Bottom Row: Estimated ROI vs Estimated savings separated by vertical line (Exact 50% height) */}
-            <div className="flex flex-col justify-center pt-2.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-                {/* Estimated ROI */}
-                <div className="sm:pr-5 space-y-0.5 pb-2 sm:pb-0">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
-                    <span>Estimated ROI</span>
-                    <div className="relative group/tip inline-flex items-center">
-                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated ROI info">
-                        <Info className="w-3.5 h-3.5" />
-                      </button>
-                      <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                        <div>Estimated ROI is calculated by dividing manual cost by AI cost.</div>
-                        <div className="mt-0.5">Manual cost ÷ AI cost</div>
-                        <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
+            {/* Content Area: Graph View (Default) vs Data / Numbers View */}
+            {roiViewMode === 'graph' ? (
+              /* GRAPH VIEW: SVG Comparison Line Chart matching Image 3 */
+              <div className="flex-1 flex flex-col justify-center py-2 relative select-none">
+                {(() => {
+                  const maxManual = Math.max(...comparisonData.map((d) => d.manual), 4000);
+                  const yMax = Math.ceil(maxManual / 1000) * 1000;
+                  const svgWidth = 640;
+                  const svgHeight = 290;
+                  const padLeft = 45;
+                  const padRight = 115;
+                  const padTop = 30;
+                  const padBottom = 38;
+                  const plotWidth = svgWidth - padLeft - padRight;
+                  const plotHeight = svgHeight - padTop - padBottom;
+
+                  const getX = (idx: number) => padLeft + (idx / (comparisonData.length - 1)) * plotWidth;
+                  const getY = (val: number) => padTop + plotHeight * (1 - Math.min(yMax, Math.max(0, val)) / yMax);
+
+                  // Path generator
+                  const manualPoints = comparisonData.map((d, i) => `${getX(i)},${getY(d.manual)}`).join(' ');
+                  const aiPoints = comparisonData.map((d, i) => `${getX(i)},${getY(d.ai)}`).join(' ');
+
+                  const step = yMax >= 8000 ? 2000 : 1000;
+                  const yTicks: number[] = [];
+                  for (let v = yMax; v >= 0; v -= step) {
+                    yTicks.push(v);
+                  }
+
+                  const lastIdx = comparisonData.length - 1;
+                  const lastPoint = comparisonData[lastIdx];
+                  const lastX = getX(lastIdx);
+                  const lastManualY = getY(lastPoint.manual);
+                  const lastAiY = getY(lastPoint.ai);
+
+                  return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <svg
+                        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                        className="w-full h-auto max-h-[340px] overflow-visible"
+                      >
+                        {/* Y-Axis Horizontal Gridlines and Labels */}
+                        {yTicks.map((val) => {
+                          const y = getY(val);
+                          const label = val === 0 ? '$0' : `$${val / 1000}K`;
+                          return (
+                            <g key={val}>
+                              <line
+                                x1={padLeft}
+                                y1={y}
+                                x2={lastX}
+                                y2={y}
+                                stroke="#F1F5F9"
+                                strokeWidth="1"
+                              />
+                              <text
+                                x={padLeft - 10}
+                                y={y + 3.5}
+                                textAnchor="end"
+                                fill="#94A3B8"
+                                fontSize="11"
+                                fontFamily="monospace"
+                              >
+                                {label}
+                              </text>
+                            </g>
+                          );
+                        })}
+
+                        {/* Manual Cost Line (Primary Light Color Line #36C0C9) */}
+                        <polyline
+                          fill="none"
+                          stroke="#36C0C9"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          points={manualPoints}
+                        />
+
+                        {/* AI Cost Line (Orange Line #ED4D19) */}
+                        <polyline
+                          fill="none"
+                          stroke="#ED4D19"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          points={aiPoints}
+                        />
+
+                        {/* Interactive Data Points & Hover Targets */}
+                        {comparisonData.map((d, i) => {
+                          const x = getX(i);
+                          const mY = getY(d.manual);
+                          const aY = getY(d.ai);
+                          const isHovered = hoveredPointIndex === i;
+                          const isSelected = i === selectedWeekIndex;
+
+                          return (
+                            <g
+                              key={d.id || d.date}
+                              onMouseEnter={() => setHoveredPointIndex(i)}
+                              onMouseLeave={() => setHoveredPointIndex(null)}
+                              onClick={() => setSelectedWeekIndex(i)}
+                              className="cursor-pointer"
+                            >
+                              {/* Transparent hit area */}
+                              <rect
+                                x={x - 22}
+                                y={padTop}
+                                width={44}
+                                height={plotHeight}
+                                fill="transparent"
+                              />
+
+                              {/* Subtle vertical indicator dashed line on hover or selection */}
+                              {(isHovered || isSelected) && (
+                                <line
+                                  x1={x}
+                                  y1={padTop}
+                                  x2={x}
+                                  y2={padTop + plotHeight}
+                                  stroke="#E2E8F0"
+                                  strokeWidth="1"
+                                  strokeDasharray="3 3"
+                                />
+                              )}
+
+                              {/* Manual Point Circle (#36C0C9) */}
+                              <circle
+                                cx={x}
+                                cy={mY}
+                                r={isSelected ? 5 : isHovered ? 4.5 : 3.5}
+                                fill="#36C0C9"
+                                stroke="#FFFFFF"
+                                strokeWidth={isSelected ? 2.5 : 1.5}
+                                className="transition-all"
+                              />
+
+                              {/* AI Point Circle (#ED4D19) */}
+                              <circle
+                                cx={x}
+                                cy={aY}
+                                r={isSelected ? 5 : isHovered ? 4.5 : 3.5}
+                                fill="#ED4D19"
+                                stroke="#FFFFFF"
+                                strokeWidth={isSelected ? 2.5 : 1.5}
+                                className="transition-all"
+                              />
+
+                              {/* X-Axis Date Labels (Weeks from data selector) */}
+                              <text
+                                x={x}
+                                y={svgHeight - 12}
+                                textAnchor="middle"
+                                fill={isSelected ? '#0D212C' : '#64748B'}
+                                fontSize="10.5"
+                                fontWeight={isSelected ? '600' : '400'}
+                                className="transition-colors select-none"
+                              >
+                                {d.date}
+                              </text>
+                            </g>
+                          );
+                        })}
+
+                        {/* End Labels for the lines */}
+                        <g>
+                          <text
+                            x={lastX + 12}
+                            y={lastManualY + 4}
+                            fill="#0D212C"
+                            fontSize="11.5"
+                            fontWeight="600"
+                            className="select-none"
+                          >
+                            Manual ${lastPoint.manual.toLocaleString()}
+                          </text>
+                          <text
+                            x={lastX + 12}
+                            y={Math.max(lastManualY + 18, lastAiY + 4)}
+                            fill="#0D212C"
+                            fontSize="11.5"
+                            fontWeight="600"
+                            className="select-none"
+                          >
+                            AI ${lastPoint.ai < 100 ? lastPoint.ai.toFixed(2) : Math.round(lastPoint.ai).toLocaleString()}
+                          </text>
+                        </g>
+                      </svg>
+
+                      {/* Custom Light Theme Tooltip on Hover */}
+                      {hoveredPointIndex !== null && (
+                        <div
+                          className="absolute z-40 bg-white text-gray-800 p-3 rounded-xl border border-gray-200/90 shadow-xl text-left pointer-events-none text-xs animate-in fade-in zoom-in-95 duration-100 min-w-[175px]"
+                          style={{
+                            left: `${(getX(hoveredPointIndex) / svgWidth) * 100}%`,
+                            top: '8%',
+                            transform: hoveredPointIndex === 0 
+                              ? 'translateX(-15%)' 
+                              : hoveredPointIndex === comparisonData.length - 1 
+                              ? 'translateX(-85%)' 
+                              : 'translateX(-50%)',
+                          }}
+                        >
+                          <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-1.5 mb-2">
+                            <span className="font-semibold text-gray-900 text-xs">
+                              {comparisonData[hoveredPointIndex].fullLabel || comparisonData[hoveredPointIndex].date}
+                            </span>
+                            {hoveredPointIndex === selectedWeekIndex && (
+                              <span className="text-[9px] font-medium bg-orange-50 text-[#ED4D19] px-1.5 py-0.5 rounded-full shrink-0">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-1.5 text-[11px]">
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-1.5 text-gray-600">
+                                <span className="w-2 h-2 rounded-full bg-[#36C0C9] shrink-0" />
+                                <span>Manual cost:</span>
+                              </div>
+                              <span className="font-semibold text-gray-900 font-mono">
+                                ${comparisonData[hoveredPointIndex].manual.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-1.5 text-gray-600">
+                                <span className="w-2 h-2 rounded-full bg-[#ED4D19] shrink-0" />
+                                <span>AI cost:</span>
+                              </div>
+                              <span className="font-semibold text-[#ED4D19] font-mono">
+                                ${comparisonData[hoveredPointIndex].ai < 100 ? comparisonData[hoveredPointIndex].ai.toFixed(2) : Math.round(comparisonData[hoveredPointIndex].ai).toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-gray-100">
+                              <span className="text-gray-500 font-medium">Estimated savings:</span>
+                              <span className="font-semibold text-[#00C3CB] font-mono">
+                                ${(Math.max(0, comparisonData[hoveredPointIndex].manual - comparisonData[hoveredPointIndex].ai)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Tooltip downward caret arrow */}
+                          <div
+                            className="absolute top-full -mt-1 w-2 h-2 bg-white border-r border-b border-gray-200 rotate-45"
+                            style={{
+                              left: hoveredPointIndex === 0
+                                ? '15%'
+                                : hoveredPointIndex === comparisonData.length - 1
+                                ? '85%'
+                                : '50%',
+                              transform: 'translateX(-50%)',
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : (
+              /* NUMBERS / DATA VIEW: 4 Financial blocks with adjusted spacing & divider lines matching taller card */
+              <div className="flex-1 flex flex-col justify-around divide-y divide-gray-100 py-2">
+                {/* Top Row: Manual cost vs AI cost */}
+                <div className="pb-4 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+                    {/* Manual cost */}
+                    <div className="sm:pr-5 space-y-1 pb-3 sm:pb-0">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                        <span>Manual cost</span>
+                        <div className="relative group/tip inline-flex items-center">
+                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Manual cost info">
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                            <div>Manual cost is outputs × manual hours × cost per hour.</div>
+                            <div className="mt-0.5">{weekOutputsCount} outputs × {appliedManualHours} hrs × ${appliedCostPerHour}/hr</div>
+                            <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-semibold text-[#0D212C] font-['Poppins']">
+                        ${totalManualCost.toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-gray-500 pt-0.5">
+                        Total hours {totalManualHours} | Cost per hour ${appliedCostPerHour}
                       </div>
                     </div>
-                  </div>
-                  <div className="text-xl sm:text-2xl font-semibold text-[#00C3CB] font-['Poppins']">
-                    {roiMultiple}x
+
+                    {/* AI cost */}
+                    <div className="sm:pl-5 space-y-1 pt-3 sm:pt-0">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                        <span>AI cost</span>
+                        <div className="relative group/tip inline-flex items-center">
+                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="AI cost info">
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                            <div>AI cost includes model tokens + web search credits.</div>
+                            <div className="mt-0.5">${totalModelCost.toFixed(2)} model + ${totalSearchCost.toFixed(2)} search</div>
+                            <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-semibold text-[#ED4D19] font-['Poppins']">
+                        ${totalAiCost.toFixed(2)}
+                      </div>
+                      <div className="text-[11px] text-gray-500 pt-0.5">
+                        ${totalModelCost.toFixed(2)} model | ${totalSearchCost.toFixed(2)} search
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Estimated savings */}
-                <div className="sm:pl-5 space-y-0.5 pt-2 sm:pt-0">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
-                    <span>Estimated savings</span>
-                    <div className="relative group/tip inline-flex items-center">
-                      <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated savings info">
-                        <Info className="w-3.5 h-3.5" />
-                      </button>
-                      <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                        <div>Estimated savings is calculated by subtracting AI cost from manual cost.</div>
-                        <div className="mt-0.5">Manual cost − AI cost</div>
-                        <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
+                {/* Bottom Row: Estimated ROI vs Estimated savings */}
+                <div className="pt-4 pb-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+                    {/* Estimated ROI */}
+                    <div className="sm:pr-5 space-y-1 pb-3 sm:pb-0">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                        <span>Estimated ROI</span>
+                        <div className="relative group/tip inline-flex items-center">
+                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated ROI info">
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                            <div>Estimated ROI is manual cost divided by AI cost.</div>
+                            <div className="mt-0.5">Manual cost ÷ AI cost</div>
+                            <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-semibold text-[#00C3CB] font-['Poppins']">
+                        {roiMultiple}x
+                      </div>
+                    </div>
+
+                    {/* Estimated savings */}
+                    <div className="sm:pl-5 space-y-1 pt-3 sm:pt-0">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                        <span>Estimated savings</span>
+                        <div className="relative group/tip inline-flex items-center">
+                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated savings info">
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
+                            <div>Estimated savings is manual cost minus AI cost.</div>
+                            <div className="mt-0.5">${totalManualCost.toLocaleString()} − ${totalAiCost.toFixed(2)}</div>
+                            <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-semibold text-[#00C3CB] font-['Poppins'] flex items-baseline">
+                        <span>${savedDollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="text-xl sm:text-2xl font-semibold text-[#00C3CB] font-['Poppins'] flex items-baseline">
-                    <span>${savedDollars.toLocaleString()}</span>
-                    <span className="text-[11px] font-normal text-gray-400 ml-1.5">this week</span>
-                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
