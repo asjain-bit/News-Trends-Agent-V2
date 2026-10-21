@@ -396,6 +396,19 @@ export default function BuildRoadmap() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Ensure appropriate default buildTop when switching between tabs/views (Impact: Top 3, options 1-5)
+  useEffect(() => {
+    if (activeTab === 'impact' || viewMode === 'table') {
+      if (!['1', '2', '3', '4', '5'].includes(buildTop)) {
+        setBuildTop('3');
+      }
+    } else if (activeTab === 'components' && viewMode === 'grid') {
+      if (!['10', '20'].includes(buildTop)) {
+        setBuildTop('10');
+      }
+    }
+  }, [activeTab, viewMode, buildTop]);
+
   const { components, solutions, reuseMatrix } = useMagicStore();
 
   // Dynamic quadrant calculation based on thresholds
@@ -539,9 +552,10 @@ export default function BuildRoadmap() {
     return sortedComponents.slice(start, start + COMPONENT_ITEMS_PER_PAGE);
   }, [sortedComponents, componentPage]);
 
-  // Set of built component IDs based on buildTop (used exclusively for Build Impact calculations)
+  // Set of built component IDs based on buildTop (used exclusively for Build Impact calculations, default Top 3, options 1-5)
   const builtComponentIds = useMemo(() => {
-    const limit = parseInt(buildTop, 10) || 10;
+    const effectiveTop = ['1', '2', '3', '4', '5'].includes(buildTop) ? buildTop : '3';
+    const limit = parseInt(effectiveTop, 10) || 3;
     return new Set(sortedComponents.slice(0, limit).map((c) => c.id));
   }, [sortedComponents, buildTop]);
 
@@ -626,6 +640,11 @@ export default function BuildRoadmap() {
             onClick={() => {
               setActiveTab('components');
               setViewingComponent(null);
+              if (viewMode === 'grid' && !['10', '20'].includes(buildTop)) {
+                setBuildTop('10');
+              } else if (viewMode === 'table' && !['1', '2', '3', '4', '5'].includes(buildTop)) {
+                setBuildTop('3');
+              }
             }}
             className={`pb-2.5 px-3 sm:px-4 text-[0.875rem] font-medium cursor-pointer transition-colors border-b-2 rounded-t-lg ${
               activeTab === 'components'
@@ -639,6 +658,9 @@ export default function BuildRoadmap() {
             onClick={() => {
               setActiveTab('impact');
               setViewingComponent(null);
+              if (!['1', '2', '3', '4', '5'].includes(buildTop)) {
+                setBuildTop('3');
+              }
             }}
             className={`pb-2.5 px-3 sm:px-4 text-[0.875rem] font-medium cursor-pointer transition-colors border-b-2 rounded-t-lg ${
               activeTab === 'impact'
@@ -713,7 +735,7 @@ export default function BuildRoadmap() {
             </div>
           )}
 
-          {/* Custom Build Top Dropdown (Options 10, 20 in Graph view; 1, 2, 3, 4, 5 in List/Impact view) */}
+          {/* Custom Build Top Dropdown (Options 10, 20 in Graph view; 1, 2, 3, 4, 5 in List/Impact view, default 3) */}
           <div className="relative" ref={buildTopRef}>
             <button
               type="button"
@@ -721,7 +743,11 @@ export default function BuildRoadmap() {
               className="inline-flex items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-lg px-3.5 py-1.5 text-[0.8125rem] text-gray-700 font-normal shadow-2xs transition-colors cursor-pointer"
             >
               <span className="text-gray-500">{viewMode === 'grid' && activeTab === 'components' ? 'Build Priority:' : 'Build top:'}</span>
-              <span className="font-semibold text-[#0D212C]">Top {buildTop}</span>
+              <span className="font-semibold text-[#0D212C]">
+                Top {activeTab === 'impact' || viewMode === 'table' 
+                  ? (['1', '2', '3', '4', '5'].includes(buildTop) ? buildTop : '3') 
+                  : (['10', '20'].includes(buildTop) ? buildTop : '10')}
+              </span>
               <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isBuildTopOpen ? 'rotate-180' : ''}`} />
             </button>
 

@@ -2328,7 +2328,7 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 </div>
               </div>
 
-              <div className="space-y-3.5 mt-3.5">
+              <div className="flex-1 flex flex-col justify-between py-2 sm:py-2.5 my-1">
                 {FACTORS.map((factor) => {
                   const currentWeight = isEditingWeightage 
                     ? (tempWeights[factor.id] ?? weights[factor.id] ?? factor.defaultWeight)
@@ -2374,8 +2374,8 @@ export default function AiScoring({ initialTab = 'scoring' }: { initialTab?: 'sc
                 })}
               </div>
 
-              {/* How weighting works info callout with reduced spacing directly below F6 Revenue depth */}
-              <div className="mt-3.5 pt-3.5 border-t border-gray-100 flex items-start gap-2.5 text-xs text-gray-500">
+              {/* How weighting works info callout directly below factors with no bottom gap */}
+              <div className="shrink-0 pt-3 border-t border-gray-100 flex items-start gap-2.5 text-xs text-gray-500">
                 <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <div className="font-semibold text-gray-700">How weighting works</div>

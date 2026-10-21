@@ -1281,12 +1281,12 @@ export default function GtmInsights() {
             {/* Market Matrix Table with Fixed Solution & Total Columns, Scrollable In-Between Columns */}
             <div className="bg-white rounded-xl border border-gray-200/90 shadow-xs overflow-hidden">
               <div className="overflow-x-auto subtle-scrollbar">
-                <table className="w-full text-left border-separate border-spacing-0 min-w-[1525px]" onMouseLeave={() => { if (!selectedCellBasis) handleCellMouseLeave(); }}>
+                <table className="w-full text-left border-separate border-spacing-0 min-w-[1475px]" onMouseLeave={() => { if (!selectedCellBasis) handleCellMouseLeave(); }}>
                   <thead>
                     <tr className="bg-[#F9FAFB] text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
                       {/* Fixed Left Column: Solution */}
                       <th 
-                        className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 font-normal cursor-pointer hover:text-gray-800 transition-colors w-[230px] min-w-[230px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]"
+                        className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 font-normal cursor-pointer hover:text-gray-800 transition-colors w-[260px] min-w-[260px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]"
                         onClick={() => {
                           setMatrixSortCol('solution');
                           setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -1294,20 +1294,6 @@ export default function GtmInsights() {
                       >
                         <div className="flex items-center gap-1">
                           <span>SOLUTION</span>
-                          <span className="text-[10px] text-gray-400">⇅</span>
-                        </div>
-                      </th>
-
-                      {/* Scrollable In-Between Column: Score */}
-                      <th 
-                        className="py-3 px-3 font-normal text-center cursor-pointer hover:text-gray-800 transition-colors w-[80px] min-w-[80px] border-b border-gray-200 bg-[#F9FAFB]"
-                        onClick={() => {
-                          setMatrixSortCol('score');
-                          setMatrixSortDir(d => d === 'asc' ? 'desc' : 'asc');
-                        }}
-                      >
-                        <div className="inline-flex items-center justify-center gap-1">
-                          <span>SCORE</span>
                           <span className="text-[10px] text-gray-400">⇅</span>
                         </div>
                       </th>
@@ -1347,7 +1333,7 @@ export default function GtmInsights() {
                   <tbody className="text-[0.875rem]">
                     {filteredMatrixData.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="py-10 text-center text-xs text-gray-400 border-b border-gray-100">
+                        <td colSpan={9} className="py-10 text-center text-xs text-gray-400 border-b border-gray-100">
                           No solutions found matching "{matrixSearch}".
                         </td>
                       </tr>
@@ -1357,25 +1343,28 @@ export default function GtmInsights() {
                           key={row.id} 
                           className="hover:bg-gray-50/70 transition-colors group"
                         >
-                          {/* Fixed Left Cell: Solution Name & Subtitle */}
-                          <td className="sticky left-0 z-20 bg-white group-hover:bg-[#F9FAFB] transition-colors py-3.5 px-5 w-[230px] min-w-[230px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
+                          {/* Fixed Left Cell: Solution Name & Subtitle with Status, Positioning & Cited Score */}
+                          <td className="sticky left-0 z-20 bg-white group-hover:bg-[#F9FAFB] transition-colors py-3.5 px-5 w-[260px] min-w-[260px] border-b border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
                             <div className="flex flex-col">
                               <span className="font-medium text-[#0D212C] text-[0.8125rem]">
                                 {row.name}
                               </span>
-                              <span className="text-[0.6875rem] text-gray-400 font-normal mt-0.5">
-                                {row.status} · {row.positioning}
-                              </span>
+                              <div className="text-[0.6875rem] text-gray-400 font-normal mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                <span>{row.status} {row.positioning}</span>
+                                <span className="text-gray-300">|</span>
+                                <ScoreOverlayTrigger solutionName={row.name} score={row.score}>
+                                  <span 
+                                    className="inline-flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+                                    title="Score citation: click or hover to view factor breakdown"
+                                  >
+                                    <span className="text-gray-400">Score</span>
+                                    <span className="text-[#36C0C9] font-bold font-mono underline decoration-dotted decoration-[#36C0C9]/60 underline-offset-2">
+                                      {row.score}
+                                    </span>
+                                  </span>
+                                </ScoreOverlayTrigger>
+                              </div>
                             </div>
-                          </td>
-
-                          {/* Scrollable Cell: Score Column */}
-                          <td className="py-3.5 px-3 text-center w-[80px] min-w-[80px] border-b border-gray-100 bg-white group-hover:bg-gray-50/70 transition-colors">
-                            <ScoreOverlayTrigger solutionName={row.name} score={row.score}>
-                              <span className="inline-flex items-center justify-center font-semibold text-[#0D212C] text-[0.8125rem] font-mono cursor-pointer hover:text-[#ED4D19] transition-colors">
-                                {row.score}
-                              </span>
-                            </ScoreOverlayTrigger>
                           </td>
 
                           {/* Scrollable Cells: Country Cells with Plain Box Colors */}
@@ -1452,11 +1441,8 @@ export default function GtmInsights() {
                   <tfoot>
                     <tr className="bg-[#F9FAFB] font-semibold text-[0.8125rem] text-[#0D212C]">
                       {/* Fixed Left Cell: Total Label */}
-                      <td className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 text-gray-900 border-t border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[230px] min-w-[230px]">
+                      <td className="sticky left-0 z-30 bg-[#F9FAFB] py-3 px-5 text-gray-900 border-t border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] w-[260px] min-w-[260px]">
                         Total (3-yr)
-                      </td>
-                      <td className="py-3 px-3 text-center text-gray-400 font-normal border-t border-gray-200 bg-[#F9FAFB] w-[80px] min-w-[80px]">
-                        —
                       </td>
                       {MATRIX_COUNTRIES.map((cnt) => (
                         <td key={cnt} className="py-3 px-2 text-center font-semibold text-[#0D212C] border-t border-gray-200 bg-[#F9FAFB] w-[155px] min-w-[155px]">
