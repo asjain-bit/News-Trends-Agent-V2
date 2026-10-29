@@ -65,6 +65,82 @@ const OCTOBER_WEEKS: MonthWeek[] = [
   },
 ];
 
+interface FeatureUsageItem {
+  feature: string;
+  tip: string;
+  aiRuns: number;
+  tokens: string;
+  webSearches: number;
+  aiCost: number;
+  shareOfCost: number;
+}
+
+const FEATURE_USAGE_DATA: FeatureUsageItem[] = [
+  {
+    feature: 'Part A reports',
+    tip: 'Health-Tech landscape reports.',
+    aiRuns: 14,
+    tokens: '15.4M',
+    webSearches: 760,
+    aiCost: 52.40,
+    shareOfCost: 65,
+  },
+  {
+    feature: 'Magic Mode scoring',
+    tip: 'Country research, solution scoring, catalogue and roadmap AI, and GTM decks. The quarterly refresh counts as one run.',
+    aiRuns: 9,
+    tokens: '4.1M',
+    webSearches: 190,
+    aiCost: 11.30,
+    shareOfCost: 14,
+  },
+];
+
+const getShareOfCostColor = (pct: number): string => {
+  if (pct >= 70) return 'text-emerald-600';
+  if (pct >= 40) return 'text-amber-600';
+  return 'text-red-600';
+};
+
+interface InfoTooltipProps {
+  text: string;
+  align?: 'left' | 'center' | 'right';
+  placement?: 'top' | 'bottom';
+  // When children are given, hovering them opens the tooltip and no info icon is shown
+  children?: React.ReactNode;
+}
+
+function InfoTooltip({ text, align = 'center', placement = 'top', children }: InfoTooltipProps) {
+  const alignClass = align === 'left' ? 'left-0' : align === 'right' ? 'right-0' : 'left-1/2 -translate-x-1/2';
+  const caretAlignClass = align === 'left' ? 'left-2' : align === 'right' ? 'right-2' : 'left-1/2 -translate-x-1/2';
+
+  return (
+    <span
+      className={`relative group/it inline-flex items-center align-middle outline-none ${children ? 'cursor-help' : ''}`}
+      tabIndex={children ? 0 : undefined}
+    >
+      {children ?? (
+        <button
+          type="button"
+          className="p-0.5 text-gray-400 hover:text-gray-600 focus:text-gray-600 transition-colors cursor-help outline-none"
+          aria-label={text}
+        >
+          <Info className="w-3.5 h-3.5" />
+        </button>
+      )}
+      <span
+        role="tooltip"
+        className={`absolute ${placement === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'} ${alignClass} hidden group-hover/it:block group-focus-within/it:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal leading-snug normal-case tracking-normal rounded-lg shadow-xl pointer-events-none w-max max-w-[260px] whitespace-pre-line text-left`}
+      >
+        {text}
+        <span
+          className={`absolute ${placement === 'bottom' ? 'bottom-full border-b-[#0D212C]' : 'top-full border-t-[#0D212C]'} ${caretAlignClass} border-4 border-transparent`}
+        />
+      </span>
+    </span>
+  );
+}
+
 interface NumericStepperInputProps {
   value: number;
   onChange: (val: number) => void;
@@ -232,21 +308,24 @@ export default function UsageInsights() {
   const weekEmbeddingTokens = isDefaultWeek ? 5.0 : parseFloat((5.0 + (weekSeed - 2) * 0.4).toFixed(1));
   const weekTokensConsumed = (weekInputTokens + weekOutputTokens + weekEmbeddingTokens).toFixed(1);
   const weekSearchCredits = isDefaultWeek ? 2500 : 2500 + (weekSeed - 2) * 200;
+  const weekWebSearches = Math.round(weekSearchCredits / 2);
 
   // View mode for Right Card (Graph view vs Data view) - Default to Graph view
   const [roiViewMode, setRoiViewMode] = useState<'graph' | 'data'>('graph');
   const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
 
-  // 6 Input assumptions state (Form inputs) matching Image 2
+  // 7 Input assumptions state (Form inputs) matching Image 2
   const [formManualHours, setFormManualHours] = useState<number>(6);
+  const [formPeoplePerOutput, setFormPeoplePerOutput] = useState<number>(1);
   const [formCostPerHour, setFormCostPerHour] = useState<number>(35);
   const [formInputTokenPrice, setFormInputTokenPrice] = useState<number>(1.25);
   const [formOutputTokenPrice, setFormOutputTokenPrice] = useState<number>(10);
   const [formEmbeddingTokenPrice, setFormEmbeddingTokenPrice] = useState<number>(0.13);
   const [formSearchCreditPrice, setFormSearchCreditPrice] = useState<number>(0.008);
 
-  // 6 Applied states: Right-side financial impact recalculates when user clicks Recalculate
+  // 7 Applied states: Right-side financial impact recalculates when user clicks Recalculate
   const [appliedManualHours, setAppliedManualHours] = useState<number>(6);
+  const [appliedPeoplePerOutput, setAppliedPeoplePerOutput] = useState<number>(1);
   const [appliedCostPerHour, setAppliedCostPerHour] = useState<number>(35);
   const [appliedInputTokenPrice, setAppliedInputTokenPrice] = useState<number>(1.25);
   const [appliedOutputTokenPrice, setAppliedOutputTokenPrice] = useState<number>(10);
@@ -256,6 +335,7 @@ export default function UsageInsights() {
   const hasPendingChanges = useMemo(() => {
     return (
       formManualHours !== appliedManualHours ||
+      formPeoplePerOutput !== appliedPeoplePerOutput ||
       formCostPerHour !== appliedCostPerHour ||
       formInputTokenPrice !== appliedInputTokenPrice ||
       formOutputTokenPrice !== appliedOutputTokenPrice ||
@@ -263,8 +343,8 @@ export default function UsageInsights() {
       formSearchCreditPrice !== appliedSearchCreditPrice
     );
   }, [
-    formManualHours, formCostPerHour, formInputTokenPrice, formOutputTokenPrice, formEmbeddingTokenPrice, formSearchCreditPrice,
-    appliedManualHours, appliedCostPerHour, appliedInputTokenPrice, appliedOutputTokenPrice, appliedEmbeddingTokenPrice, appliedSearchCreditPrice
+    formManualHours, formPeoplePerOutput, formCostPerHour, formInputTokenPrice, formOutputTokenPrice, formEmbeddingTokenPrice, formSearchCreditPrice,
+    appliedManualHours, appliedPeoplePerOutput, appliedCostPerHour, appliedInputTokenPrice, appliedOutputTokenPrice, appliedEmbeddingTokenPrice, appliedSearchCreditPrice
   ]);
 
   const [isRecalculating, setIsRecalculating] = useState<boolean>(false);
@@ -274,6 +354,7 @@ export default function UsageInsights() {
     setIsRecalculating(true);
     setTimeout(() => {
       setAppliedManualHours(formManualHours);
+      setAppliedPeoplePerOutput(formPeoplePerOutput);
       setAppliedCostPerHour(formCostPerHour);
       setAppliedInputTokenPrice(formInputTokenPrice);
       setAppliedOutputTokenPrice(formOutputTokenPrice);
@@ -285,8 +366,8 @@ export default function UsageInsights() {
 
   // Live Calculated metrics derived from APPLIED state
   const totalManualHours = useMemo(() => {
-    return Math.max(0, Math.round(weekOutputsCount * appliedManualHours));
-  }, [weekOutputsCount, appliedManualHours]);
+    return Math.max(0, Math.round(weekOutputsCount * appliedManualHours * appliedPeoplePerOutput));
+  }, [weekOutputsCount, appliedManualHours, appliedPeoplePerOutput]);
 
   const totalManualCost = useMemo(() => {
     return Math.max(0, Math.round(totalManualHours * appliedCostPerHour));
@@ -312,9 +393,10 @@ export default function UsageInsights() {
     return Math.max(0, Math.round((totalManualCost - totalAiCost) * 100) / 100);
   }, [totalManualCost, totalAiCost]);
 
-  const roiMultiple = useMemo(() => {
-    if (totalAiCost <= 0) return 100;
-    return Math.max(1, Math.round(totalManualCost / totalAiCost));
+  // Cost saved % = (manual cost − AI cost) ÷ manual cost
+  const costSavedPct = useMemo(() => {
+    if (totalManualCost <= 0) return null;
+    return Math.max(0, Math.round(((totalManualCost - totalAiCost) / totalManualCost) * 1000) / 10);
   }, [totalManualCost, totalAiCost]);
 
   // Comparison Historical Data for Line Chart: All 5 weeks of current month
@@ -337,7 +419,7 @@ export default function UsageInsights() {
         };
       }
       const outputs = weekOutputsBase[idx];
-      const mCost = Math.round(outputs * appliedManualHours * appliedCostPerHour);
+      const mCost = Math.round(outputs * appliedManualHours * appliedPeoplePerOutput * appliedCostPerHour);
       const ratio = outputs / 20;
       const mTokensIn = 16.0 * ratio;
       const mTokensOut = 4.0 * ratio;
@@ -365,6 +447,7 @@ export default function UsageInsights() {
     totalManualCost,
     totalAiCost,
     appliedManualHours,
+    appliedPeoplePerOutput,
     appliedCostPerHour,
     appliedInputTokenPrice,
     appliedOutputTokenPrice,
@@ -396,6 +479,19 @@ export default function UsageInsights() {
     { label: 'EMR', value: 3 },
     { label: 'Pop Health', value: 2 },
   ];
+
+  // Totals for Feature Usage & Cost breakdown table (corrected: 14+9=23, 15.4+4.1=19.5M, 760+190=950, $52.40+$11.30=$63.70)
+  const featureUsageTotals = useMemo(() => {
+    const runs = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.aiRuns, 0);
+    const searches = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.webSearches, 0);
+    const cost = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.aiCost, 0);
+    return {
+      runs,
+      tokens: '19.5M',
+      searches: searches.toLocaleString(),
+      cost: `$${cost.toFixed(2)}`,
+    };
+  }, []);
 
   return (
     <div className="w-full px-5 py-6 md:py-8 space-y-6">
@@ -511,9 +607,15 @@ export default function UsageInsights() {
           {/* Card 1: Outputs Generated */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                OUTPUTS GENERATED
-              </span>
+              <InfoTooltip
+                placement="bottom"
+                align="left"
+                text="Reports and decks that finished and were delivered this week. Failed ones are not counted."
+              >
+                <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                  OUTPUTS GENERATED
+                </span>
+              </InfoTooltip>
               <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#ED4D19] flex items-center justify-center">
                 <FileText className="w-4 h-4" />
               </div>
@@ -531,9 +633,15 @@ export default function UsageInsights() {
           {/* Card 2: Tokens Consumed */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                TOKENS CONSUMED
-              </span>
+              <InfoTooltip
+                placement="bottom"
+                align="left"
+                text={'How much text the AI read and wrote.\nAI is charged by tokens: about 750 words = 1,000 tokens.'}
+              >
+                <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                  TOKENS CONSUMED
+                </span>
+              </InfoTooltip>
               <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
@@ -543,7 +651,27 @@ export default function UsageInsights() {
                 <span>{weekTokensConsumed}M</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                {weekInputTokens.toFixed(1)}M input | {weekOutputTokens.toFixed(1)}M output | {weekEmbeddingTokens.toFixed(1)}M embedding
+                <InfoTooltip
+                  placement="bottom"
+                  text="Text sent to the AI: the request plus the web pages and data it had to read."
+                >
+                  {weekInputTokens.toFixed(1)}M input
+                </InfoTooltip>
+                {' | '}
+                <InfoTooltip
+                  placement="bottom"
+                  text="Text the AI wrote back: the report, scores or deck content. Output costs more per token than input."
+                >
+                  {weekOutputTokens.toFixed(1)}M output
+                </InfoTooltip>
+                {' | '}
+                <InfoTooltip
+                  placement="bottom"
+                  align="right"
+                  text="Text from uploaded or knowledge files, converted so the AI can search it. Cheaper than input or output."
+                >
+                  {weekEmbeddingTokens.toFixed(1)}M embedding
+                </InfoTooltip>
               </p>
             </div>
           </div>
@@ -551,9 +679,15 @@ export default function UsageInsights() {
           {/* Card 3: Web Search Credits */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                WEB SEARCH CREDITS
-              </span>
+              <InfoTooltip
+                placement="bottom"
+                align="left"
+                text={`The web search service charges in credits:\n• Basic search = 1 credit\n• Advanced (deeper) search = 2 credits\n\nThis week: ${weekWebSearches.toLocaleString()} searches used ${weekSearchCredits.toLocaleString()} credits.\n\nSearch cost = credits × price per credit\n${weekSearchCredits.toLocaleString()} × $${appliedSearchCreditPrice} = $${totalSearchCost.toFixed(2)}`}
+              >
+                <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                  WEB SEARCH CREDITS
+                </span>
+              </InfoTooltip>
               <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                 <Search className="w-4 h-4" />
               </div>
@@ -571,9 +705,15 @@ export default function UsageInsights() {
           {/* Card 4: Estimated AI Cost */}
           <div className="bg-white rounded-2xl border border-gray-200/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
-                ESTIMATED AI COST
-              </span>
+              <InfoTooltip
+                placement="bottom"
+                align="right"
+                text={`What the AI cost this week, at the prices set in Value/ROI.\n\nModel cost + search cost\n$${totalModelCost.toFixed(2)} + $${totalSearchCost.toFixed(2)} = $${totalAiCost.toFixed(2)}`}
+              >
+                <span className="text-[0.6875rem] font-medium text-gray-400 uppercase tracking-wider">
+                  ESTIMATED AI COST
+                </span>
+              </InfoTooltip>
               <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <DollarSign className="w-4 h-4" />
               </div>
@@ -583,7 +723,20 @@ export default function UsageInsights() {
                 <span>${totalAiCost.toFixed(2)}</span>
               </div>
               <p className="text-[0.75rem] text-gray-500 mt-1 font-normal">
-                ${totalModelCost.toFixed(2)} model | ${totalSearchCost.toFixed(2)} search
+                <InfoTooltip
+                  placement="bottom"
+                  text={`Model cost = tokens × price per 1M tokens (set in Value/ROI):\n\n${weekInputTokens.toFixed(1)}M input × $${appliedInputTokenPrice} = $${(weekInputTokens * appliedInputTokenPrice).toFixed(2)}\n${weekOutputTokens.toFixed(1)}M output × $${appliedOutputTokenPrice} = $${(weekOutputTokens * appliedOutputTokenPrice).toFixed(2)}\n${weekEmbeddingTokens.toFixed(1)}M embedding × $${appliedEmbeddingTokenPrice} = $${(weekEmbeddingTokens * appliedEmbeddingTokenPrice).toFixed(2)}\nTotal: $${totalModelCost.toFixed(2)}`}
+                >
+                  ${totalModelCost.toFixed(2)} model
+                </InfoTooltip>
+                {' | '}
+                <InfoTooltip
+                  placement="bottom"
+                  align="right"
+                  text={`Search cost = credits × price per credit\n${weekSearchCredits.toLocaleString()} × $${appliedSearchCreditPrice} = $${totalSearchCost.toFixed(2)}`}
+                >
+                  ${totalSearchCost.toFixed(2)} search
+                </InfoTooltip>
               </p>
             </div>
           </div>
@@ -592,8 +745,12 @@ export default function UsageInsights() {
 
       {/* 2. Value/ROI Section */}
       <div className="space-y-3">
-        <h2 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+        <h2 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins'] flex items-center gap-1">
           Value/ROI
+          <InfoTooltip
+            align="left"
+            text="Values used for this week's costs and savings. Change them and select Recalculate. A new week starts with the previous week's values."
+          />
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
@@ -603,7 +760,10 @@ export default function UsageInsights() {
               {/* Row 1: Manual hours per output */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3 first:pt-0">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Manual hours per output</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Manual hours per output
+                    <InfoTooltip align="left" text="How long it takes to produce one report or deck by hand." />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">per report or deck</div>
                 </div>
                 <NumericStepperInput
@@ -615,10 +775,34 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 2: Resource cost per hour */}
+              {/* Row 2: People per output */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Resource cost per hour</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    People per output
+                    <InfoTooltip
+                      align="left"
+                      text="How many people would work on one report or deck by hand. Each person works the manual hours above."
+                    />
+                  </div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">people working on one report or deck</div>
+                </div>
+                <NumericStepperInput
+                  value={formPeoplePerOutput}
+                  onChange={setFormPeoplePerOutput}
+                  unit="people"
+                  min={1}
+                  max={20}
+                />
+              </div>
+
+              {/* Row 3: Resource cost per hour */}
+              <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
+                <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Resource cost per hour
+                    <InfoTooltip align="left" text="The hourly cost of the person who would do this research by hand." />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">Cost of the person doing the research manually</div>
                 </div>
                 <NumericStepperInput
@@ -631,10 +815,13 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 3: Input token price */}
+              {/* Row 4: Input token price */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Input token price</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Input token price
+                    <InfoTooltip align="left" text="The AI provider's price for 1 million input tokens." />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M input tokens</div>
                 </div>
                 <NumericStepperInput
@@ -648,10 +835,13 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 4: Output token price */}
+              {/* Row 5: Output token price */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Output token price</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Output token price
+                    <InfoTooltip align="left" text="The AI provider's price for 1 million output tokens." />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M output tokens</div>
                 </div>
                 <NumericStepperInput
@@ -665,10 +855,13 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 5: Embedding token price */}
+              {/* Row 6: Embedding token price */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Embedding token price</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Embedding token price
+                    <InfoTooltip align="left" text="The AI provider's price for 1 million embedding tokens (uploaded files)." />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">per 1M tokens · uploaded files</div>
                 </div>
                 <NumericStepperInput
@@ -682,10 +875,16 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 6: Price per search credit */}
+              {/* Row 7: Price per search credit */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3 last:pb-0">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
-                  <div className="font-medium text-gray-800">Price per search credit</div>
+                  <div className="font-medium text-gray-800 flex items-center gap-1">
+                    Price per search credit
+                    <InfoTooltip
+                      align="left"
+                      text="The price Tavily charges for one credit. A basic search uses 1 credit; an advanced search uses 2."
+                    />
+                  </div>
                   <div className="text-[11px] text-gray-400 font-normal mt-0.5">web search (Tavily)</div>
                 </div>
                 <NumericStepperInput
@@ -736,9 +935,15 @@ export default function UsageInsights() {
             {/* Header: Title, Legend & View Mode Toggle (Segmented Buttons from Build Roadmap) */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 shrink-0">
               <div className="flex flex-wrap items-center gap-4">
-                <h3 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
-                  Manual cost vs AI cost
-                </h3>
+                <div className="flex items-center gap-1">
+                  <h3 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins']">
+                    Manual cost vs AI cost
+                  </h3>
+                  <InfoTooltip
+                    align="left"
+                    text="Manual and AI cost for each of the last 5 weeks. Each week uses its own saved values."
+                  />
+                </div>
                 {/* Legend (Only shown in graph view, removed in data view) */}
                 {roiViewMode === 'graph' && (
                   <div className="flex items-center gap-3.5 text-xs">
@@ -1064,8 +1269,10 @@ export default function UsageInsights() {
                             <Info className="w-3.5 h-3.5" />
                           </button>
                           <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                            <div>Manual cost is outputs × manual hours × cost per hour.</div>
-                            <div className="mt-0.5">{weekOutputsCount} outputs × {appliedManualHours} hrs × ${appliedCostPerHour}/hr</div>
+                            <div>Manual cost = outputs × manual hours × people × cost per hour</div>
+                            <div className="mt-0.5">
+                              {weekOutputsCount} × {appliedManualHours} hrs × {appliedPeoplePerOutput} {appliedPeoplePerOutput === 1 ? 'person' : 'people'} × ${appliedCostPerHour}/hr = ${totalManualCost.toLocaleString()}
+                            </div>
                             <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
                           </div>
                         </div>
@@ -1103,26 +1310,31 @@ export default function UsageInsights() {
                   </div>
                 </div>
 
-                {/* Bottom Row: Estimated ROI vs Estimated savings */}
+                {/* Bottom Row: Cost saved vs Estimated savings */}
                 <div className="pt-4 pb-1">
                   <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-                    {/* Estimated ROI */}
+                    {/* Cost saved */}
                     <div className="sm:pr-5 space-y-1 pb-3 sm:pb-0">
                       <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
-                        <span>Estimated ROI</span>
+                        <span>Cost saved</span>
                         <div className="relative group/tip inline-flex items-center">
-                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Estimated ROI info">
+                          <button type="button" className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" aria-label="Cost saved info">
                             <Info className="w-3.5 h-3.5" />
                           </button>
                           <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                            <div>Estimated ROI is manual cost divided by AI cost.</div>
-                            <div className="mt-0.5">Manual cost ÷ AI cost</div>
+                            <div>How much less the AI cost than doing the work by hand.</div>
+                            <div className="mt-1">(Manual cost − AI cost) ÷ manual cost</div>
+                            <div className="mt-0.5">
+                              {costSavedPct === null
+                                ? '–'
+                                : `($${totalManualCost.toLocaleString()} − $${totalAiCost.toFixed(2)}) ÷ $${totalManualCost.toLocaleString()} = ${costSavedPct.toFixed(1)}%`}
+                            </div>
                             <div className="absolute top-full left-2 border-4 border-transparent border-t-[#0D212C]" />
                           </div>
                         </div>
                       </div>
                       <div className="text-2xl sm:text-3xl font-semibold text-[#00C3CB] font-['Poppins']">
-                        {roiMultiple}x
+                        {costSavedPct === null ? '–' : `${costSavedPct.toFixed(1)}%`}
                       </div>
                     </div>
 
@@ -1135,8 +1347,10 @@ export default function UsageInsights() {
                             <Info className="w-3.5 h-3.5" />
                           </button>
                           <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 hidden group-hover/tip:block z-50 px-3 py-1.5 bg-[#0D212C] text-white text-[11px] font-normal rounded-lg shadow-xl pointer-events-none w-max max-w-xs text-left animate-in fade-in duration-150">
-                            <div>Estimated savings is manual cost minus AI cost.</div>
-                            <div className="mt-0.5">${totalManualCost.toLocaleString()} − ${totalAiCost.toFixed(2)}</div>
+                            <div>Estimated savings = manual cost − AI cost</div>
+                            <div className="mt-0.5">
+                              ${totalManualCost.toLocaleString()} − ${totalAiCost.toFixed(2)} = ${savedDollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
                             <div className="absolute top-full left-2 sm:left-auto sm:right-2 border-4 border-transparent border-t-[#0D212C]" />
                           </div>
                         </div>
@@ -1150,6 +1364,102 @@ export default function UsageInsights() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Feature Breakdown Table: AI cost by feature */}
+      <div className="space-y-3">
+        <h2 className="text-sm sm:text-base font-semibold text-[#0D212C] font-['Poppins'] flex items-center gap-1">
+          AI cost by feature
+          <InfoTooltip
+            align="left"
+            text="Where this week's AI cost went: Part A reports and Magic Mode. The total equals the Estimated AI cost card."
+          />
+        </h2>
+        {/* Visible overflow on large screens so header/row tooltips are not clipped */}
+        <div className="bg-white rounded-2xl border border-gray-200/90 shadow-xs overflow-x-auto lg:overflow-visible">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/50 border-b border-gray-200 text-[0.6875rem] font-normal text-gray-500 tracking-wider uppercase select-none">
+                <th className="py-3.5 px-6 font-normal rounded-tl-2xl">FEATURE</th>
+                <th className="py-3.5 px-6 font-normal">
+                  <span className="inline-flex items-center gap-1">
+                    AI RUNS
+                    <InfoTooltip text="The number of jobs the AI ran this week, such as a report, a deck or the quarterly refresh. Failed runs are included because they still cost money." />
+                  </span>
+                </th>
+                <th className="py-3.5 px-6 font-normal">
+                  <span className="inline-flex items-center gap-1">
+                    TOKENS
+                    <InfoTooltip text="Input + output + embedding tokens used by this feature." />
+                  </span>
+                </th>
+                <th className="py-3.5 px-6 font-normal">
+                  <span className="inline-flex items-center gap-1">
+                    WEB SEARCHES
+                    <InfoTooltip text="The number of times the AI searched the web for this feature this week. Each search uses 1 or 2 credits. The total matches the searches shown on the Web search credits card." />
+                  </span>
+                </th>
+                <th className="py-3.5 px-6 font-normal">
+                  <span className="inline-flex items-center gap-1">
+                    AI COST
+                    <InfoTooltip text="Token cost + web search cost for this feature, at this week's prices." />
+                  </span>
+                </th>
+                <th className="py-3.5 px-6 font-normal rounded-tr-2xl">
+                  <span className="inline-flex items-center gap-1">
+                    SHARE OF COST
+                    <InfoTooltip align="right" text="The part of this week's total AI cost that this feature used." />
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 text-[0.875rem]">
+              {FEATURE_USAGE_DATA.map((row) => (
+                <tr key={row.feature} className="hover:bg-gray-50/70 transition-colors">
+                  <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
+                    <InfoTooltip align="left" text={row.tip}>
+                      {row.feature}
+                    </InfoTooltip>
+                  </td>
+                  <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
+                    {row.aiRuns}
+                  </td>
+                  <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
+                    {row.tokens}
+                  </td>
+                  <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
+                    {row.webSearches.toLocaleString()}
+                  </td>
+                  <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
+                    ${row.aiCost.toFixed(2)}
+                  </td>
+                  <td className={`py-3.5 px-6 font-semibold text-[0.8125rem] ${getShareOfCostColor(row.shareOfCost)}`}>
+                    {row.shareOfCost}%
+                  </td>
+                </tr>
+              ))}
+              {/* Total Row */}
+              <tr className="border-t border-gray-200 hover:bg-gray-50/70 transition-colors">
+                <td className="py-3.5 px-6 font-bold text-[0.8125rem] text-[#0D212C]">
+                  Total
+                </td>
+                <td className="py-3.5 px-6 font-bold text-[0.8125rem] text-[#0D212C]">
+                  {featureUsageTotals.runs}
+                </td>
+                <td className="py-3.5 px-6 font-bold text-[0.8125rem] text-[#0D212C]">
+                  {featureUsageTotals.tokens}
+                </td>
+                <td className="py-3.5 px-6 font-bold text-[0.8125rem] text-[#0D212C]">
+                  {featureUsageTotals.searches}
+                </td>
+                <td className="py-3.5 px-6 font-bold text-[0.8125rem] text-[#0D212C]">
+                  {featureUsageTotals.cost}
+                </td>
+                <td className="py-3.5 px-6"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1167,6 +1477,7 @@ export default function UsageInsights() {
               <div className="pb-2.5">
                 <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
                   Top Reports
+                  <InfoTooltip align="left" text="Domains most requested in Part A reports this week." />
                 </h3>
                 <p className="text-[11px] text-gray-400 font-normal mt-0.5">
                   Based on Part A reports
@@ -1189,6 +1500,7 @@ export default function UsageInsights() {
               <div className="pb-2.5">
                 <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
                   Top countries
+                  <InfoTooltip align="left" text="Countries most requested this week, from Part A reports and Part B country decks." />
                 </h3>
                 <p className="text-[11px] text-gray-400 font-normal mt-0.5">
                   Based on Part A reports and Part B country decks
@@ -1211,6 +1523,7 @@ export default function UsageInsights() {
               <div className="pb-2.5">
                 <h3 className="text-xs sm:text-sm font-semibold text-[#0D212C] font-['Poppins']">
                   Top solutions (Magic Mode)
+                  <InfoTooltip align="left" text="Solutions most requested this week, from Part B solution decks." />
                 </h3>
                 <p className="text-[11px] text-gray-400 font-normal mt-0.5">
                   Based on Part B solution decks
