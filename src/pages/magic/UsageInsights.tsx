@@ -69,32 +69,12 @@ interface FeatureUsageItem {
   feature: string;
   tip: string;
   aiRuns: number;
-  tokens: string;
+  failedRuns: number;
+  tokens: number;
   webSearches: number;
   aiCost: number;
   shareOfCost: number;
 }
-
-const FEATURE_USAGE_DATA: FeatureUsageItem[] = [
-  {
-    feature: 'Part A reports',
-    tip: 'Health-Tech landscape reports.',
-    aiRuns: 14,
-    tokens: '15.4M',
-    webSearches: 760,
-    aiCost: 52.40,
-    shareOfCost: 65,
-  },
-  {
-    feature: 'Magic Mode scoring',
-    tip: 'Country research, solution scoring, catalogue and roadmap AI, and GTM decks. The quarterly refresh counts as one run.',
-    aiRuns: 9,
-    tokens: '4.1M',
-    webSearches: 190,
-    aiCost: 11.30,
-    shareOfCost: 14,
-  },
-];
 
 const getShareOfCostColor = (pct: number): string => {
   if (pct >= 70) return 'text-emerald-600';
@@ -480,18 +460,49 @@ export default function UsageInsights() {
     { label: 'Pop Health', value: 2 },
   ];
 
-  // Totals for Feature Usage & Cost breakdown table (corrected: 14+9=23, 15.4+4.1=19.5M, 760+190=950, $52.40+$11.30=$63.70)
+  // Feature Usage & Cost breakdown derived from the week's totals (same split as the design prototype):
+  // Part A reports take 62% of tokens, 61% of searches and 65% of AI cost; Magic Mode gets the rest
+  const featureUsageData = useMemo<FeatureUsageItem[]>(() => {
+    const totalTokens = parseFloat(weekTokensConsumed);
+    const partATokens = parseFloat((totalTokens * 0.62).toFixed(1));
+    const partASearches = Math.round(weekWebSearches * 0.61);
+    const partACost = parseFloat((totalAiCost * 0.65).toFixed(2));
+    const magicCost = parseFloat((totalAiCost - partACost).toFixed(2));
+    const share = (cost: number) => (totalAiCost > 0 ? Math.round((cost / totalAiCost) * 100) : 0);
+    return [
+      {
+        feature: 'Part A reports',
+        tip: 'Health-Tech landscape reports.',
+        aiRuns: weekReportsCount + 2,
+        failedRuns: 2,
+        tokens: partATokens,
+        webSearches: partASearches,
+        aiCost: partACost,
+        shareOfCost: share(partACost),
+      },
+      {
+        feature: 'Magic Mode scoring',
+        tip: 'Country research, solution scoring, catalogue and roadmap AI, and GTM decks. The quarterly refresh counts as one run.',
+        aiRuns: weekDecksCount + 9 + 1,
+        failedRuns: 1,
+        tokens: parseFloat((totalTokens - partATokens).toFixed(1)),
+        webSearches: weekWebSearches - partASearches,
+        aiCost: magicCost,
+        shareOfCost: share(magicCost),
+      },
+    ];
+  }, [weekTokensConsumed, weekWebSearches, weekReportsCount, weekDecksCount, totalAiCost]);
+
+  // Totals equal the KPI cards (tokens consumed, web searches, estimated AI cost)
   const featureUsageTotals = useMemo(() => {
-    const runs = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.aiRuns, 0);
-    const searches = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.webSearches, 0);
-    const cost = FEATURE_USAGE_DATA.reduce((acc, r) => acc + r.aiCost, 0);
+    const runs = featureUsageData.reduce((acc, r) => acc + r.aiRuns, 0);
     return {
       runs,
-      tokens: '19.5M',
-      searches: searches.toLocaleString(),
-      cost: `$${cost.toFixed(2)}`,
+      tokens: `${parseFloat(weekTokensConsumed).toFixed(1)}M`,
+      searches: weekWebSearches.toLocaleString(),
+      cost: `$${totalAiCost.toFixed(2)}`,
     };
-  }, []);
+  }, [featureUsageData, weekTokensConsumed, weekWebSearches, totalAiCost]);
 
   return (
     <div className="w-full px-5 py-6 md:py-8 space-y-6">
@@ -1415,7 +1426,7 @@ export default function UsageInsights() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-[0.875rem]">
-              {FEATURE_USAGE_DATA.map((row) => (
+              {featureUsageData.map((row) => (
                 <tr key={row.feature} className="hover:bg-gray-50/70 transition-colors">
                   <td className="py-3.5 px-6 font-normal text-[0.8125rem] text-[#0D212C]">
                     <InfoTooltip align="left" text={row.tip}>
@@ -1423,10 +1434,11 @@ export default function UsageInsights() {
                     </InfoTooltip>
                   </td>
                   <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
-                    {row.aiRuns}
+                    {row.aiRuns}{' '}
+                    <span className="text-[11px] font-normal text-gray-400">({row.failedRuns} failed)</span>
                   </td>
                   <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
-                    {row.tokens}
+                    {row.tokens.toFixed(1)}M
                   </td>
                   <td className="py-3.5 px-6 font-semibold text-[0.8125rem] text-[#0D212C]">
                     {row.webSearches.toLocaleString()}
