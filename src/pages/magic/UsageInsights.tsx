@@ -786,17 +786,17 @@ export default function UsageInsights() {
                 />
               </div>
 
-              {/* Row 2: People per output */}
+              {/* Row 2: People */}
               <div className="py-2.5 sm:py-3 flex items-center justify-between gap-3">
                 <div className="text-xs sm:text-[13px] text-gray-800 leading-tight">
                   <div className="font-medium text-gray-800 flex items-center gap-1">
-                    People per output
+                    People
                     <InfoTooltip
                       align="left"
                       text="How many people would work on one report or deck by hand. Each person works the manual hours above."
                     />
                   </div>
-                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">people working on one report or deck</div>
+                  <div className="text-[11px] text-gray-400 font-normal mt-0.5">Number of people working on the research and report or deck</div>
                 </div>
                 <NumericStepperInput
                   value={formPeoplePerOutput}
